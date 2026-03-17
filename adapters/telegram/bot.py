@@ -518,6 +518,14 @@ async def text_message_handler(update: Update, context: ContextTypes.DEFAULT_TYP
             await message.reply_text("❌ 服务器错误，请稍后重试", reply_markup=get_main_menu_keyboard())
         return
 
+    message = update.message
+    if message is not None and getattr(getattr(message, "chat", None), "type", "") == "private":
+        await message.reply_text(
+            "当前私聊不支持自由聊天，请使用 /start、命令菜单，或点击下方按钮。",
+            reply_markup=get_main_menu_keyboard(),
+        )
+        return
+
     return
 
 def require_account(handler):
@@ -5359,9 +5367,13 @@ def main():
     def _make_chat_filter():
         if not _allowed_chat_ids:
             return filters.ALL
-        return filters.Chat(chat_id=list(_allowed_chat_ids))
+        return filters.ChatType.PRIVATE | filters.Chat(chat_id=list(_allowed_chat_ids))
 
     _chat_filter = _make_chat_filter()
+    if _allowed_chat_ids:
+        logger.info("Telegram chat filter enabled: private chats + %s", sorted(_allowed_chat_ids))
+    else:
+        logger.info("Telegram chat filter enabled: all chats")
 
     # 命令处理器（/xian_ 前缀 + 兼容旧命令）
     app.add_handler(CommandHandler(["xian_start", "start"], start_cmd, filters=_chat_filter))
