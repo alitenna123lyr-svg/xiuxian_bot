@@ -490,7 +490,7 @@ def _create_indexes(cur) -> None:
         "CREATE INDEX IF NOT EXISTS idx_sect_branch_members_user ON sect_branch_members(user_id)",
         "CREATE INDEX IF NOT EXISTS idx_sect_branch_requests_parent ON sect_branch_requests(parent_sect_id, status)",
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_sect_branch_req_pending_unique ON sect_branch_requests(parent_sect_id, applicant_user_id) WHERE status = 'pending'",
-        "CREATE UNIQUE INDEX IF NOT EXISTS idx_social_chat_pending_pair ON social_chat_requests(CASE WHEN from_user_id < to_user_id THEN from_user_id ELSE to_user_id END, CASE WHEN from_user_id < to_user_id THEN to_user_id ELSE from_user_id END) WHERE status = 'pending'",
+        "CREATE INDEX IF NOT EXISTS idx_social_chat_from_to ON social_chat_requests(from_user_id, to_user_id) WHERE status = 'pending'",
         # 炼丹索引
         "CREATE INDEX IF NOT EXISTS idx_alchemy_logs_user ON alchemy_logs(user_id)",
         # 掉落保底索引

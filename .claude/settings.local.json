@@ -12,7 +12,8 @@
       "Bash(python:*)",
       "Bash(pip install:*)",
       "Bash(uv:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(PGPASSWORD=mycompany psql:*)"
     ]
   }
 }
