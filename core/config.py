@@ -110,12 +110,15 @@ class _AppConfig:
 
     def telegram_token(self) -> str:
         return os.environ.get("XXBOT_TELEGRAM_TOKEN") or \
+               os.environ.get("TELEGRAM_BOT_TOKEN") or \
+               os.environ.get("BOT_TOKEN") or \
                self.get_nested("tokens", "telegram_token", default="")
 
     @property
     def internal_api_token(self) -> str:
         """核心服务内部调用令牌。"""
         return os.environ.get("XXBOT_INTERNAL_API_TOKEN") or \
+               os.environ.get("INTERNAL_TOKEN") or \
                self.get_nested("core_server", "api_token", default="") or \
                self.telegram_token()
 

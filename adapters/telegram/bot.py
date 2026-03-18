@@ -5358,9 +5358,19 @@ def main():
         logger.error("No telegram token configured (set XXBOT_TELEGRAM_TOKEN env var)")
         return
 
+    if os.environ.get("XXBOT_TELEGRAM_TOKEN"):
+        token_source = "XXBOT_TELEGRAM_TOKEN"
+    elif os.environ.get("TELEGRAM_BOT_TOKEN"):
+        token_source = "TELEGRAM_BOT_TOKEN"
+    elif os.environ.get("BOT_TOKEN"):
+        token_source = "BOT_TOKEN"
+    else:
+        token_source = "config.json tokens.telegram_token"
+
     request = _build_telegram_request(for_updates=False)
     get_updates_request = _build_telegram_request(for_updates=True)
     logger.info("Telegram outbound proxy: %s", TELEGRAM_PROXY_URL or "disabled")
+    logger.info("Telegram token source: %s (%s)", token_source, _mask_bot_token(token))
 
     app = (
         Application.builder()
