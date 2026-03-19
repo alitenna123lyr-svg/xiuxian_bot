@@ -1172,7 +1172,7 @@ def settle_quest_claim(
 
     resp = {
         "success": True,
-        "message": f"领取成功！获得 {rewards_scaled.get('copper', 0)} 铜币，{rewards_scaled.get('exp', 0)} 修为",
+        "message": f"领取成功！获得 {rewards_scaled.get('copper', 0)} 下品灵石，{rewards_scaled.get('exp', 0)} 修为",
         "rewards": rewards_scaled,
     }
     log_event(
@@ -1475,7 +1475,7 @@ def settle_enhance(
 
     if user.get("copper", 0) < cost:
         _log_enhance(False, reason="INSUFFICIENT", meta={"item_db_id": item_db_id, "strategy": strategy, "cost": cost})
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {cost} 铜币"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {cost} 下品灵石"}, 400)
     mat_row = fetch_one(
         "SELECT id, quantity FROM items WHERE user_id = ? AND item_id = ? AND item_type = 'material' ORDER BY id ASC LIMIT 1",
         (user_id, mat_id),
@@ -1590,7 +1590,7 @@ def settle_enhance(
             _log_enhance(False, reason="NOT_FOUND", meta={"item_db_id": item_db_id, "strategy": strategy})
             return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "物品不存在"}, 404)
         _log_enhance(False, reason="INSUFFICIENT", meta={"item_db_id": item_db_id, "strategy": strategy, "cost": copper_spent})
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {copper_spent} 铜币"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {copper_spent} 下品灵石"}, 400)
 
     if enhance_success:
         message = f"{strategy_name}成功！{item['item_name'].split(' +')[0]} +{new_level}"

@@ -57,6 +57,17 @@ def log_action(event: str, user_id: str = "", request_id: str | None = None,
     }
     try:
         logger.info(json.dumps(payload, ensure_ascii=False))
+        try:
+            from core.services.audit_log_service import write_audit_log
+            write_audit_log(
+                module=str(event or "core").split("_")[0],
+                action=str(event or ""),
+                user_id=str(user_id or ""),
+                success=(result or "") != "error",
+                detail=payload,
+            )
+        except Exception:
+            pass
     except Exception as exc:
         context_fields = []
         for key in ("request_id", "session_id", "monster_id", "realm_id", "item_id", "skill_id"):

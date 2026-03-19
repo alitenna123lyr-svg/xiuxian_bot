@@ -570,6 +570,12 @@ def _create_indexes(cur) -> None:
         # Story progression indexes
         "CREATE INDEX IF NOT EXISTS idx_story_unlocks_user_order ON user_story_unlocks(user_id, chapter_order)",
         "CREATE INDEX IF NOT EXISTS idx_story_unlocks_user_claimed ON user_story_unlocks(user_id, claimed)",
+        # Audit and bounty indexes
+        "CREATE INDEX IF NOT EXISTS idx_audit_logs_ts ON audit_logs(created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id, created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_bounty_status_created ON bounty_orders(status, created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_bounty_poster ON bounty_orders(poster_user_id, created_at)",
+        "CREATE INDEX IF NOT EXISTS idx_bounty_claimer ON bounty_orders(claimer_user_id, created_at)",
         # Metrics & reports
         "CREATE INDEX IF NOT EXISTS idx_event_logs_ts ON event_logs(ts)",
         "CREATE INDEX IF NOT EXISTS idx_event_logs_user_event ON event_logs(user_id, event)",
@@ -631,6 +637,14 @@ def create_tables(conn: Optional[object] = None) -> None:
             dy_times INTEGER DEFAULT 0,
             copper INTEGER DEFAULT 0,
             gold INTEGER DEFAULT 0,
+            spirit_high INTEGER DEFAULT 0,
+            spirit_exquisite INTEGER DEFAULT 0,
+            spirit_supreme INTEGER DEFAULT 0,
+            immortal_flawed INTEGER DEFAULT 0,
+            immortal_low INTEGER DEFAULT 0,
+            immortal_mid INTEGER DEFAULT 0,
+            immortal_high INTEGER DEFAULT 0,
+            immortal_supreme INTEGER DEFAULT 0,
             asc_reduction INTEGER DEFAULT 0,
             sign INTEGER DEFAULT 0,
             element TEXT,
@@ -687,6 +701,8 @@ def create_tables(conn: Optional[object] = None) -> None:
             gacha_free_today INTEGER DEFAULT 0,
             gacha_paid_today INTEGER DEFAULT 0,
             gacha_daily_reset INTEGER DEFAULT 0,
+            daily_cultivate_stone_day INTEGER DEFAULT 0,
+            daily_cultivate_stone_claimed INTEGER DEFAULT 0,
             telegram_id TEXT
         )
         """
@@ -824,6 +840,16 @@ def create_tables(conn: Optional[object] = None) -> None:
         ("gacha_free_today", "ALTER TABLE users ADD COLUMN gacha_free_today INTEGER DEFAULT 0"),
         ("gacha_paid_today", "ALTER TABLE users ADD COLUMN gacha_paid_today INTEGER DEFAULT 0"),
         ("gacha_daily_reset", "ALTER TABLE users ADD COLUMN gacha_daily_reset INTEGER DEFAULT 0"),
+        ("spirit_high", "ALTER TABLE users ADD COLUMN spirit_high INTEGER DEFAULT 0"),
+        ("spirit_exquisite", "ALTER TABLE users ADD COLUMN spirit_exquisite INTEGER DEFAULT 0"),
+        ("spirit_supreme", "ALTER TABLE users ADD COLUMN spirit_supreme INTEGER DEFAULT 0"),
+        ("immortal_flawed", "ALTER TABLE users ADD COLUMN immortal_flawed INTEGER DEFAULT 0"),
+        ("immortal_low", "ALTER TABLE users ADD COLUMN immortal_low INTEGER DEFAULT 0"),
+        ("immortal_mid", "ALTER TABLE users ADD COLUMN immortal_mid INTEGER DEFAULT 0"),
+        ("immortal_high", "ALTER TABLE users ADD COLUMN immortal_high INTEGER DEFAULT 0"),
+        ("immortal_supreme", "ALTER TABLE users ADD COLUMN immortal_supreme INTEGER DEFAULT 0"),
+        ("daily_cultivate_stone_day", "ALTER TABLE users ADD COLUMN daily_cultivate_stone_day INTEGER DEFAULT 0"),
+        ("daily_cultivate_stone_claimed", "ALTER TABLE users ADD COLUMN daily_cultivate_stone_claimed INTEGER DEFAULT 0"),
         ("telegram_id", "ALTER TABLE users ADD COLUMN telegram_id TEXT"),
         ("max_signin_days", "ALTER TABLE users ADD COLUMN max_signin_days INTEGER DEFAULT 0"),
         ("signin_month_key", "ALTER TABLE users ADD COLUMN signin_month_key TEXT DEFAULT ''"),
@@ -1494,6 +1520,39 @@ def create_tables(conn: Optional[object] = None) -> None:
         )
         """
     )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id SERIAL PRIMARY KEY,
+            module TEXT NOT NULL,
+            action TEXT NOT NULL,
+            user_id TEXT DEFAULT '',
+            target_user_id TEXT DEFAULT '',
+            success INTEGER DEFAULT 1,
+            detail_json TEXT DEFAULT '{}',
+            created_at INTEGER NOT NULL
+        )
+        """
+    )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS bounty_orders (
+            id SERIAL PRIMARY KEY,
+            poster_user_id TEXT NOT NULL,
+            wanted_item_id TEXT NOT NULL,
+            wanted_item_name TEXT NOT NULL,
+            wanted_quantity INTEGER NOT NULL,
+            reward_spirit_low INTEGER NOT NULL,
+            description TEXT DEFAULT '',
+            status TEXT DEFAULT 'open',
+            claimer_user_id TEXT,
+            created_at INTEGER NOT NULL,
+            claimed_at INTEGER DEFAULT 0,
+            completed_at INTEGER DEFAULT 0,
+            cancelled_at INTEGER DEFAULT 0
+        )
+        """
+    )
 
     # --- 创建索引 ---
     _create_indexes(cur)
@@ -1543,7 +1602,9 @@ def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
 # 允许通过 update_user() 修改的列（白名单防止SQL注入）
 VALID_USER_COLUMNS = frozenset({
     "in_game_username", "lang", "state", "exp", "rank", "dy_times",
-    "copper", "gold", "asc_reduction", "sign", "element",
+    "copper", "gold", "spirit_high", "spirit_exquisite", "spirit_supreme",
+    "immortal_flawed", "immortal_low", "immortal_mid", "immortal_high", "immortal_supreme",
+    "asc_reduction", "sign", "element",
     "hp", "mp", "max_hp", "max_mp", "attack", "defense", "crit_rate",
     "weak_until", "breakthrough_pity", "last_sign_timestamp",
     "consecutive_sign_days", "max_signin_days", "signin_month_key", "signin_month_days", "signin_month_claim_bits",
@@ -1559,6 +1620,7 @@ VALID_USER_COLUMNS = frozenset({
     "vitals_updated_at",
     "chat_energy_today", "chat_energy_reset",
     "gacha_free_today", "gacha_paid_today", "gacha_daily_reset",
+    "daily_cultivate_stone_day", "daily_cultivate_stone_claimed",
     "secret_loot_score", "alchemy_output_score",
 })
 

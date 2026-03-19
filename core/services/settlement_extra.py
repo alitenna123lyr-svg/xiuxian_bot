@@ -573,7 +573,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
             reason="INSUFFICIENT_COPPER",
             meta={"strategy": strategy, "cost": cost},
         )
-        return {"success": False, "code": "INSUFFICIENT_COPPER", "message": f"铜币不足，需要 {cost} 铜币"}, 400
+        return {"success": False, "code": "INSUFFICIENT_COPPER", "message": f"下品灵石不足，需要 {cost} 下品灵石"}, 400
 
     # Compute displayed success rate with pity (without changing the realm module).
     next_realm = get_next_realm(current_rank)
@@ -672,7 +672,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
     new_rank = next_realm["id"]
 
     if ok:
-        # 突破成功金币奖励（按境界阶段）
+        # 突破成功中品灵石奖励（按境界阶段）
         gold_reward = 0
         if new_rank >= 30:
             gold_reward = 5    # 大乘+
@@ -787,7 +787,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
                 return {
                     "success": False,
                     "code": "INSUFFICIENT_COPPER",
-                    "message": f"铜币不足，需要 {cost} 铜币",
+                    "message": f"下品灵石不足，需要 {cost} 下品灵石",
                     "copper": int((latest or {}).get("copper", 0) or 0),
                 }, 400
             if reason == "INSUFFICIENT_ITEM":
@@ -822,10 +822,10 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
             resp["message"] += "\n🛡️ 突破保护丹已生效。"
         if gold_reward > 0:
             resp["gold_reward"] = gold_reward
-            resp["message"] += f"\n🪙 额外获得 {gold_reward} 金币！"
+            resp["message"] += f"\n🪙 额外获得 {gold_reward} 中品灵石！"
         if copper_reward > 0:
             resp["copper_reward"] = copper_reward
-            resp["message"] += f"\n💰 生死破境额外获得 {copper_reward} 铜币！"
+            resp["message"] += f"\n💰 生死破境额外获得 {copper_reward} 下品灵石！"
         if item_row:
             resp["strategy_cost_text"] = (
                 "消耗突破丹 x1" if strategy == "steady" else f"消耗灵石 x{protect_material_need}"
@@ -970,7 +970,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
             return {
                 "success": False,
                 "code": "INSUFFICIENT_COPPER",
-                "message": f"铜币不足，需要 {cost} 铜币",
+                "message": f"下品灵石不足，需要 {cost} 下品灵石",
                 "copper": int((latest or {}).get("copper", 0) or 0),
             }, 400
         if reason == "INSUFFICIENT_ITEM":
@@ -1247,3 +1247,4 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
         return {"success": True, "message": message, "effect": effect, "value": int(new_pct)}, 200
 
     return {"success": False, "code": "INVALID", "message": "此物品无法使用"}, 400
+

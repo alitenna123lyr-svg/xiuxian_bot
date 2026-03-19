@@ -97,11 +97,13 @@ _MENU_COMMANDS = [
     BotCommand("xian_chat", "Chat"),
     BotCommand("xian_sect", "Sect"),
     BotCommand("xian_alchemy", "Alchemy"),
+    BotCommand("xian_currency", "Currency"),
     BotCommand("xian_convert", "Convert"),
     BotCommand("xian_gacha", "Gacha"),
     BotCommand("xian_achievements", "Achievements"),
     BotCommand("xian_codex", "Codex"),
     BotCommand("xian_events", "Events"),
+    BotCommand("xian_bounty", "Bounty"),
     BotCommand("xian_worldboss", "World boss"),
     BotCommand("xian_guide", "Guide"),
     BotCommand("xian_version", "Version"),
@@ -355,13 +357,8 @@ def _matches_pending_action(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         return False
     if int(context.user_data.get("pending_chat_id", 0) or 0) != int(getattr(getattr(message, "chat", None), "id", 0) or 0):
         return False
-    prompt_id = int(context.user_data.get("pending_prompt_id", 0) or 0)
-    if prompt_id <= 0:
-        return False
-    if message.chat and message.chat.type == "private":
-        return True
-    reply_to = getattr(message, "reply_to_message", None)
-    return bool(reply_to and int(getattr(reply_to, "message_id", 0) or 0) == prompt_id)
+    # Allow direct text input without mandatory reply-to in both private/group chats.
+    return True
 
 
 async def _reply_with_owned_panel(
@@ -412,7 +409,9 @@ async def _on_app_init(_app: Application) -> None:
             BotCommand("xian_bag", "储物袋"),
             BotCommand("xian_quest", "任务面板"),
             BotCommand("xian_sect", "宗门系统"),
+            BotCommand("xian_currency", "统一货币"),
             BotCommand("xian_gacha", "天机阁抽签"),
+            BotCommand("xian_bounty", "全服悬赏会"),
             BotCommand("xian_pvp", "切磋挑战"),
             BotCommand("xian_rank", "修仙排行榜"),
             BotCommand("xian_guide", "修仙指南"),
@@ -621,6 +620,7 @@ def get_main_menu_keyboard():
             InlineKeyboardButton("🏛️ 宗门", callback_data="sect_menu"),
         ],
         [
+            InlineKeyboardButton("💱 货币", callback_data="currency_menu"),
             InlineKeyboardButton("🔁 转化", callback_data="convert_menu"),
             InlineKeyboardButton("🧪 炼丹", callback_data="alchemy_menu"),
         ],
@@ -636,6 +636,7 @@ def get_main_menu_keyboard():
         [
             InlineKeyboardButton("🎉 活动", callback_data="events_menu"),
             InlineKeyboardButton("🐲 世界BOSS", callback_data="worldboss_menu"),
+            InlineKeyboardButton("📜 悬赏会", callback_data="bounty_menu"),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -984,8 +985,8 @@ async def hunt_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 🎁 *奖励:*
 • 修为: +{result['rewards']['exp']:,}
-• 铜币: +{result['rewards']['copper']:,}
-{f"• 金币: +{result['rewards']['gold']}" if result['rewards']['gold'] > 0 else ""}
+• 下品灵石: +{result['rewards']['copper']:,}
+{f"• 中品灵石: +{result['rewards']['gold']}" if result['rewards']['gold'] > 0 else ""}
 
 回合数: {result['rounds']}
 """
@@ -1110,7 +1111,7 @@ def _build_guide_text() -> str:
 
 🧭 *基础说明*
 • 修炼：挂机积累修为，是最稳定的成长来源
-• 狩猎：打怪拿修为、铜币、掉落和部分装备
+• 狩猎：打怪拿修为、下品灵石、掉落和部分装备
 • 突破：修为足够后冲击下一境界，失败也有保底推进
 • 秘境：每天限次探索，按路线拿不同收益
 • 炼丹：做阶段目标丹、路线丹和稀有配方
@@ -1119,11 +1120,11 @@ def _build_guide_text() -> str:
 🗺️ *玩法阶段*
 • 练气到筑基：以基础资源、低级炼丹、日常成长为主
 • 金丹到元婴：以突破准备、装备强化、妖丹积累为主
-• 化神以上：以高阶秘境、金币资源、稀有材料追逐为主
+• 化神以上：以高阶秘境、中品灵石资源、稀有材料追逐为主
 
 💰 *资源说明*
-• 铜币：日常消耗资源，用于补给、基础炼丹、普通强化
-• 金币：稀缺推进资源，用于关键购买、突破窗口、高价值机会
+• 下品灵石：日常消耗资源，用于补给、基础炼丹、普通强化
+• 中品灵石：稀缺推进资源，用于关键购买、突破窗口、高价值机会
 
 🧱 *材料流派*
 • 铁矿石：强化流，主要用于锻造和强化
@@ -1160,8 +1161,8 @@ def _format_post_battle_status(status: dict | None) -> str:
         f"• 攻击: {status.get('attack', 0)}\n"
         f"• 防御: {status.get('defense', 0)}\n"
         f"• 修为: {status.get('exp', 0):,}\n"
-        f"• 铜币: {status.get('copper', 0):,}\n"
-        f"• 金币: {status.get('gold', 0):,}\n"
+        f"• 下品灵石: {status.get('copper', 0):,}\n"
+        f"• 中品灵石: {status.get('gold', 0):,}\n"
     )
 
 
@@ -1378,6 +1379,75 @@ def _format_leaderboard_text(mode: str, entries: list[dict], stage_goal: dict | 
     return text
 
 
+async def _build_currency_menu(uid: str):
+    data = await http_get(f"{SERVER_URL}/api/currency/{uid}", timeout=15)
+    if not data.get("success"):
+        return "❌ 获取货币信息失败", [[InlineKeyboardButton("🔙 返回", callback_data="main_menu")]]
+    tiers = data.get("tiers", []) or []
+    rules = data.get("rules", {})
+    rate = int(rules.get("exchange_rate", 1000) or 1000)
+    text = "💱 *统一货币*\n\n"
+    spirit_rows = [r for r in tiers if str(r.get("group")) == "spirit"]
+    immortal_rows = [r for r in tiers if str(r.get("group")) == "immortal"]
+    if spirit_rows:
+        text += "灵石：\n"
+        for row in spirit_rows:
+            text += f"• {row.get('label')}: {int(row.get('amount', 0) or 0):,}\n"
+        text += "\n"
+    if immortal_rows:
+        text += "仙石：\n"
+        for row in immortal_rows:
+            unlocked = bool(row.get("unlocked"))
+            amt_text = f"{int(row.get('amount', 0) or 0):,}" if unlocked else "未开启"
+            text += f"• {row.get('label')}: {amt_text}\n"
+        if not all(bool(r.get("unlocked")) for r in immortal_rows):
+            text += "提示：你已知晓仙石体系，需个人飞升仙界后开启。\n"
+        text += "\n"
+    else:
+        text += "仙石：当前境界尚未知晓。\n\n"
+    text += (
+        f"兑换规则：相邻档位 1:{rate}\n"
+        "用法：`/currency up <下品数量>`、`/currency down <中品数量>`\n"
+        "进阶：`/currency <源货币ID> <目标货币ID> <数量>`"
+    )
+    keyboard = [
+        [
+            InlineKeyboardButton("⬆️ 下转中(1000)", callback_data="currency_exchange_up_1000"),
+            InlineKeyboardButton("⬇️ 中转下(1)", callback_data="currency_exchange_down_1"),
+        ],
+        [InlineKeyboardButton("🔄 刷新", callback_data="currency_menu")],
+        [InlineKeyboardButton("🔙 返回", callback_data="main_menu")],
+    ]
+    return text, keyboard
+
+
+async def _build_bounty_menu():
+    data = await http_get(f"{SERVER_URL}/api/bounties", params={"status": "open", "limit": 12}, timeout=15)
+    if not data.get("success"):
+        return "❌ 获取悬赏会失败", [[InlineKeyboardButton("🔙 返回", callback_data="main_menu")]]
+    rows = data.get("bounties", []) or []
+    text = "📜 *悬赏会（全服）*\n\n"
+    if not rows:
+        text += "当前暂无公开悬赏。\n"
+    else:
+        for row in rows[:12]:
+            text += (
+                f"#{row.get('id')} ｜ {row.get('poster_name', row.get('poster_user_id', '未知'))}\n"
+                f"需求: {row.get('wanted_item_name', row.get('wanted_item_id'))} x{row.get('wanted_quantity', 0)}\n"
+                f"奖励: {row.get('reward_spirit_low', 0)} 下品灵石\n"
+            )
+            if row.get("description"):
+                text += f"备注: {row.get('description')}\n"
+            text += "\n"
+    text += "命令：`/bounty publish <道具ID> <数量> <奖励下品灵石> [描述]`\n"
+    text += "命令：`/bounty accept <悬赏ID>` ｜ `/bounty submit <悬赏ID>`"
+    keyboard = [
+        [InlineKeyboardButton("🔄 刷新", callback_data="bounty_menu")],
+        [InlineKeyboardButton("🔙 返回", callback_data="main_menu")],
+    ]
+    return text, keyboard
+
+
 async def _build_convert_menu(uid: str):
     data = await http_get(f"{SERVER_URL}/api/convert/options/{uid}", timeout=15)
     if not data.get("success"):
@@ -1394,11 +1464,11 @@ async def _build_convert_menu(uid: str):
         for key, info in routes.items():
             text += f"• {info.get('name', key)}：{info.get('desc', '')}\n"
         text += "\n"
-    text += "说明：稳妥/投机仅消耗铜币与精力；专精路线会额外消耗催化材料。\n\n"
+    text += "说明：稳妥/投机仅消耗下品灵石与精力；专精路线会额外消耗催化材料。\n\n"
     if targets:
-        text += "可转资源（每批基础铜币消耗）：\n"
+        text += "可转资源（每批基础下品灵石消耗）：\n"
         for row in targets[:12]:
-            text += f"• {row.get('name')} ({row.get('item_id')}) - {row.get('base_copper')} 铜币\n"
+            text += f"• {row.get('name')} ({row.get('item_id')}) - {row.get('base_copper')} 下品灵石\n"
         text += "\n"
         text += "请选择路线："
         keyboard = [
@@ -1438,7 +1508,7 @@ async def _build_convert_route(uid: str, route: str):
     text = f"🔁 *{route_info.get('name', route)}*\n"
     if route_info.get("desc"):
         text += f"{route_info.get('desc')}\n"
-    text += "\n说明：稳妥/投机路线不需要背包材料，仅消耗铜币和精力。\n"
+    text += "\n说明：稳妥/投机路线不需要背包材料，仅消耗下品灵石和精力。\n"
     if route == "focused":
         text += "专精路线需要对应催化材料。\n"
     text += "\n"
@@ -1460,9 +1530,9 @@ async def _build_convert_route(uid: str, route: str):
     for row in targets[:12]:
         catalyst = row.get("focused_catalyst")
         if route == "focused" and catalyst:
-            text += f"• {row.get('name')} - {row.get('base_copper')} 铜币/批（专精材料: {catalyst}）\n"
+            text += f"• {row.get('name')} - {row.get('base_copper')} 下品灵石/批（专精材料: {catalyst}）\n"
         else:
-            text += f"• {row.get('name')} - {row.get('base_copper')} 铜币/批\n"
+            text += f"• {row.get('name')} - {row.get('base_copper')} 下品灵石/批\n"
         keyboard.append([
             InlineKeyboardButton(f"{row.get('name')} x1", callback_data=f"convert_do|{route}|{row.get('item_id')}|1"),
             InlineKeyboardButton("x5", callback_data=f"convert_do|{route}|{row.get('item_id')}|5"),
@@ -1503,7 +1573,7 @@ async def _build_alchemy_menu(uid: str):
                 f"  路线: {r.get('focus', '炼丹流')} ｜ 阶段: {r.get('stage_hint', '当前阶段')}\n"
                 f"  转化: {efficiency_text}\n"
                 f"  材料: {mats}\n"
-                f"  花费: {r.get('copper_cost', 0)} 铜币\n\n"
+                f"  花费: {r.get('copper_cost', 0)} 下品灵石\n\n"
             )
             keyboard.append([InlineKeyboardButton(f"炼制 {r.get('name')}", callback_data=f"alchemy_brew_{r.get('id')}")])
     keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
@@ -1517,12 +1587,12 @@ async def _build_forge_menu(uid: str):
     catalog = await http_get(f"{SERVER_URL}/api/forge/catalog/{uid}", timeout=15)
     text = (
         "🔨 *锻造/祭炼*\n\n"
-        "铁矿石属于强化流核心材料，用来把日常铜币转成装备与强化机会。\n"
+        "铁矿石属于强化流核心材料，用来把日常下品灵石转成装备与强化机会。\n"
         "普通锻造：随机出当前阶段装备，适合补装和开图鉴。\n"
         "定向锻造：指定做已收录装备，适合追目标和刷更高品质同名装备，消耗更高。\n"
         "定向锻造要求图鉴里已经收录过该装备。\n\n"
-        f"普通锻造: {st.get('cost_copper',0)} 铜币 + {st.get('material_need',0)} 个 {st.get('material_item_id','iron_ore')}\n"
-        f"定向锻造: {st.get('cost_copper',0) * 2} 铜币 + {st.get('material_need',0) * 2} 个 {st.get('material_item_id','iron_ore')}\n\n"
+        f"普通锻造: {st.get('cost_copper',0)} 下品灵石 + {st.get('material_need',0)} 个 {st.get('material_item_id','iron_ore')}\n"
+        f"定向锻造: {st.get('cost_copper',0) * 2} 下品灵石 + {st.get('material_need',0) * 2} 个 {st.get('material_item_id','iron_ore')}\n\n"
     )
     keyboard = [[InlineKeyboardButton("🔨 普通锻造", callback_data="forge_do")]]
     catalog_items = catalog.get("items", []) if catalog.get("success") else []
@@ -1553,7 +1623,7 @@ async def _build_gacha_menu(uid: str | None = None):
         "🎲 *抽奖*\n\n"
         f"今日免费：剩余 {free_remaining}/3 次，不消耗精力\n"
         f"今日付费：剩余 {paid_remaining}/15 次\n"
-        "规则：免费抽奖不耗精力；付费单抽消耗 1 金币 + 1 精力；五连消耗 4 金币 + 4 精力。\n\n"
+        "规则：免费抽奖不耗精力；付费单抽消耗 1 中品灵石 + 1 精力；五连消耗 4 中品灵石 + 4 精力。\n\n"
     )
     keyboard = []
     if not banners:
@@ -1701,7 +1771,7 @@ def _format_shop_intro(*, rank: int = 1) -> str:
         f"当前阶段：{stage.get('label')} - {stage.get('theme')}\n"
         f"阶段重点：{stage.get('focus')}\n"
         f"货币分工：{get_currency_role('copper')}\n"
-        f"金币定位：{get_currency_role('gold')}\n\n"
+        f"中品灵石定位：{get_currency_role('gold')}\n\n"
     )
 
 
@@ -1741,7 +1811,7 @@ def _build_shop_text(items: list[dict], *, rank: int = 1, category: str = "all")
         tag = item.get("tag")
         remaining_limit = item.get("remaining_limit")
         min_rank = int(item.get("min_rank", 1) or 1)
-        currency_name = "铜币" if item.get("currency") == "copper" else "金币"
+        currency_name = "下品灵石" if item.get("currency") == "copper" else "中品灵石"
         text += f"• *{item_name}* - {price} {currency_name}\n"
         if tag and tag != "常驻货架":
             text += f"  货架: {tag}\n"
@@ -1982,7 +2052,7 @@ def _build_breakthrough_preview(user_data: dict, *, strategy: str = "normal") ->
         f"⚡ *渡劫预告*\n"
         f"策略: *{strategy_name}*\n"
         f"你将从 *{current_realm['name']}* 冲击 *{next_realm['name']}*。\n"
-        f"消耗: {cost:,} 铜币\n"
+        f"消耗: {cost:,} 下品灵石\n"
         "额外消耗: 1 点精力\n"
         f"{extra_cost_text}\n"
         f"预计成功率: *{int(shown_rate * 100)}%*\n"
@@ -2007,9 +2077,9 @@ def _build_breakthrough_strategy_notes(user_data: dict) -> str:
     protect_rate = base_rate
     desperate_rate = base_rate
     return (
-        f"稳妥突破：消耗铜币 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
-        f"护脉突破：消耗铜币 + 灵石 x{protect_need}，成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
-        f"生死突破：只消耗铜币，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重"
+        f"稳妥突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
+        f"护脉突破：消耗下品灵石 + 灵石 x{protect_need}，成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
+        f"生死突破：只消耗下品灵石，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重"
     )
 
 
@@ -2050,8 +2120,8 @@ async def _build_worldboss_menu():
     text = (
         "🐲 *世界BOSS*\n\n"
         f"{boss.get('name')} HP: {boss.get('hp')}/{boss.get('max_hp')}\n"
-        "每次攻击都会拿到日常铜币和修为。\n"
-        "金丹后有机会掉妖丹，化神后有机会掉龙鳞或凤羽，击杀额外给金币。"
+        "每次攻击都会拿到日常下品灵石和修为。\n"
+        "金丹后有机会掉妖丹，化神后有机会掉龙鳞或凤羽，击杀额外给中品灵石。"
     )
     keyboard = [
         [InlineKeyboardButton("⚔️ 攻击", callback_data="worldboss_attack")],
@@ -2324,7 +2394,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"{result.get('message', '')}\n"
                         f"回合数: {result.get('rounds', 0)}\n"
                         f"ELO 变化: {change.get('challenger', 0)}\n"
-                        f"奖励: {rewards.get('copper', 0)} 铜币, {rewards.get('exp', 0)} 修为\n"
+                        f"奖励: {rewards.get('copper', 0)} 下品灵石, {rewards.get('exp', 0)} 修为\n"
                     )
                 else:
                     text = f"❌ {result.get('message', '挑战失败')}"
@@ -2379,12 +2449,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"资金: {sect.get('fund_copper', 0)}铜 / {sect.get('fund_gold', 0)}金\n"
                         f"战绩: {sect.get('war_wins', 0)}胜 {sect.get('war_losses', 0)}负\n\n"
                         "使用命令：\n"
-                        "• 创建消耗：5000 铜币 + 10 金币\n"
-                        "• 别院申请：3000 铜币 + 3 金币，需宗主同意\n"
+                        "• 创建消耗：5000 下品灵石 + 10 中品灵石\n"
+                        "• 别院申请：3000 下品灵石 + 3 中品灵石，需宗主同意\n"
                         "• 每个别院最多 5 人\n"
                         "• `/sect list` 查看宗门列表\n"
                         "• `/sect branch_join <别院ID>`\n"
-                        "• `/sect donate <铜币> [金币]` 捐献\n"
+                        "• `/sect donate <下品灵石> [中品灵石]` 捐献\n"
                         "• `/sect branch_apply <名称> [描述]`\n"
                         "• `/sect branch_approve <申请ID>`\n"
                         "• `/sect branch_reject <申请ID>`\n"
@@ -2397,7 +2467,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "🏛️ *宗门系统*\n\n"
                         "你当前未加入宗门。\n\n"
                         "使用命令：\n"
-                        "• 创建消耗：5000 铜币 + 10 金币\n"
+                        "• 创建消耗：5000 下品灵石 + 10 中品灵石\n"
                         "• 宗门人数上限：10 人\n"
                         "• 宗门Buff：修炼+10% ｜ 属性+5% ｜ 战斗收益+10%\n"
                         "• 每个宗门最多 5 个附属别院\n"
@@ -2427,6 +2497,69 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"sect create prompt error: {e}")
             await _safe_edit("❌ 无法发起创建流程，请稍后重试", reply_markup=get_main_menu_keyboard())
+        return
+
+    if data == "currency_menu":
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": user_id},
+                timeout=15,
+            )
+            if r.get("success"):
+                uid = r["user_id"]
+                text, keyboard = await _build_currency_menu(uid)
+                await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+            else:
+                await _safe_edit("❌ 未找到账号，请先注册或稍后重试", reply_markup=get_main_menu_keyboard())
+        except Exception as e:
+            logger.error(f"currency menu error: {e}")
+            await _safe_edit("❌ 货币面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
+        return
+
+    if data.startswith("currency_exchange_"):
+        parts = data.split("_")
+        if len(parts) < 4:
+            return
+        direction = parts[2]
+        amount_text = parts[3]
+        try:
+            amount = int(amount_text)
+        except (TypeError, ValueError):
+            await _safe_edit("❌ 兑换参数错误", reply_markup=get_main_menu_keyboard())
+            return
+        if direction not in ("up", "down"):
+            await _safe_edit("❌ 兑换方向无效", reply_markup=get_main_menu_keyboard())
+            return
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": user_id},
+                timeout=15,
+            )
+            if r.get("success"):
+                uid = r["user_id"]
+                from_currency = "copper" if direction == "up" else "gold"
+                result = await http_post(
+                    f"{SERVER_URL}/api/currency/exchange",
+                    json={"user_id": uid, "from_currency": from_currency, "amount": amount},
+                    timeout=15,
+                )
+                msg = f"{'✅' if result.get('success') else '❌'} {result.get('message', '兑换失败')}"
+                text, keyboard = await _build_currency_menu(uid)
+                await query.message.reply_text(msg)
+                await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+            else:
+                await _safe_edit("❌ 未找到账号，请先注册或稍后重试", reply_markup=get_main_menu_keyboard())
+        except Exception as e:
+            logger.error(f"currency exchange callback error: {e}")
+            await _safe_edit(
+                "❌ 货币兑换失败，请稍后重试",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("💱 返回货币", callback_data="currency_menu")],
+                    [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+                ]),
+            )
         return
 
     if data == "convert_menu":
@@ -2526,7 +2659,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text = (
                         f"✅ {result.get('message', result.get('route_name', '转化完成'))}\n"
                         f"目标: {result.get('target_name')} x{result.get('output_quantity', 0)}\n"
-                        f"消耗: {result.get('cost_copper', 0)} 铜币{catalyst_text}"
+                        f"消耗: {result.get('cost_copper', 0)} 下品灵石{catalyst_text}"
                     )
                 else:
                     text = f"❌ {result.get('message', '转化失败')}"
@@ -2642,7 +2775,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         text += "\n本次为免费抽奖。"
                     else:
                         cost = result.get("cost", {})
-                        currency_name = "金币" if cost.get("currency") == "gold" else "铜币"
+                        currency_name = "中品灵石" if cost.get("currency") == "gold" else "下品灵石"
                         text += f"\n消耗：{cost.get('amount', 0)}{currency_name} + {result.get('stamina_cost', 0)}精力"
                 else:
                     text = f"❌ {result.get('message', '抽奖失败')}"
@@ -2725,6 +2858,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"worldboss menu error: {e}")
             await _safe_edit("❌ 世界BOSS面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
+        return
+
+    if data == "bounty_menu":
+        try:
+            text, keyboard = await _build_bounty_menu()
+            await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+        except Exception as e:
+            logger.error(f"bounty menu error: {e}")
+            await _safe_edit("❌ 悬赏会面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
         return
 
     if data.startswith("event_claim_"):
@@ -3218,9 +3360,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                 text += f"  {entry}\n"
                         text += "\n🎁 *奖励:*\n"
                         text += f"• 修为: +{rewards.get('exp', 0):,}\n"
-                        text += f"• 铜币: +{rewards.get('copper', 0):,}\n"
+                        text += f"• 下品灵石: +{rewards.get('copper', 0):,}\n"
                         if rewards.get("gold"):
-                            text += f"• 金币: +{rewards['gold']}\n"
+                            text += f"• 中品灵石: +{rewards['gold']}\n"
                         if drops:
                             text += "\n📦 *掉落:*\n"
                             for d in drops[:4]:
@@ -3867,9 +4009,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         for sk in not_learned:
                             cost_parts = []
                             if sk['cost_copper']:
-                                cost_parts.append(f"{sk['cost_copper']}铜")
+                                cost_parts.append(f"{sk['cost_copper']}下灵")
                             if sk['cost_gold']:
-                                cost_parts.append(f"{sk['cost_gold']}金")
+                                cost_parts.append(f"{sk['cost_gold']}中灵")
                             text += _skill_line(sk)
                             text = text.rstrip("\n") + f"（{' '.join(cost_parts)}）\n"
                             keyboard.append([InlineKeyboardButton(f"学习 {sk['name']}", callback_data=f"skill_learn_{sk['id']}")])
@@ -4019,7 +4161,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         focus_parts.append(f"MP+{focus_bonus['mp']}")
                     icon = "✅" if result.get("enhance_success", True) else "⚠️"
                     text = f"{icon} {result['message']}\n"
-                    text += f"消耗: {result.get('cost', 0)} 铜币\n"
+                    text += f"消耗: {result.get('cost', 0)} 下品灵石\n"
                     text += f"材料: {result.get('material', {}).get('used', 0)} x {result.get('material', {}).get('item_id', '')}\n"
                     if bonus_parts:
                         text += f"属性提升: {', '.join(bonus_parts)}"
@@ -4060,9 +4202,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         text = (
             "🔧 *选择强化策略*\n\n"
-            "保守强化：铜币更省，提升较稳，收益较低。\n"
+            "保守强化：下品灵石更省，提升较稳，收益较低。\n"
             "冲击强化：提升最高，但有失败风险。\n"
-            "材料专精强化：更吃材料，铜币更省，适合按路线培养。\n"
+            "材料专精强化：更吃材料，下品灵石更省，适合按路线培养。\n"
         )
         keyboard = [
             [InlineKeyboardButton("🛡️ 保守强化", callback_data=f"enhance_do_{item_db_id}_steady")],
@@ -4208,7 +4350,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             text += f"  • {m['name']} (HP:{m['hp']} ATK:{m['attack']})\n"
                     text += f"\n🎁 奖励范围:\n"
                     text += f"  • 修为: {exp_range[0]} - {exp_range[1]}\n"
-                    text += f"  • 铜币: {copper_range[0]} - {copper_range[1]}\n"
+                    text += f"  • 下品灵石: {copper_range[0]} - {copper_range[1]}\n"
                     if drops:
                         drop_names = []
                         for did in drops:
@@ -4328,9 +4470,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Rewards
                     text += "🎁 *探索收获:*\n"
                     text += f"  • 修为: +{rewards.get('exp', 0):,}\n"
-                    text += f"  • 铜币: +{rewards.get('copper', 0):,}\n"
+                    text += f"  • 下品灵石: +{rewards.get('copper', 0):,}\n"
                     if rewards.get("gold"):
-                        text += f"  • 金币: +{rewards['gold']}\n"
+                        text += f"  • 中品灵石: +{rewards['gold']}\n"
                     for drop in drops[:4]:
                         text += f"  • 掉落: *{drop.get('item_name', '未知物品')}*"
                         if drop.get("quantity", 1) > 1:
@@ -4452,9 +4594,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         text += f"⚠️ 机关余波: -{result.get('trap_damage')} HP\n\n"
                     text += f"📜 {event}\n\n🎁 *探索收获:*\n"
                     text += f"  • 修为: +{rewards.get('exp', 0):,}\n"
-                    text += f"  • 铜币: +{rewards.get('copper', 0):,}\n"
+                    text += f"  • 下品灵石: +{rewards.get('copper', 0):,}\n"
                     if rewards.get("gold"):
-                        text += f"  • 金币: +{rewards['gold']}\n"
+                        text += f"  • 中品灵石: +{rewards['gold']}\n"
                     for drop in drops[:4]:
                         text += f"  • 掉落: *{drop.get('item_name', '未知物品')}*"
                         if drop.get("quantity", 1) > 1:
@@ -4747,9 +4889,9 @@ async def skills_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for sk in not_learned:
                 cost_parts = []
                 if sk['cost_copper']:
-                    cost_parts.append(f"{sk['cost_copper']}铜")
+                    cost_parts.append(f"{sk['cost_copper']}下灵")
                 if sk['cost_gold']:
-                    cost_parts.append(f"{sk['cost_gold']}金")
+                    cost_parts.append(f"{sk['cost_gold']}中灵")
                 text += _skill_line(sk)
                 text = text.rstrip("\n") + f"（{' '.join(cost_parts)}）\n"
                 keyboard.append([InlineKeyboardButton(f"学习 {sk['name']}", callback_data=f"skill_learn_{sk['id']}")])
@@ -4788,7 +4930,7 @@ async def secret_realms_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 copper_range = realm.get("rewards", {}).get("copper", (0, 0))
                 text += f"▸ *{realm['name']}* ｜ 需求 Lv.{realm['min_rank']}\n"
                 text += f"  {realm['flavor']}\n"
-                text += f"  奖励: {exp_range[0]}-{exp_range[1]}修为 {copper_range[0]}-{copper_range[1]}铜币\n\n"
+                text += f"  奖励: {exp_range[0]}-{exp_range[1]}修为 {copper_range[0]}-{copper_range[1]}下品灵石\n\n"
                 if attempts_left > 0:
                     keyboard.append([InlineKeyboardButton(f"🗺️ {realm['name']}", callback_data=f"secret_realm_info_{realm['id']}")])
         else:
@@ -4882,13 +5024,13 @@ async def sect_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "🏛️ *宗门指令*\n\n"
                 "• `/sect info` 查看宗门信息\n"
                 "• `/sect list [关键字]` 查看宗门列表\n"
-                "• 创建消耗：5000 铜币 + 10 金币\n"
+                "• 创建消耗：5000 下品灵石 + 10 中品灵石\n"
                 "• 宗门人数上限：10 人\n"
                 "• 宗门Buff：修炼+10% ｜ 属性+5% ｜ 战斗收益+10%\n"
-                "• 别院申请：3000 铜币 + 3 金币，需宗主同意\n"
+                "• 别院申请：3000 下品灵石 + 3 中品灵石，需宗主同意\n"
                 "• 每个别院最多 5 人\n"
                 "• 别院成员享受宗门 Buff 的 90%\n"
-                "• `/sect donate <铜币> [金币]` 捐献\n"
+                "• `/sect donate <下品灵石> [中品灵石]` 捐献\n"
                 "• `/sect branch_apply <名称> [描述]`\n"
                 "• `/sect branch_join <别院ID>` 加入别院\n"
                 "• `/sect branch_approve <申请ID>` 批准别院\n"
@@ -4903,7 +5045,7 @@ async def sect_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             text = (
                 "🏛️ *宗门指令*\n\n"
-                "• 创建消耗：5000 铜币 + 10 金币\n"
+                "• 创建消耗：5000 下品灵石 + 10 中品灵石\n"
                 "• 宗门人数上限：10 人\n"
                 "• 宗门Buff：修炼+10% ｜ 属性+5% ｜ 战斗收益+10%\n"
                 "• 每个宗门最多 5 个附属别院\n"
@@ -5026,7 +5168,7 @@ async def sect_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 copper = int(args[1])
                 gold = int(args[2]) if len(args) >= 3 else 0
             except (TypeError, ValueError):
-                await update.message.reply_text("❌ 参数错误：/sect donate <铜币> [金币]，金额必须是整数")
+                await update.message.reply_text("❌ 参数错误：/sect donate <下品灵石> [中品灵石]，金额必须是整数")
                 return
             if copper < 0 or gold < 0:
                 await update.message.reply_text("❌ 参数错误：捐献金额不能为负数")
@@ -5152,6 +5294,96 @@ async def alchemy_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @require_account
+async def currency_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    uid = context.user_data["uid"]
+    args = context.args or []
+    try:
+        if len(args) >= 3:
+            from_currency = str(args[0] or "").strip()
+            to_currency = str(args[1] or "").strip()
+            try:
+                amount = int(args[2])
+            except (TypeError, ValueError):
+                await update.message.reply_text("❌ 参数错误：数量必须是整数")
+                return
+            result = await http_post(
+                f"{SERVER_URL}/api/currency/exchange",
+                json={"user_id": uid, "from_currency": from_currency, "to_currency": to_currency, "amount": amount},
+                timeout=15,
+            )
+            await update.message.reply_text(("✅ " if result.get("success") else "❌ ") + result.get("message", "兑换失败"))
+            return
+
+        if len(args) >= 2:
+            direction = str(args[0] or "").strip().lower()
+            from_currency = None
+            if direction in ("up", "to_mid", "mid", "上转", "中"):
+                from_currency = "copper"
+            elif direction in ("down", "to_low", "low", "下转", "下"):
+                from_currency = "gold"
+            if from_currency is None:
+                await update.message.reply_text("❌ 参数错误：/currency <up|down> <数量>")
+                return
+            try:
+                amount = int(args[1])
+            except (TypeError, ValueError):
+                await update.message.reply_text("❌ 参数错误：数量必须是整数")
+                return
+            result = await http_post(
+                f"{SERVER_URL}/api/currency/exchange",
+                json={"user_id": uid, "from_currency": from_currency, "amount": amount},
+                timeout=15,
+            )
+            if result.get("success"):
+                wallet = result.get("wallet", {})
+                text = (
+                    f"✅ {result.get('message', '兑换成功')}\n\n"
+                    f"下品灵石: {int(wallet.get('spirit_low', 0) or 0):,}\n"
+                    f"中品灵石: {int(wallet.get('spirit_mid', 0) or 0):,}"
+                )
+                await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+            else:
+                await update.message.reply_text(f"❌ {result.get('message', '兑换失败')}")
+            return
+
+        data = await http_get(f"{SERVER_URL}/api/currency/{uid}", timeout=15)
+        if not data.get("success"):
+            await update.message.reply_text(f"❌ {data.get('message', '获取货币信息失败')}")
+            return
+        tiers = data.get("tiers", []) or []
+        rules = data.get("rules", {})
+        rate = int(rules.get("exchange_rate", 1000) or 1000)
+        text = "💱 *统一货币*\n\n"
+        spirit_rows = [r for r in tiers if str(r.get("group")) == "spirit"]
+        immortal_rows = [r for r in tiers if str(r.get("group")) == "immortal"]
+        if spirit_rows:
+            text += "灵石：\n"
+            for row in spirit_rows:
+                text += f"• {row.get('label')}: {int(row.get('amount', 0) or 0):,}\n"
+            text += "\n"
+        if immortal_rows:
+            text += "仙石：\n"
+            for row in immortal_rows:
+                unlocked = bool(row.get("unlocked"))
+                amt = f"{int(row.get('amount', 0) or 0):,}" if unlocked else "未开启"
+                text += f"• {row.get('label')}: {amt}\n"
+            if not all(bool(r.get("unlocked")) for r in immortal_rows):
+                text += "提示：你已知晓仙石体系，需个人飞升仙界后开启。\n"
+            text += "\n"
+        else:
+            text += "仙石：当前境界尚未知晓。\n\n"
+        text += (
+            f"兑换规则：相邻档位 1:{rate}\n"
+            "用法：/currency up <下品数量> ｜ /currency down <中品数量>\n"
+            "进阶：/currency <源货币ID> <目标货币ID> <数量>"
+        )
+        await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+    except Exception as exc:
+        logger.error(f"currency error: {exc}")
+        await update.message.reply_text("❌ 服务器错误")
+
+
+@require_account
 async def convert_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = context.user_data["uid"]
     args = context.args or []
@@ -5189,7 +5421,7 @@ async def convert_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text = (
                     f"✅ {result.get('message', result.get('route_name', '转化完成'))}\n"
                     f"目标: {result.get('target_name')} x{result.get('output_quantity', 0)}\n"
-                    f"消耗: {result.get('cost_copper', 0)} 铜币{catalyst_text}"
+                    f"消耗: {result.get('cost_copper', 0)} 下品灵石{catalyst_text}"
                 )
                 await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
             else:
@@ -5245,7 +5477,7 @@ async def gacha_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text += "\n\n本次为免费抽奖。"
                 else:
                     cost = result.get("cost", {})
-                    currency_name = "金币" if cost.get("currency") == "gold" else "铜币"
+                    currency_name = "中品灵石" if cost.get("currency") == "gold" else "下品灵石"
                     text += f"\n\n消耗：{cost.get('amount', 0)}{currency_name} + {result.get('stamina_cost', 0)}精力"
                 await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
             else:
@@ -5371,6 +5603,104 @@ async def worldboss_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ 服务器错误")
 
 
+@require_account
+async def bounty_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    uid = context.user_data["uid"]
+    args = context.args or []
+    try:
+        if not args:
+            text, keyboard = await _build_bounty_menu()
+            await _reply_with_owned_panel(
+                update,
+                context,
+                text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+            return
+
+        action = str(args[0] or "").strip().lower()
+        if action == "publish":
+            if len(args) < 4:
+                await update.message.reply_text("用法：/bounty publish <道具ID> <数量> <奖励下品灵石> [描述]")
+                return
+            wanted_item_id = str(args[1]).strip()
+            try:
+                wanted_quantity = int(args[2])
+                reward_low = int(args[3])
+            except (TypeError, ValueError):
+                await update.message.reply_text("❌ 参数错误：数量和奖励必须是整数")
+                return
+            description = " ".join(args[4:]).strip() if len(args) > 4 else ""
+            result = await http_post(
+                f"{SERVER_URL}/api/bounty/publish",
+                json={
+                    "user_id": uid,
+                    "wanted_item_id": wanted_item_id,
+                    "wanted_quantity": wanted_quantity,
+                    "reward_spirit_low": reward_low,
+                    "description": description,
+                },
+                timeout=15,
+            )
+            await update.message.reply_text(("✅ " if result.get("success") else "❌ ") + result.get("message", "发布失败"))
+            return
+
+        if action == "accept":
+            if len(args) < 2:
+                await update.message.reply_text("用法：/bounty accept <悬赏ID>")
+                return
+            try:
+                bounty_id = int(args[1])
+            except (TypeError, ValueError):
+                await update.message.reply_text("❌ 参数错误：悬赏ID必须是整数")
+                return
+            result = await http_post(
+                f"{SERVER_URL}/api/bounty/accept",
+                json={"user_id": uid, "bounty_id": bounty_id},
+                timeout=15,
+            )
+            await update.message.reply_text(("✅ " if result.get("success") else "❌ ") + result.get("message", "接取失败"))
+            return
+
+        if action == "submit":
+            if len(args) < 2:
+                await update.message.reply_text("用法：/bounty submit <悬赏ID>")
+                return
+            try:
+                bounty_id = int(args[1])
+            except (TypeError, ValueError):
+                await update.message.reply_text("❌ 参数错误：悬赏ID必须是整数")
+                return
+            result = await http_post(
+                f"{SERVER_URL}/api/bounty/submit",
+                json={"user_id": uid, "bounty_id": bounty_id},
+                timeout=15,
+            )
+            await update.message.reply_text(("✅ " if result.get("success") else "❌ ") + result.get("message", "提交失败"))
+            return
+
+        if action == "list":
+            status = str(args[1] if len(args) >= 2 else "open")
+            data = await http_get(f"{SERVER_URL}/api/bounties", params={"status": status, "limit": 15}, timeout=15)
+            if not data.get("success"):
+                await update.message.reply_text(f"❌ {data.get('message', '获取悬赏失败')}")
+                return
+            lines = ["📜 悬赏会"]
+            for row in (data.get("bounties") or [])[:15]:
+                lines.append(
+                    f"#{row.get('id')} {row.get('wanted_item_name', row.get('wanted_item_id'))} x{row.get('wanted_quantity')} "
+                    f"=> {row.get('reward_spirit_low')} 下品灵石 ({row.get('status')})"
+                )
+            await update.message.reply_text("\n".join(lines))
+            return
+
+        await update.message.reply_text("用法：/bounty [list [open|claimed|completed]] | publish | accept | submit")
+    except Exception as exc:
+        logger.error(f"bounty error: {exc}")
+        await update.message.reply_text("❌ 服务器错误")
+
+
 # ==================== 主函数 ====================
 
 def load_config():
@@ -5459,11 +5789,13 @@ def main():
     app.add_handler(CommandHandler(["xian_chat", "xian_dao", "chat", "dao"], chat_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_sect", "sect"], sect_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_alchemy", "alchemy"], alchemy_cmd, filters=_chat_filter))
+    app.add_handler(CommandHandler(["xian_currency", "currency"], currency_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_convert", "convert"], convert_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_gacha", "gacha"], gacha_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_achievements", "xian_ach", "achievements", "ach"], achievements_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_codex", "codex"], codex_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_events", "events"], events_cmd, filters=_chat_filter))
+    app.add_handler(CommandHandler(["xian_bounty", "bounty"], bounty_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_worldboss", "xian_boss", "worldboss", "boss"], worldboss_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_guide", "xian_realms", "guide", "realms"], guide_cmd, filters=_chat_filter))
     app.add_handler(CommandHandler(["xian_version", "version"], version_cmd, filters=_chat_filter))
@@ -5492,11 +5824,13 @@ def main():
         BotCommand("xian_chat", "论道交流"),
         BotCommand("xian_sect", "宗门系统"),
         BotCommand("xian_alchemy", "炼丹系统"),
+        BotCommand("xian_currency", "统一货币"),
         BotCommand("xian_convert", "资源转化"),
         BotCommand("xian_gacha", "抽奖"),
         BotCommand("xian_achievements", "成就系统"),
         BotCommand("xian_codex", "图鉴"),
         BotCommand("xian_events", "活动"),
+        BotCommand("xian_bounty", "全服悬赏"),
         BotCommand("xian_worldboss", "世界BOSS"),
         BotCommand("xian_guide", "玩法说明"),
         BotCommand("xian_version", "版本信息"),
@@ -5525,3 +5859,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

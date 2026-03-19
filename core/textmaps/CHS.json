@@ -10,8 +10,8 @@
         "user_status": {
             "description": "用户状态详情",
             "type": "embed",
-            "text": "## 👤 {in_game_username}\n🆔 UID: `{user_id}`\n⭐ 境界: {stage_description} (第{rank}重)\n💫 修为: {exp:,}/{max_exp:,}\n📊 进度: {progress_bar} {progress:.1f}%\n🔥 五行: {element}\n💰 铜币: {copper:,}\n💎 元宝: {gold:,}\n📅 打野次数: {dy_times}/3\n🧘 状态: {state_text}",
-            "text_TG": "👤 *{in_game_username}*\n🆔 UID: `{user_id}`\n⭐ 境界: {stage_description} (第{rank}重)\n💫 修为: {exp:,}/{max_exp:,}\n📊 进度: {progress_bar} {progress:.1f}%\n🔥 五行: {element}\n💰 铜币: {copper:,}\n💎 元宝: {gold:,}\n📅 打野次数: {dy_times}/3\n🧘 状态: {state_text}",
+            "text": "## 👤 {in_game_username}\n🆔 UID: `{user_id}`\n⭐ 境界: {stage_description} (第{rank}重)\n💫 修为: {exp:,}/{max_exp:,}\n📊 进度: {progress_bar} {progress:.1f}%\n🔥 五行: {element}\n💰 下品灵石: {copper:,}\n💎 中品灵石: {gold:,}\n📅 打野次数: {dy_times}/3\n🧘 状态: {state_text}",
+            "text_TG": "👤 *{in_game_username}*\n🆔 UID: `{user_id}`\n⭐ 境界: {stage_description} (第{rank}重)\n💫 修为: {exp:,}/{max_exp:,}\n📊 进度: {progress_bar} {progress:.1f}%\n🔥 五行: {element}\n💰 下品灵石: {copper:,}\n💎 中品灵石: {gold:,}\n📅 打野次数: {dy_times}/3\n🧘 状态: {state_text}",
             "text_Matrix": ""
         },
         "no_account": {
@@ -52,7 +52,7 @@
         "xx_commands": {
             "description": "Command list for help",
             "type": "embed",
-            "text": "## 修仙指令列表（别名均为`^`开头，方便英文输入）：\n### 私聊/DM指令：\n- `开始` —— 创建账号。\n    别名：`^ks`、`^start`、`^begin`\n- `/acc` —— 查看账号细节，修改名称/语言。\n### 游戏指令：\n- `介绍` —— 获取修仙相关介绍。\n    别名：`^js`、`^intro`、`^intro`\n- `修炼` —— 修炼两小时（期间不可使用其他部分指令）。\n    别名：`^xl`、`^sit`、`^cul`\n- `打野` —— 击杀野怪（可获得铜币、修为，极小概率获得元宝）。\n    别名：`^dy`、`^wild`\n- `突破` —— 当当前修为达到上限的100%或更多时，使用此指令提升阶段。\n    别名：`^tp`、`^ascend`、`^asc`\n- `状态` —— 查看当前修为、状态。\n    别名：`^zt`、`^stat`\n- `物品栏` —— 查看当前物品栏。\n    别名：`^wp`、`^inv`\n- `测试` —— 查看当前测试版本详情。\n    别名：`^cs`、`^beta`、`^test`\n- `商店` —— 购买物品。\n    别名：`^sd`、`^shop`\n- `元素` —— 查看或选择元素。\n    别名：`^ys`、`^wx`、`^ele`\n- `探索` —— (test)探索。\n    别名：`^ts`、`^exp`\n- `挑战` —— (test)进行特殊挑战，例如副本。\n    别名：`^tz`、`^challenge`\n### 其他指令：\n- `/help` —— 显示此消息\n    别名： `帮助`、`指令`、`命令`、`^help`、`^h`、`^bz`\n- `/luck` —— 查看今日运势（纯属娱乐，无任何实际意义）\n- `/lunar` —— 查看黄历（可指定日期），信则有不信则无，请勿过度依赖\n修仙版本：`{xx_version} (Internal)`",
+            "text": "## 修仙指令列表（别名均为`^`开头，方便英文输入）：\n### 私聊/DM指令：\n- `开始` —— 创建账号。\n    别名：`^ks`、`^start`、`^begin`\n- `/acc` —— 查看账号细节，修改名称/语言。\n### 游戏指令：\n- `介绍` —— 获取修仙相关介绍。\n    别名：`^js`、`^intro`、`^intro`\n- `修炼` —— 修炼两小时（期间不可使用其他部分指令）。\n    别名：`^xl`、`^sit`、`^cul`\n- `打野` —— 击杀野怪（可获得下品灵石、修为，极小概率获得中品灵石）。\n    别名：`^dy`、`^wild`\n- `突破` —— 当当前修为达到上限的100%或更多时，使用此指令提升阶段。\n    别名：`^tp`、`^ascend`、`^asc`\n- `状态` —— 查看当前修为、状态。\n    别名：`^zt`、`^stat`\n- `物品栏` —— 查看当前物品栏。\n    别名：`^wp`、`^inv`\n- `测试` —— 查看当前测试版本详情。\n    别名：`^cs`、`^beta`、`^test`\n- `商店` —— 购买物品。\n    别名：`^sd`、`^shop`\n- `元素` —— 查看或选择元素。\n    别名：`^ys`、`^wx`、`^ele`\n- `探索` —— (test)探索。\n    别名：`^ts`、`^exp`\n- `挑战` —— (test)进行特殊挑战，例如副本。\n    别名：`^tz`、`^challenge`\n### 其他指令：\n- `/help` —— 显示此消息\n    别名： `帮助`、`指令`、`命令`、`^help`、`^h`、`^bz`\n- `/luck` —— 查看今日运势（纯属娱乐，无任何实际意义）\n- `/lunar` —— 查看黄历（可指定日期），信则有不信则无，请勿过度依赖\n修仙版本：`{xx_version} (Internal)`",
             "text_TG": "待添加",
             "text_Matrix": ""
         },
@@ -198,8 +198,8 @@
         }
     },
     "currency_display": {
-        "copper": "铜币",
-        "gold": "元宝"
+        "copper": "下品灵石",
+        "gold": "中品灵石"
     },
     "elements": {
         "金": "金",

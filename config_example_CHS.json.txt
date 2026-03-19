@@ -11,7 +11,8 @@
     "port": 11452                                           # 公共入口端口
   },
   "adapters": {                                             # 选择你需要Bot启动在哪些平台
-    "telegram": true
+    "telegram": true,
+    "aiogram": false
   },
   "tokens": {                                               # 机器人的Token/认证方式
     "telegram_token": "12345...."                           # 你的Telegram机器人的Token，可在BotFather获取（`https://t.me/BotFather`）

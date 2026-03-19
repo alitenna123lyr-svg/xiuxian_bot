@@ -5,6 +5,7 @@
 import logging
 from core.database.connection import fetch_one, refresh_user_stamina, refresh_user_vitals, DEFAULT_STAMINA_MAX
 from core.game.realms import get_realm_by_id, get_next_realm, format_realm_progress
+from core.game.currency import wallet_from_user
 from core.services.sect_service import apply_sect_stat_buffs, get_user_sect_buffs
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ def get_user_status(user_id):
             return None
         user = apply_sect_stat_buffs(user)
         sect_buffs = user.get("sect_buffs") or get_user_sect_buffs(user_id)
+        wallet = wallet_from_user(user)
 
         rank = user.get('rank', 1)
         realm = get_realm_by_id(rank)
@@ -51,6 +53,16 @@ def get_user_status(user_id):
             'element': element,
             'copper': user.get('copper', 0),
             'gold': user.get('gold', 0),
+            'spirit_stone_low': wallet.get('spirit_low', 0),
+            'spirit_stone_mid': wallet.get('spirit_mid', 0),
+            'spirit_stone_high': wallet.get('spirit_high', 0),
+            'spirit_stone_exquisite': wallet.get('spirit_exquisite', 0),
+            'spirit_stone_supreme': wallet.get('spirit_supreme', 0),
+            'immortal_stone_flawed': wallet.get('immortal_flawed', 0),
+            'immortal_stone_low': wallet.get('immortal_low', 0),
+            'immortal_stone_mid': wallet.get('immortal_mid', 0),
+            'immortal_stone_high': wallet.get('immortal_high', 0),
+            'immortal_stone_supreme': wallet.get('immortal_supreme', 0),
             'stamina': user.get('stamina', DEFAULT_STAMINA_MAX),
             'max_stamina': DEFAULT_STAMINA_MAX,
             'hp': user.get('hp', 100),
@@ -113,8 +125,8 @@ def format_status_text(status_info, lang="CHS", platform=None, equipped_items=No
 ╠══════════════════════╣
 ├ 🔮 境界: {status_info.get('realm_name', '凡人')} (Lv.{status_info.get('rank', 1)})
 ├ 🌟 五行: {status_info.get('element', '无')}
-├ 💰 铜币: {status_info.get('copper', 0):,}
-├ 💎 金币: {status_info.get('gold', 0):,}
+├ 💰 下品灵石: {status_info.get('copper', 0):,}
+├ 💎 中品灵石: {status_info.get('gold', 0):,}
 ├ ⚡ 精力: {_format_stamina_value(status_info.get('stamina', DEFAULT_STAMINA_MAX))} / {status_info.get('max_stamina', DEFAULT_STAMINA_MAX)}
 ╠══════════════════════╣
 ├ ❤️ HP: {status_info.get('hp', 100)} / {status_info.get('max_hp', 100)}

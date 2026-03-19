@@ -351,11 +351,11 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
         if currency == "gold":
             if int(user.get("gold", 0) or 0) < price:
                 _log_failure("INSUFFICIENT_GOLD", meta={"currency": currency, "price": price})
-                return {"success": False, "code": "INSUFFICIENT", "message": "金币不足"}, 400
+                return {"success": False, "code": "INSUFFICIENT", "message": "中品灵石不足"}, 400
         else:
             if int(user.get("copper", 0) or 0) < price:
                 _log_failure("INSUFFICIENT_COPPER", meta={"currency": currency, "price": price})
-                return {"success": False, "code": "INSUFFICIENT", "message": "铜币不足"}, 400
+                return {"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400
     pity = get_pity(user_id, banner_id)
     pity_count = int(pity.get("pity_count", 0) or 0)
     sr_pity = int(pity.get("sr_pity_count", 0) or 0)
@@ -507,7 +507,7 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
             return {
                 "success": False,
                 "code": "INSUFFICIENT",
-                "message": "金币不足" if reason == "INSUFFICIENT_GOLD" else "铜币不足",
+                "message": "中品灵石不足" if reason == "INSUFFICIENT_GOLD" else "下品灵石不足",
             }, 400
         remaining = max(0, GACHA_PAID_DAILY_LIMIT - int((get_user_by_id(user_id) or {}).get("gacha_paid_today", 0) or 0))
         _log_failure("DAILY_LIMIT", meta={"paid_remaining": remaining})

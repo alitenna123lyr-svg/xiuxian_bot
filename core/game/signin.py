@@ -45,11 +45,11 @@ def _item_display(item: Optional[Dict[str, Any]]) -> str:
 
 def _reward_lines(reward: Dict[str, Any]) -> list[str]:
     lines = [
-        f"• 铜币: {reward['copper']}",
+        f"• 下品灵石: {reward['copper']}",
         f"• 修为: {reward['exp']}",
     ]
     if reward.get("gold", 0) > 0:
-        lines.append(f"• 金币: {reward['gold']}")
+        lines.append(f"• 中品灵石: {reward['gold']}")
     if reward.get("item"):
         lines.append(f"• 物品: {_item_display(reward['item'])}")
     return lines
@@ -60,13 +60,13 @@ def get_signin_tomorrow_hint(consecutive_days: int, user_rank: int = 1) -> str:
     next_day = next_reward["day"]
     highlights = []
     if next_reward.get("gold", 0) > 0:
-        highlights.append(f"{next_reward['gold']} 金币")
+        highlights.append(f"{next_reward['gold']} 中品灵石")
     if next_reward.get("item"):
         highlights.append(_item_display(next_reward["item"]))
     if next_day == 7:
         highlights.append("7 日满签大奖")
     if not highlights:
-        highlights.append(f"{next_reward['exp']} 修为 + {next_reward['copper']} 铜币")
+        highlights.append(f"{next_reward['exp']} 修为 + {next_reward['copper']} 下品灵石")
     return f"⏰ 明天最值得回来拿：第 {next_day} 天的 {'、'.join(highlights)}"
 
 
@@ -119,7 +119,7 @@ def get_signin_reward(consecutive_days: int, user_rank: int = 1) -> Dict[str, An
     day_in_cycle = ((consecutive_days - 1) % 7) + 1
     reward = SIGNIN_REWARDS.get(day_in_cycle, SIGNIN_REWARDS[1]).copy()
 
-    # 按境界分段缩放（金币不缩放，保持稀缺性）
+    # 按境界分段缩放（中品灵石不缩放，保持稀缺性）
     rank_mult = rank_scale(int(user_rank or 1))
     reward["copper"] = int(reward["copper"] * rank_mult)
     reward["exp"] = int(reward["exp"] * rank_mult)
@@ -214,9 +214,9 @@ def do_signin(user_data: Dict) -> Tuple[bool, Dict[str, Any], str]:
 🎯 当前周期: 第 {reward['day']} 天
 
 🎁 *今日奖励:*
-• 铜币: +{reward['copper']}
+• 下品灵石: +{reward['copper']}
 • 修为: +{reward['exp']}
-{f"• 金币: +{reward['gold']}" if reward.get('gold', 0) > 0 else ""}{item_text}
+{f"• 中品灵石: +{reward['gold']}" if reward.get('gold', 0) > 0 else ""}{item_text}
 """
         return False, {"rewards": reward}, message.strip()
 
@@ -302,9 +302,9 @@ def do_signin(user_data: Dict) -> Tuple[bool, Dict[str, Any], str]:
         rewards["month_bonus"] = month_bonus
         rewards["month_days"] = month_days
     
-    reward_lines = [f"• 铜币: +{reward['copper']}", f"• 修为: +{reward['exp']}"]
+    reward_lines = [f"• 下品灵石: +{reward['copper']}", f"• 修为: +{reward['exp']}"]
     if reward.get('gold', 0) > 0:
-        reward_lines.append(f"• 金币: +{reward['gold']}")
+        reward_lines.append(f"• 中品灵石: +{reward['gold']}")
     if reward.get("item"):
         reward_lines.append(f"• 物品: {_item_display(reward['item'])}")
     tomorrow_hint = get_signin_tomorrow_hint(new_consecutive, user_rank)

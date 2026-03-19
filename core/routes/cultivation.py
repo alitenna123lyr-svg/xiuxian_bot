@@ -33,6 +33,8 @@ from core.services.stats_service import recalculate_user_combat_stats
 from core.services.metrics_service import log_event, log_economy_ledger
 from core.services.realm_trials_service import get_or_create_realm_trial
 from core.services.story_service import track_story_action
+from core.services.audit_log_service import write_audit_log
+from core.utils.timeutil import local_day_key
 
 cultivation_bp = Blueprint("cultivation", __name__)
 
@@ -179,6 +181,30 @@ def cultivate_end():
         "UPDATE users SET state = 0, exp = exp + ? WHERE user_id = ?", (gain, user_id)
     )
 
+    # Daily cultivation spirit-stone reward (hard-capped per day).
+    rank_now = int(user.get("rank", 1) or 1)
+    stone_cfg = config.get_nested("balance", "cultivation_spirit_stone", default={}) or {}
+    per_session = int(stone_cfg.get("per_session", max(1, rank_now // 10)) or max(1, rank_now // 10))
+    daily_limit = int(stone_cfg.get("daily_limit", max(3, rank_now // 4)) or max(3, rank_now // 4))
+    day_key = local_day_key()
+    last_day = int(user.get("daily_cultivate_stone_day", 0) or 0)
+    claimed_today = int(user.get("daily_cultivate_stone_claimed", 0) or 0) if last_day == day_key else 0
+    stone_reward = max(0, min(per_session, daily_limit - claimed_today))
+    new_claimed = claimed_today + stone_reward
+    execute(
+        "UPDATE users SET daily_cultivate_stone_day = ?, daily_cultivate_stone_claimed = ? WHERE user_id = ?",
+        (day_key, new_claimed, user_id),
+    )
+    if stone_reward > 0:
+        execute("UPDATE users SET copper = copper + ? WHERE user_id = ?", (stone_reward, user_id))
+        write_audit_log(
+            module="cultivation",
+            action="daily_spirit_reward",
+            user_id=user_id,
+            success=True,
+            detail={"stone_reward": stone_reward, "claimed_today": new_claimed, "daily_limit": daily_limit},
+        )
+
     # Quest progress: cultivate
     increment_quest(user_id, "daily_cultivate")
     story_update = []
@@ -208,13 +234,23 @@ def cultivate_end():
         module="cultivation",
         action="cultivate_end",
         delta_exp=int(gain or 0),
+        delta_copper=int(stone_reward or 0),
         success=True,
         rank=int(user.get("rank", 1) or 1),
-        meta={"hours": gain_result["hours"], "efficiency": gain_result["efficiency"]},
+        meta={
+            "hours": gain_result["hours"],
+            "efficiency": gain_result["efficiency"],
+            "daily_spirit_stone_reward": int(stone_reward or 0),
+            "daily_spirit_stone_claimed": int(new_claimed or 0),
+            "daily_spirit_stone_limit": int(daily_limit or 0),
+        },
     )
     return success(
         gain=gain,
         total_exp=new_exp,
+        spirit_stone_low_reward=int(stone_reward or 0),
+        spirit_stone_low_daily_claimed=int(new_claimed or 0),
+        spirit_stone_low_daily_limit=int(daily_limit or 0),
         can_breakthrough=can_break,
         hours=gain_result["hours"],
         efficiency=gain_result["efficiency"],

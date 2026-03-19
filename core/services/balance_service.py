@@ -71,6 +71,10 @@ def hunt_rewards(rank: int, cfg: Dict[str, Any]) -> Dict[str, int]:
     low = max(1, low)
     high = max(low, high)
     copper = random.randint(low, high)
+    # Unified currency hardening: spirit stone acquisition is intentionally tighter.
+    gain_mult = float(cfg.get("currency_gain_mult", 0.25) or 0.25)
+    gain_mult = max(0.05, min(1.0, gain_mult))
+    copper = max(1, int(round(copper * gain_mult)))
     return {"exp": exp, "copper": copper}
 
 

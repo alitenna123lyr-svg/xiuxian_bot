@@ -29,6 +29,14 @@ USER_SCHEMA = {
     "dy_times": int,              # 成功狩猎次数
     "copper": int,                # 铜币
     "gold": int,                  # 金币
+    "spirit_high": int,
+    "spirit_exquisite": int,
+    "spirit_supreme": int,
+    "immortal_flawed": int,
+    "immortal_low": int,
+    "immortal_mid": int,
+    "immortal_high": int,
+    "immortal_supreme": int,
     "asc_reduction": int,         # 突破减免
     "sign": int,                  # 签到相关
 
@@ -98,6 +106,8 @@ USER_SCHEMA = {
     "gacha_free_today": int,
     "gacha_paid_today": int,
     "gacha_daily_reset": int,
+    "daily_cultivate_stone_day": int,
+    "daily_cultivate_stone_claimed": int,
 
     # 玩法评分
     "secret_loot_score": int,
@@ -112,6 +122,14 @@ USER_DEFAULT_VALUES = {
     "dy_times": 0,
     "copper": 0,
     "gold": 0,
+    "spirit_high": 0,
+    "spirit_exquisite": 0,
+    "spirit_supreme": 0,
+    "immortal_flawed": 0,
+    "immortal_low": 0,
+    "immortal_mid": 0,
+    "immortal_high": 0,
+    "immortal_supreme": 0,
     "asc_reduction": 0,
     "sign": 0,
     "element": None,
@@ -161,6 +179,8 @@ USER_DEFAULT_VALUES = {
     "gacha_free_today": 0,
     "gacha_paid_today": 0,
     "gacha_daily_reset": 0,
+    "daily_cultivate_stone_day": 0,
+    "daily_cultivate_stone_claimed": 0,
     "secret_loot_score": 0,
     "alchemy_output_score": 0,
 }
@@ -380,6 +400,35 @@ WORLD_BOSS_ATTACK_SCHEMA = {
     "attacks_today": int,
 }
 
+# ── audit_logs 表 ──
+AUDIT_LOG_SCHEMA = {
+    "id": int,
+    "module": str,
+    "action": str,
+    "user_id": str,
+    "target_user_id": str,
+    "success": int,
+    "detail_json": str,
+    "created_at": int,
+}
+
+# ── bounty_orders 表 ──
+BOUNTY_ORDER_SCHEMA = {
+    "id": int,
+    "poster_user_id": str,
+    "wanted_item_id": str,
+    "wanted_item_name": str,
+    "wanted_quantity": int,
+    "reward_spirit_low": int,
+    "description": str,
+    "status": str,
+    "claimer_user_id": str,
+    "created_at": int,
+    "claimed_at": int,
+    "completed_at": int,
+    "cancelled_at": int,
+}
+
 COLLECTIONS = {
     "USERS": "users",
     "ITEMS": "items",
@@ -391,6 +440,8 @@ COLLECTIONS = {
     "CODEX_MONSTERS": "codex_monsters",
     "CODEX_ITEMS": "codex_items",
     "REQUEST_DEDUP": "request_dedup",
+    "AUDIT_LOGS": "audit_logs",
+    "BOUNTY_ORDERS": "bounty_orders",
 }
 
 

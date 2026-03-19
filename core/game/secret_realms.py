@@ -390,7 +390,7 @@ def roll_secret_realm_rewards(
         event = "你在秘境中顿悟，额外获得了大量修为。"
     elif victory and event_roll < 0.22:
         copper = int(copper * 1.5)
-        event = "你发现了一处藏宝角落，收获了更多铜币。"
+        event = "你发现了一处藏宝角落，收获了更多下品灵石。"
     elif event_roll > 0.94:
         exp = int(exp * 0.7)
         copper = int(copper * 0.7)
@@ -401,7 +401,7 @@ def roll_secret_realm_rewards(
     if not victory:
         found_items = []
 
-    # 高等级秘境金币掉落
+    # 高等级秘境中品灵石掉落
     gold = 0
     realm_id = realm.get("id", "")
     if victory:

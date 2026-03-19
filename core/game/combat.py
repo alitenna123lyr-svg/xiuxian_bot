@@ -286,7 +286,11 @@ class Combat:
 
 
 def get_available_monsters(user_rank: int) -> List[Dict[str, Any]]:
-    return [m for m in MONSTERS if m["min_rank"] <= user_rank]
+    unlocked = [m for m in MONSTERS if m["min_rank"] <= user_rank]
+    if len(unlocked) <= 8:
+        return unlocked
+    # Keep the latest unlocked monsters to avoid flooding high-rank hunt panels.
+    return unlocked[-8:]
 
 
 def get_monster_by_id(monster_id: str) -> Optional[Dict[str, Any]]:
@@ -570,5 +574,5 @@ def format_monster_list(user_rank: int) -> str:
     for m in monsters:
         difficulty = "简单" if m["min_rank"] <= user_rank - 2 else "普通" if m["min_rank"] <= user_rank else "困难"
         lines.append(f"▸ {m['name']} (HP:{m['hp']} ATK:{m['attack']})")
-        lines.append(f"  奖励: {m['exp_reward']}修为 {m['copper_reward'][0]}-{m['copper_reward'][1]}铜币 [{difficulty}]")
+        lines.append(f"  奖励: {m['exp_reward']}修为 {m['copper_reward'][0]}-{m['copper_reward'][1]}下品灵石 [{difficulty}]")
     return "\n".join(lines)

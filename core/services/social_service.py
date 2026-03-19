@@ -24,6 +24,7 @@ from core.utils.timeutil import midnight_timestamp
 CHAT_DAILY_LIMIT = 10.0
 CHAT_REQUEST_DAILY_LIMIT = 20
 CHAT_REQUEST_TTL_SECONDS = 6 * 3600
+GIFT_CURRENCY_LABELS = {"copper": "下品灵石", "gold": "中品灵石"}
 
 
 def _coerce_float(value: Any, default: float = 0.0) -> float:
@@ -304,4 +305,106 @@ def reject_chat_request(*, user_id: str, request_id: int) -> Tuple[Dict[str, Any
         "from_telegram_id": ((from_user or {}).get("telegram_id") or "").strip(),
         "to_user_id": to_id,
         "to_username": (to_user or {}).get("in_game_username"),
+    }, 200
+
+
+def send_gift(
+    *,
+    user_id: str,
+    target_name: Optional[str] = None,
+    target_user_id: Optional[str] = None,
+    amount: int = 0,
+    currency: str = "copper",
+) -> Tuple[Dict[str, Any], int]:
+    sender = get_user_by_id(user_id)
+    if not sender:
+        return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
+
+    alias = {
+        "copper": "copper",
+        "gold": "gold",
+        "下品灵石": "copper",
+        "铜币": "copper",
+        "铜": "copper",
+        "中品灵石": "gold",
+        "金币": "gold",
+        "金": "gold",
+    }
+    currency_key = alias.get(str(currency or "").strip().lower()) or alias.get(str(currency or "").strip())
+    if currency_key not in GIFT_CURRENCY_LABELS:
+        return {"success": False, "code": "INVALID_CURRENCY", "message": "仅支持赠送下品灵石或中品灵石"}, 400
+
+    try:
+        gift_amount = int(amount)
+    except (TypeError, ValueError):
+        return {"success": False, "code": "INVALID_AMOUNT", "message": "赠礼数量必须是整数"}, 400
+    if gift_amount <= 0:
+        return {"success": False, "code": "INVALID_AMOUNT", "message": "赠礼数量必须大于 0"}, 400
+
+    if target_user_id:
+        target = get_user_by_id(str(target_user_id))
+    else:
+        target_name = (target_name or "").strip()
+        if not target_name:
+            return {"success": False, "code": "MISSING_PARAMS", "message": "缺少目标玩家"}, 400
+        target = get_user_by_username(target_name)
+    if not target:
+        return {"success": False, "code": "TARGET_NOT_FOUND", "message": "未找到该玩家"}, 404
+
+    target_id = str(target.get("user_id"))
+    if target_id == str(user_id):
+        return {"success": False, "code": "INVALID_TARGET", "message": "不能给自己送礼"}, 400
+
+    if int(sender.get(currency_key, 0) or 0) < gift_amount:
+        return {
+            "success": False,
+            "code": "INSUFFICIENT",
+            "message": f"{GIFT_CURRENCY_LABELS[currency_key]}不足",
+        }, 400
+
+    try:
+        with db_transaction() as cur:
+            cur.execute(
+                f"UPDATE users SET {currency_key} = {currency_key} - %s WHERE user_id = %s AND {currency_key} >= %s",
+                (gift_amount, user_id, gift_amount),
+            )
+            if cur.rowcount == 0:
+                return {
+                    "success": False,
+                    "code": "INSUFFICIENT",
+                    "message": f"{GIFT_CURRENCY_LABELS[currency_key]}不足",
+                }, 400
+            cur.execute(
+                f"UPDATE users SET {currency_key} = {currency_key} + %s WHERE user_id = %s",
+                (gift_amount, target_id),
+            )
+            if cur.rowcount == 0:
+                raise ValueError("TARGET_NOT_FOUND")
+    except ValueError as exc:
+        if str(exc) == "TARGET_NOT_FOUND":
+            return {"success": False, "code": "TARGET_NOT_FOUND", "message": "未找到该玩家"}, 404
+        raise
+
+    sender_latest = get_user_by_id(user_id) or sender
+    target_latest = get_user_by_id(target_id) or target
+
+    log_event(
+        "social_gift",
+        user_id=user_id,
+        success=True,
+        rank=int(sender.get("rank", 1) or 1),
+        meta={"target_user_id": target_id, "currency": currency_key, "amount": gift_amount},
+    )
+    return {
+        "success": True,
+        "message": f"成功赠送 {gift_amount} {GIFT_CURRENCY_LABELS[currency_key]} 给 {target_latest.get('in_game_username')}",
+        "currency": currency_key,
+        "currency_name": GIFT_CURRENCY_LABELS[currency_key],
+        "amount": gift_amount,
+        "from_user_id": user_id,
+        "from_username": sender_latest.get("in_game_username"),
+        "to_user_id": target_id,
+        "to_username": target_latest.get("in_game_username"),
+        "sender_balance": int(sender_latest.get(currency_key, 0) or 0),
+        "target_balance": int(target_latest.get(currency_key, 0) or 0),
     }, 200

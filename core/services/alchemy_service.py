@@ -154,7 +154,7 @@ def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) ->
             reason="INSUFFICIENT",
             meta={"recipe_id": recipe_id},
         )
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "铜币不足"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400)
 
     missing = []
     for mat in recipe.get("materials", []):
@@ -294,7 +294,7 @@ def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) ->
             reason="INSUFFICIENT",
             meta={"recipe_id": recipe_id},
         )
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "铜币不足"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400)
 
     resp = {
         "success": True,

@@ -19,6 +19,7 @@ from core.utils.number import format_stamina_value
 from core.game.events import list_events, get_world_boss_config
 from core.services.sect_service import apply_sect_stat_buffs, get_user_sect_buffs
 from core.services.metrics_service import log_event, log_economy_ledger
+from core.services.worldboss_fsm import WorldBossFSM, WorldBossSnapshot
 from core.utils.timeutil import midnight_timestamp, local_day_key
 
 BOSS_DAILY_LIMIT = 5
@@ -411,29 +412,35 @@ def _ensure_worldboss_tables(cur) -> None:
 
 
 def get_world_boss_status() -> Dict[str, Any]:
-    from core.database.connection import get_sqlite
     boss_cfg = _world_boss()
-    conn = get_sqlite()
-    cur = conn.cursor()
-    _ensure_worldboss_tables(cur)
-    row = _ensure_boss_state(cur)
-    if row is None:
-        return {"success": False, "message": "Boss not found"}
-    # daily reset
-    if int(row["last_reset"] or 0) < midnight_timestamp():
-        cur.execute(
-            "UPDATE world_boss_state SET hp = %s, last_reset = %s WHERE boss_id = %s",
-            (boss_cfg["max_hp"], int(time.time()), boss_cfg["id"]),
-        )
-        conn.commit()
+    now = int(time.time())
+    day_start = midnight_timestamp()
+    with db_transaction() as cur:
+        _ensure_worldboss_tables(cur)
         row = _ensure_boss_state(cur)
+        if row is None:
+            return {"success": False, "message": "Boss not found"}
+        row_data = dict(row)
+        snapshot = WorldBossSnapshot.from_row(row_data, now_ts=now, day_start_ts=day_start)
+        fsm = WorldBossFSM(snapshot)
+        if fsm.should_daily_reset():
+            fsm.apply_daily_reset()
+            cur.execute(
+                "UPDATE world_boss_state SET hp = %s, last_reset = %s WHERE boss_id = %s",
+                (snapshot.hp, snapshot.last_reset, boss_cfg["id"]),
+            )
+            row = _ensure_boss_state(cur)
+            row_data = dict(row) if row is not None else {}
+            snapshot = WorldBossSnapshot.from_row(row_data, now_ts=now, day_start_ts=day_start)
+            fsm = WorldBossFSM(snapshot)
     return {
         "success": True,
         "boss": {
             "id": boss_cfg["id"],
             "name": boss_cfg["name"],
-            "hp": int(row["hp"]),
-            "max_hp": int(row["max_hp"]),
+            "hp": int(row_data.get("hp", 0) or 0),
+            "max_hp": int(row_data.get("max_hp", 0) or 0),
+            "state": fsm.state.value,
         },
     }
 
@@ -475,15 +482,19 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
             return {"success": False, "code": "LIMIT", "message": "今日攻击次数已用完"}, 400
 
         row = _ensure_boss_state(cur)
-        if int(row["last_reset"] or 0) < midnight_timestamp():
+        snapshot = WorldBossSnapshot.from_row(row, now_ts=now, day_start_ts=midnight_timestamp())
+        fsm = WorldBossFSM(snapshot)
+        if fsm.should_daily_reset():
+            fsm.apply_daily_reset()
             cur.execute(
                 "UPDATE world_boss_state SET hp = %s, last_reset = %s WHERE boss_id = %s",
-                (boss_cfg["max_hp"], now, boss_cfg["id"]),
+                (snapshot.hp, snapshot.last_reset, boss_cfg["id"]),
             )
             row = _ensure_boss_state(cur)
+            snapshot = WorldBossSnapshot.from_row(row, now_ts=now, day_start_ts=midnight_timestamp())
+            fsm = WorldBossFSM(snapshot)
 
-        hp = int(row["hp"] or 0)
-        if hp <= 0:
+        if not fsm.can_attack():
             log_event(
                 "world_boss_attack",
                 user_id=user_id,
@@ -492,6 +503,7 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
                 reason="DEFEATED",
             )
             return {"success": False, "code": "DEFEATED", "message": "世界BOSS已被击败，请等待刷新"}, 400
+        hp = int(snapshot.hp or 0)
         if not spend_user_stamina_tx(cur, user_id, 1, now=now):
             current = get_user_by_id(user_id) or stamina_user or user
             log_event(

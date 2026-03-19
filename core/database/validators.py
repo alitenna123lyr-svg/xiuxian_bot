@@ -10,7 +10,9 @@ from typing import Set
 
 USERS_COLUMNS: Set[str] = {
     "user_id", "in_game_username", "lang", "state", "exp", "rank",
-    "dy_times", "copper", "gold", "asc_reduction", "sign", "element",
+    "dy_times", "copper", "gold", "spirit_high", "spirit_exquisite", "spirit_supreme",
+    "immortal_flawed", "immortal_low", "immortal_mid", "immortal_high", "immortal_supreme",
+    "asc_reduction", "sign", "element",
     "hp", "mp", "max_hp", "max_mp", "attack", "defense", "crit_rate",
     "weak_until", "breakthrough_pity", "created_at",
     "last_sign_timestamp", "consecutive_sign_days", "max_signin_days",
@@ -27,6 +29,7 @@ USERS_COLUMNS: Set[str] = {
     "stamina", "stamina_updated_at", "vitals_updated_at",
     "chat_energy_today", "chat_energy_reset",
     "gacha_free_today", "gacha_paid_today", "gacha_daily_reset",
+    "daily_cultivate_stone_day", "daily_cultivate_stone_claimed",
     "secret_loot_score", "alchemy_output_score",
 }
 

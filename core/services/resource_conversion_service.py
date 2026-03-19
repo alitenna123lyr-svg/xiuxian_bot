@@ -159,7 +159,7 @@ def convert_resources(
     cost_copper = int(math.ceil(base_copper * qty * float(route_cfg.get("cost_mult", 1.0))))
 
     if int(user.get("copper", 0) or 0) < cost_copper:
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {cost_copper} 铜币"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {cost_copper} 下品灵石"}, 400)
 
     catalyst_item_id = None
     catalyst_need = 0
@@ -273,7 +273,7 @@ def convert_resources(
             reason="INSUFFICIENT",
             meta={"target_item_id": target_item_id, "quantity": qty, "route": route},
         )
-        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {cost_copper} 铜币"}, 400)
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {cost_copper} 下品灵石"}, 400)
 
     if output_qty > 0:
         try:

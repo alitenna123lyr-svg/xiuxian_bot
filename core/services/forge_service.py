@@ -187,7 +187,7 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
 
     if int(user.get("copper", 0) or 0) < base_cost:
         log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {base_cost}"}, 400
+        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400
 
     have = _sum_material(user_id, mat_id)
     if have < mat_need:
@@ -266,7 +266,7 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
                 "material": {"item_id": mat_id, "need": mat_need, "have": current_have},
             }, 400
         log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {base_cost}"}, 400
+        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400
 
     if drop:
         try:
@@ -365,7 +365,7 @@ def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[
     have = _sum_material(user_id, mat_id)
     if int(user.get("copper", 0) or 0) < target_cost:
         log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {target_cost}"}, 400
+        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400
     if have < target_mat_need:
         log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
         return {"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_id}"}, 400
@@ -401,7 +401,7 @@ def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[
             log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
             return {"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_id}"}, 400
         log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"铜币不足，需要 {target_cost}"}, 400
+        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400
     try:
         from core.services.codex_service import ensure_item
         ensure_item(user_id, reward["item_id"], 1)
@@ -517,4 +517,4 @@ def decompose_item(*, user_id: str, item_db_id: int) -> Tuple[Dict[str, Any], in
         rank=int(user.get("rank", 1) or 1),
         meta={"item_id": item.get("item_id")},
     )
-    return {"success": True, "message": f"分解成功，获得 {reward_mat['item_name']} x{mat_qty} 与 {copper} 铜币", "rewards": {"copper": copper, "items": [{"item_id": mat_id, "quantity": mat_qty}]}}, 200
+    return {"success": True, "message": f"分解成功，获得 {reward_mat['item_name']} x{mat_qty} 与 {copper} 下品灵石", "rewards": {"copper": copper, "items": [{"item_id": mat_id, "quantity": mat_qty}]}}, 200

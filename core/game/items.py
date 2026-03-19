@@ -229,6 +229,16 @@ MATERIALS = [
         "stage_hint": "练气-筑基",
     },
     {
+        "id": "beast_hide",
+        "name": "兽皮",
+        "type": ItemType.MATERIAL,
+        "price": 15,
+        "drop_rate": 0.22,
+        "focus": "悬赏流",
+        "usage": "常见悬赏道具，也可作为基础锻造辅料",
+        "stage_hint": "炼气-筑基",
+    },
+    {
         "id": "spirit_herb",
         "name": "仙草",
         "type": ItemType.MATERIAL,
@@ -311,10 +321,12 @@ DROP_TABLES = {
     "wild_boar": [
         {"item_id": "iron_ore", "rate": 0.28, "quantity": (1, 2)},
         {"item_id": "herb", "rate": 0.20, "quantity": (1, 2)},
+        {"item_id": "beast_hide", "rate": 0.26, "quantity": (1, 3)},
     ],
     "wolf": [
         {"item_id": "iron_ore", "rate": 0.30, "quantity": (1, 3)},
         {"item_id": "herb", "rate": 0.22, "quantity": (1, 2)},
+        {"item_id": "beast_hide", "rate": 0.34, "quantity": (1, 4)},
         {"item_id": "wooden_sword", "rate": 0.05, "quality": Quality.COMMON},
     ],
     "giant_snake": [
@@ -748,8 +760,8 @@ SHOP_ROTATIONS = {
 }
 
 SHOP_CURRENCY_ROLES = {
-    "copper": "铜币用于日常消耗，覆盖修炼补给、基础材料与低风险准备。",
-    "gold": "金币用于阶段推进与稀缺机会，优先买突破、爆发成长和关键窗口资源。",
+    "copper": "下品灵石用于日常消耗，覆盖修炼补给、基础材料与低风险准备。",
+    "gold": "中品灵石用于阶段推进与稀缺机会，优先用于突破、爆发成长和关键窗口资源。",
 }
 
 PROGRESSION_STAGE_THEMES = [
@@ -758,7 +770,7 @@ PROGRESSION_STAGE_THEMES = [
         "max_rank": 9,
         "label": "练气-筑基",
         "theme": "基础资源与低级炼丹",
-        "focus": "优先囤铜币、灵草、铁矿石，建立日常修炼与补给循环。",
+        "focus": "优先囤下品灵石、灵草、铁矿石，建立日常修炼与补给循环。",
     },
     {
         "min_rank": 10,
@@ -771,8 +783,8 @@ PROGRESSION_STAGE_THEMES = [
         "min_rank": 20,
         "max_rank": 999,
         "label": "化神以上",
-        "theme": "高阶秘境、金币资源、稀有材料追逐",
-        "focus": "核心目标转为高阶秘境掉落、金币机会和龙鳞凤羽等稀有材料。",
+        "theme": "高阶秘境、中品灵石资源、稀有材料追逐",
+        "focus": "核心目标转为高阶秘境掉落、中品灵石机会和龙鳞凤羽等稀有材料。",
     },
 ]
 
@@ -915,14 +927,14 @@ def can_buy_item(
             except Exception:
                 gold_min_rank = 8
             if user_rank < gold_min_rank:
-                return False, "gold", f"境界不足，需达到 Lv.{gold_min_rank} 才可使用金币商店"
+                return False, "gold", f"境界不足，需达到 Lv.{gold_min_rank} 才可使用中品灵石商店"
             total_price = int(price) * max(1, int(quantity or 1))
             if user_gold >= total_price:
-                return True, "gold", f"需要 {total_price} 金币"
-            return False, "gold", f"金币不足，需要 {total_price}"
+                return True, "gold", f"需要 {total_price} 中品灵石"
+            return False, "gold", f"中品灵石不足，需要 {total_price}"
         pricing = calculate_shop_price(price, "copper", int(quantity or 1))
         actual_total = int(pricing.get("actual_total", price))
         if user_copper >= actual_total:
-            return True, "copper", f"需要 {actual_total} 铜币"
-        return False, "copper", f"铜币不足，需要 {actual_total}"
+            return True, "copper", f"需要 {actual_total} 下品灵石"
+        return False, "copper", f"下品灵石不足，需要 {actual_total}"
     return False, "", "物品不存在"
