@@ -3,6 +3,7 @@
 """
 
 import logging
+import time
 from core.database.connection import fetch_one, refresh_user_stamina, refresh_user_vitals, DEFAULT_STAMINA_MAX
 from core.game.realms import get_realm_by_id, get_next_realm, format_realm_progress
 from core.game.currency import wallet_from_user
@@ -21,6 +22,21 @@ def _format_stamina_value(value):
     return round(val, 1)
 
 
+def _format_remaining_duration(seconds):
+    seconds = max(0, int(seconds or 0))
+    hours, remainder = divmod(seconds, 3600)
+    minutes, secs = divmod(remainder, 60)
+    if hours > 0:
+        if minutes > 0:
+            return f"{hours}小时{minutes}分钟"
+        return f"{hours}小时"
+    if minutes > 0:
+        if secs > 0:
+            return f"{minutes}分钟{secs}秒"
+        return f"{minutes}分钟"
+    return f"{secs}秒"
+
+
 def get_user_status(user_id):
     """获取用户完整状态"""
     try:
@@ -37,6 +53,9 @@ def get_user_status(user_id):
         rank = user.get('rank', 1)
         realm = get_realm_by_id(rank)
         next_realm = get_next_realm(rank)
+        weak_until = int(user.get("weak_until", 0) or 0)
+        weak_remaining_seconds = max(0, weak_until - int(time.time()))
+        is_weak = bool(user.get("is_weak", False) or weak_remaining_seconds > 0)
         
         element = user.get("element") or "无"
         
@@ -75,6 +94,13 @@ def get_user_status(user_id):
             'dy_times': user.get('dy_times', 0),
             'breakthrough_pity': user.get('breakthrough_pity', 0),
             'state': user.get('state', False),
+            'weak_until': weak_until,
+            'is_weak': is_weak,
+            'weak_remaining_seconds': weak_remaining_seconds,
+            'weak_debuff_pct': int(user.get('weak_debuff_pct', 30) or 30),
+            'weak_effects': user.get('weak_effects') or (
+                ["不能开始修炼", "HP/MP/攻击/防御/暴击率 -30%"] if is_weak else []
+            ),
             'lang': user.get('lang', 'CHS'),
             'equipped_weapon': user.get('equipped_weapon'),
             'equipped_armor': user.get('equipped_armor'),
@@ -108,6 +134,21 @@ def format_status_text(status_info, lang="CHS", platform=None, equipped_items=No
 
     # 状态
     state_text = "🧘 修炼中" if status_info.get("state") else "💤 空闲"
+    weak_active = bool(status_info.get("is_weak"))
+    weak_line = "正常"
+    weak_detail_lines = []
+    if weak_active:
+        weak_left = max(0, int(status_info.get("weak_remaining_seconds", 0) or 0))
+        weak_line = f"虚弱中（剩余 {_format_remaining_duration(weak_left)}）"
+        weak_effects = status_info.get("weak_effects") or []
+        if weak_effects:
+            for effect in weak_effects:
+                weak_detail_lines.append(f"  • {effect}")
+        else:
+            weak_detail_lines = [
+                "  • 不能开始修炼",
+                f"  • HP/MP/攻击/防御/暴击率 -{int(status_info.get('weak_debuff_pct', 30) or 30)}%",
+            ]
 
     # 装备信息
     equip_lines = ""
@@ -136,7 +177,11 @@ def format_status_text(status_info, lang="CHS", platform=None, equipped_items=No
 ╠══════════════════════╣
 {exp_text}
 ├ 🎯 狩猎次数: {status_info.get('dy_times', 0)}
-├ 📍 状态: {state_text}"""
+├ 📍 状态: {state_text}
+├ ☠️ 虚弱: {weak_line}"""
+
+    if weak_detail_lines:
+        text += "\n├ 📉 虚弱影响:\n" + "\n".join(weak_detail_lines)
 
     if equip_lines:
         text += f"""

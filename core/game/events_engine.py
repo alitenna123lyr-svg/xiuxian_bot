@@ -526,16 +526,28 @@ def check_event_condition(
     if not cond:
         return True
 
+    def _to_int(value: Any, default: int = 0) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return int(default)
+
+    def _to_float(value: Any, default: float = 0.0) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return float(default)
+
     # 地图限制
     if "map" in cond:
         if map_id != cond["map"]:
             return False
 
     # 境界范围
-    realm_id = player_data.get("realm_id", 1)
-    if "min_realm" in cond and realm_id < cond["min_realm"]:
+    realm_id = _to_int(player_data.get("realm_id", 1), 1)
+    if "min_realm" in cond and realm_id < _to_int(cond.get("min_realm"), 0):
         return False
-    if "max_realm" in cond and realm_id > cond["max_realm"]:
+    if "max_realm" in cond and realm_id > _to_int(cond.get("max_realm"), 10**9):
         return False
 
     # 宗门
@@ -547,13 +559,15 @@ def check_event_condition(
     dao_min = cond.get("dao_min")
     if dao_min and isinstance(dao_min, dict):
         for dao_key, min_val in dao_min.items():
-            actual = player_data.get(f"dao_{dao_key}", 0)
-            if actual < min_val:
+            actual = _to_float(player_data.get(f"dao_{dao_key}", 0), 0.0)
+            required = _to_float(min_val, 0.0)
+            if actual < required:
                 return False
 
     # 随机概率
     if "random" in cond:
-        if random.random() > cond["random"]:
+        prob = max(0.0, min(1.0, _to_float(cond.get("random"), 0.0)))
+        if random.random() > prob:
             return False
 
     return True

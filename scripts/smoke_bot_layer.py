@@ -154,16 +154,6 @@ class UpdateFactory:
         return Update.de_json(update_json, self.bot)
 
 
-def _cleanup_db(db_path: Path) -> None:
-    for suffix in ("", "-wal", "-shm"):
-        path = Path(str(db_path) + suffix)
-        if path.exists():
-            try:
-                path.unlink()
-            except Exception:
-                pass
-
-
 def _last_event(bot: FakeBot, *, chat_id: Optional[int] = None) -> Optional[dict]:
     for evt in reversed(bot.events):
         if chat_id is None or int(evt.get("chat_id", 0)) == int(chat_id):
@@ -265,8 +255,6 @@ def _assert_last_text(bot: FakeBot, *, chat_id: int, label: str, contains: Optio
 
 async def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    db_path = root / "data" / f"_tmp_bot_layer_{int(time.time())}.db"
-    os.environ["XXBOT_DB_PATH"] = str(db_path)
     os.environ["XXBOT_INTERNAL_API_TOKEN"] = "test_internal_token"
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
@@ -801,7 +789,6 @@ async def main() -> None:
     finally:
         await bot_app.shutdown()
         close_sqlite()
-        _cleanup_db(db_path)
 
 
 if __name__ == "__main__":

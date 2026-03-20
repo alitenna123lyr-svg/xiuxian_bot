@@ -35,13 +35,22 @@ def currency_exchange():
     from_currency = data.get("from_currency")
     to_currency = data.get("to_currency")
     amount = data.get("amount")
+    request_id = data.get("request_id")
     if not from_currency or amount is None:
         return error("MISSING_PARAMS", "Missing from_currency or amount", 400)
-    log_action("currency_exchange", user_id=user_id, from_currency=from_currency, to_currency=to_currency, amount=amount)
+    log_action(
+        "currency_exchange",
+        user_id=user_id,
+        request_id=request_id,
+        from_currency=from_currency,
+        to_currency=to_currency,
+        amount=amount,
+    )
     resp, status = exchange_currency(
         user_id=user_id,
         from_currency=str(from_currency),
         to_currency=(None if to_currency is None else str(to_currency)),
         amount=amount,
+        request_id=request_id,
     )
     return jsonify(resp), status

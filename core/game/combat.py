@@ -287,10 +287,10 @@ class Combat:
 
 def get_available_monsters(user_rank: int) -> List[Dict[str, Any]]:
     unlocked = [m for m in MONSTERS if m["min_rank"] <= user_rank]
-    if len(unlocked) <= 8:
+    if len(unlocked) <= 4:
         return unlocked
-    # Keep the latest unlocked monsters to avoid flooding high-rank hunt panels.
-    return unlocked[-8:]
+    # Keep only the latest unlocked monsters to avoid flooding hunt panels.
+    return unlocked[-4:]
 
 
 def get_monster_by_id(monster_id: str) -> Optional[Dict[str, Any]]:
@@ -306,11 +306,12 @@ def create_combatant_from_user(
     *,
     selected_active_skill_id: Optional[str] = None,
 ) -> Dict[str, Any]:
+    precomputed_stats = bool(user_data.get("_combat_stats_precomputed", False))
     stats = calculate_user_stats(user_data)
-    attack = stats["attack"]
-    defense = stats["defense"]
-    max_hp = stats["max_hp"]
-    max_mp = stats["max_mp"]
+    attack = int((user_data.get("attack") if precomputed_stats else stats["attack"]) or stats["attack"])
+    defense = int((user_data.get("defense") if precomputed_stats else stats["defense"]) or stats["defense"])
+    max_hp = int((user_data.get("max_hp") if precomputed_stats else stats["max_hp"]) or stats["max_hp"])
+    max_mp = int((user_data.get("max_mp") if precomputed_stats else stats["max_mp"]) or stats["max_mp"])
     crit_rate = user_data.get("crit_rate", 0.05)
     active_skill = None
     best_active_skill = None
@@ -375,14 +376,24 @@ def create_combatant_from_user(
             skill_damage_bonus += float(effect.get("skill_damage"))
 
     now = int(time.time())
-    atk_until = int(user_data.get("attack_buff_until", 0) or 0)
-    atk_val = int(user_data.get("attack_buff_value", 0) or 0)
-    if atk_val > 0 and atk_until > now:
-        attack += atk_val
-    def_until = int(user_data.get("defense_buff_until", 0) or 0)
-    def_val = int(user_data.get("defense_buff_value", 0) or 0)
-    if def_val > 0 and def_until > now:
-        defense += def_val
+    if not precomputed_stats:
+        atk_until = int(user_data.get("attack_buff_until", 0) or 0)
+        atk_val = int(user_data.get("attack_buff_value", 0) or 0)
+        if atk_val > 0 and atk_until > now:
+            attack += atk_val
+        def_until = int(user_data.get("defense_buff_until", 0) or 0)
+        def_val = int(user_data.get("defense_buff_value", 0) or 0)
+        if def_val > 0 and def_until > now:
+            defense += def_val
+
+    weak_until = int(user_data.get("weak_until", 0) or 0)
+    if weak_until > now and not precomputed_stats:
+        weak_mult = 0.7
+        max_hp = max(1, int(round(max_hp * weak_mult)))
+        max_mp = max(1, int(round(max_mp * weak_mult)))
+        attack = max(1, int(round(attack * weak_mult)))
+        defense = max(0, int(round(defense * weak_mult)))
+        crit_rate = max(0.0, float(crit_rate) * weak_mult)
 
     if active_skill is None:
         active_skill = best_active_skill
@@ -454,7 +465,11 @@ def hunt_monster(
     if not ignore_min_rank and base_monster["min_rank"] > user_rank:
         return {"success": False, "message": f"需要达到 {base_monster['min_rank']} 级才能挑战此怪物"}
 
-    user_combatant = create_combatant_from_user(user_data, learned_skills, selected_active_skill_id=active_skill_id)
+    user_combatant = create_combatant_from_user(
+        user_data,
+        learned_skills,
+        selected_active_skill_id=active_skill_id,
+    )
     try:
         base_max_hp = int(user_data.get("max_hp", user_combatant.get("max_hp", 1)) or user_combatant.get("max_hp", 1))
         current_hp = int(user_data.get("hp", base_max_hp) or base_max_hp)

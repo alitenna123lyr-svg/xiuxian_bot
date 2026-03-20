@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from typing import Any, Dict, List, Tuple
 
 from core.database.connection import fetch_one, fetch_all, db_transaction, get_user_by_id, get_sqlite
 from core.game.achievements import list_achievements, get_achievement
 from core.services.metrics_service import log_event, log_economy_ledger
+
+_ACH_TABLES_READY = False
+_ACH_TABLES_LOCK = threading.Lock()
 
 
 def _ensure_achievement_tables() -> None:
@@ -26,6 +30,17 @@ def _ensure_achievement_tables() -> None:
         """
     )
     conn.commit()
+
+
+def _ensure_achievement_tables_once() -> None:
+    global _ACH_TABLES_READY
+    if _ACH_TABLES_READY:
+        return
+    with _ACH_TABLES_LOCK:
+        if _ACH_TABLES_READY:
+            return
+        _ensure_achievement_tables()
+        _ACH_TABLES_READY = True
 
 
 def _progress(user: Dict[str, Any], ach: Dict[str, Any]) -> int:
@@ -57,7 +72,6 @@ def _progress(user: Dict[str, Any], ach: Dict[str, Any]) -> int:
 
 
 def _is_claimed(user_id: str, ach_id: str) -> bool:
-    _ensure_achievement_tables()
     row = fetch_one(
         "SELECT 1 AS ok FROM user_achievements WHERE user_id = %s AND achievement_id = %s AND claimed = 1",
         (user_id, ach_id),
@@ -66,10 +80,15 @@ def _is_claimed(user_id: str, ach_id: str) -> bool:
 
 
 def get_achievements(user_id: str) -> Tuple[Dict[str, Any], int]:
-    _ensure_achievement_tables()
+    _ensure_achievement_tables_once()
     user = get_user_by_id(user_id)
     if not user:
         return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
+    claimed_rows = fetch_all(
+        "SELECT achievement_id FROM user_achievements WHERE user_id = %s AND claimed = 1",
+        (user_id,),
+    )
+    claimed_set = {str(row.get("achievement_id") or "") for row in (claimed_rows or [])}
     achievements = []
     for ach in list_achievements():
         prog = _progress(user, ach)
@@ -78,13 +97,13 @@ def get_achievements(user_id: str) -> Tuple[Dict[str, Any], int]:
             **ach,
             "progress": prog,
             "completed": prog >= goal,
-            "claimed": _is_claimed(user_id, ach["id"]),
+            "claimed": str(ach.get("id") or "") in claimed_set,
         })
     return {"success": True, "achievements": achievements}, 200
 
 
 def claim_achievement(user_id: str, achievement_id: str) -> Tuple[Dict[str, Any], int]:
-    _ensure_achievement_tables()
+    _ensure_achievement_tables_once()
     user = get_user_by_id(user_id)
     if not user:
         log_event("achievement_claim", user_id=user_id, success=False, reason="USER_NOT_FOUND", meta={"achievement_id": achievement_id})
@@ -99,35 +118,46 @@ def claim_achievement(user_id: str, achievement_id: str) -> Tuple[Dict[str, Any]
         return {"success": False, "code": "NOT_DONE", "message": "成就未完成"}, 400
     rewards = ach.get("rewards", {})
     now = int(time.time())
-    with db_transaction() as cur:
-        cur.execute(
-            """
-            INSERT INTO user_achievements (user_id, achievement_id, claimed, completed_at)
-            VALUES (%s, %s, 1, %s)
-            ON CONFLICT(user_id, achievement_id) DO UPDATE SET
-                claimed = 1,
-                completed_at = excluded.completed_at
-            WHERE user_achievements.claimed = 0
-            """,
-            (user_id, achievement_id, now),
-        )
-        if int(cur.rowcount or 0) == 0:
-            log_event("achievement_claim", user_id=user_id, success=True, reason="CLAIMED", meta={"achievement_id": achievement_id})
-            return {
-                "success": True,
-                "already_claimed": True,
-                "message": "已领取过奖励",
-                "rewards": rewards,
-            }, 200
-        cur.execute(
-            "UPDATE users SET copper = copper + %s, exp = exp + %s, gold = gold + %s WHERE user_id = %s",
-            (
-                int(rewards.get("copper", 0) or 0),
-                int(rewards.get("exp", 0) or 0),
-                int(rewards.get("gold", 0) or 0),
-                user_id,
-            ),
-        )
+    already_claimed = False
+    try:
+        with db_transaction() as cur:
+            cur.execute(
+                """
+                INSERT INTO user_achievements (user_id, achievement_id, claimed, completed_at)
+                VALUES (%s, %s, 1, %s)
+                ON CONFLICT(user_id, achievement_id) DO UPDATE SET
+                    claimed = 1,
+                    completed_at = excluded.completed_at
+                WHERE user_achievements.claimed = 0
+                """,
+                (user_id, achievement_id, now),
+            )
+            if int(cur.rowcount or 0) == 0:
+                already_claimed = True
+            else:
+                cur.execute(
+                    "UPDATE users SET copper = copper + %s, exp = exp + %s, gold = gold + %s WHERE user_id = %s",
+                    (
+                        int(rewards.get("copper", 0) or 0),
+                        int(rewards.get("exp", 0) or 0),
+                        int(rewards.get("gold", 0) or 0),
+                        user_id,
+                    ),
+                )
+                if int(cur.rowcount or 0) == 0:
+                    raise ValueError("USER_NOT_FOUND")
+    except ValueError:
+        log_event("achievement_claim", user_id=user_id, success=False, reason="USER_NOT_FOUND", meta={"achievement_id": achievement_id})
+        return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
+
+    if already_claimed:
+        log_event("achievement_claim", user_id=user_id, success=True, reason="CLAIMED", meta={"achievement_id": achievement_id})
+        return {
+            "success": True,
+            "already_claimed": True,
+            "message": "已领取过奖励",
+            "rewards": rewards,
+        }, 200
     log_event(
         "achievement_claim",
         user_id=user_id,

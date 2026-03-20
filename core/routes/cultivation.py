@@ -18,6 +18,7 @@ from core.database.connection import (
     execute,
     fetch_one,
     get_user_skills,
+    db_transaction,
 )
 from core.game.mechanics import (
     start_cultivation,
@@ -26,12 +27,12 @@ from core.game.mechanics import (
 from core.game.realms import can_breakthrough
 from core.game.skills import get_skill, scale_skill_effect
 from core.game.signin import check_signed_today, format_signin_status
-from core.services.settlement_extra import settle_signin, settle_breakthrough
+from core.services.settlement_extra import settle_signin, settle_breakthrough, get_breakthrough_preview
 from core.services.quests_service import increment_quest
 from core.services.sect_service import get_user_sect_buffs
 from core.services.stats_service import recalculate_user_combat_stats
 from core.services.metrics_service import log_event, log_economy_ledger
-from core.services.realm_trials_service import get_or_create_realm_trial
+from core.services.realm_trials_service import get_realm_trial
 from core.services.story_service import track_story_action
 from core.services.audit_log_service import write_audit_log
 from core.utils.timeutil import local_day_key
@@ -101,17 +102,44 @@ def cultivate_start():
         timing["base_gain"] = int(timing["base_gain"] * boost_mult)
         boost_applied = True
 
-    execute(
-        "INSERT INTO timings (user_id, start_time, type, base_gain) VALUES (?, ?, ?, ?)",
-        (user_id, timing["start_time"], timing["type"], timing["base_gain"]),
-    )
-    if boost_applied:
-        execute(
-            "UPDATE users SET state = 1, cultivation_boost_until = 0, cultivation_boost_pct = 0 WHERE user_id = ?",
-            (user_id,),
-        )
-    else:
-        execute("UPDATE users SET state = 1 WHERE user_id = ?", (user_id,))
+    lock_now = int(time.time())
+    try:
+        with db_transaction() as cur:
+            if boost_applied:
+                cur.execute(
+                    """UPDATE users
+                       SET state = 1, cultivation_boost_until = 0, cultivation_boost_pct = 0
+                       WHERE user_id = %s AND state = 0 AND COALESCE(weak_until, 0) <= %s""",
+                    (user_id, lock_now),
+                )
+            else:
+                cur.execute(
+                    """UPDATE users
+                       SET state = 1
+                       WHERE user_id = %s AND state = 0 AND COALESCE(weak_until, 0) <= %s""",
+                    (user_id, lock_now),
+                )
+            if int(cur.rowcount or 0) != 1:
+                raise ValueError("STATE_OR_WEAK")
+            # 清理历史脏会话，确保同一用户只有一个修炼会话。
+            cur.execute("DELETE FROM timings WHERE user_id = %s AND type = 'cultivation'", (user_id,))
+            cur.execute(
+                "INSERT INTO timings (user_id, start_time, type, base_gain) VALUES (%s, %s, %s, %s)",
+                (user_id, timing["start_time"], timing["type"], timing["base_gain"]),
+            )
+    except ValueError:
+        latest = get_user_by_id(user_id) or user
+        latest_weak_until = float(latest.get("weak_until", 0) or 0)
+        now_ts = time.time()
+        if latest_weak_until > now_ts:
+            log_event("cultivate_start", user_id=user_id, success=False, reason="WEAK")
+            return error(
+                "WEAK",
+                f"虚弱状态中，还需等待 {int((latest_weak_until - now_ts) / 60)} 分钟",
+                400,
+            )
+        log_event("cultivate_start", user_id=user_id, success=False, reason="ALREADY")
+        return error("ERROR", "Already cultivating", 400)
 
     log_event(
         "cultivate_start",
@@ -150,57 +178,101 @@ def cultivate_end():
         log_event("cultivate_end", user_id=user_id, success=False, reason="NOT_CULTIVATING")
         return error("ERROR", "Not cultivating", 400)
 
-    timing = fetch_one(
-        "SELECT * FROM timings WHERE user_id = ? AND type = 'cultivation'", (user_id,)
-    )
-    if not timing:
-        # recover: timing missing but user is marked cultivating
-        execute("UPDATE users SET state = 0 WHERE user_id = ?", (user_id,))
-        current_exp = int(user.get("exp", 0) or 0)
+    gain = 0
+    gain_result = {"hours": 0, "efficiency": 0, "tip": "修炼记录异常，已重置状态。"}
+    stone_reward = 0
+    new_claimed = 0
+    daily_limit = 0
+    recovered = False
+    rank_now = int(user.get("rank", 1) or 1)
+    current_exp = int(user.get("exp", 0) or 0)
+
+    try:
+        with db_transaction() as cur:
+            cur.execute("SELECT * FROM users WHERE user_id = %s FOR UPDATE", (user_id,))
+            locked_user = cur.fetchone()
+            if not locked_user:
+                raise ValueError("NOT_FOUND")
+            locked_user = dict(locked_user)
+            if not locked_user.get("state"):
+                raise ValueError("NOT_CULTIVATING")
+
+            rank_now = int(locked_user.get("rank", 1) or 1)
+            current_exp = int(locked_user.get("exp", 0) or 0)
+
+            cur.execute(
+                "SELECT * FROM timings WHERE user_id = %s AND type = 'cultivation' ORDER BY id DESC LIMIT 1 FOR UPDATE",
+                (user_id,),
+            )
+            timing = cur.fetchone()
+            if not timing:
+                # recover: timing missing but user is marked cultivating
+                cur.execute("DELETE FROM timings WHERE user_id = %s AND type = 'cultivation'", (user_id,))
+                cur.execute("UPDATE users SET state = 0 WHERE user_id = %s AND state = 1", (user_id,))
+                if int(cur.rowcount or 0) != 1:
+                    raise ValueError("NOT_CULTIVATING")
+                recovered = True
+            else:
+                gain_result = calculate_cultivation_progress(dict(timing))
+                gain = int(gain_result["exp"] or 0)
+                if gain <= 0:
+                    gain = 1
+                    gain_result["exp"] = 1
+                    gain_result["tip"] = "修炼时间过短，本次保底获得 1 点修为。"
+
+                # 清理该用户所有修炼会话，兼容历史重复会话脏数据。
+                cur.execute("DELETE FROM timings WHERE user_id = %s AND type = 'cultivation'", (user_id,))
+                if int(cur.rowcount or 0) <= 0:
+                    raise ValueError("CONFLICT")
+
+                stone_cfg = config.get_nested("balance", "cultivation_spirit_stone", default={}) or {}
+                per_session = int(stone_cfg.get("per_session", max(1, rank_now // 10)) or max(1, rank_now // 10))
+                daily_limit = int(stone_cfg.get("daily_limit", max(3, rank_now // 4)) or max(3, rank_now // 4))
+                day_key = local_day_key()
+                last_day = int(locked_user.get("daily_cultivate_stone_day", 0) or 0)
+                claimed_today = int(locked_user.get("daily_cultivate_stone_claimed", 0) or 0) if last_day == day_key else 0
+                stone_reward = max(0, min(per_session, daily_limit - claimed_today))
+                new_claimed = claimed_today + stone_reward
+
+                cur.execute(
+                    """UPDATE users
+                       SET state = 0,
+                           exp = exp + %s,
+                           copper = copper + %s,
+                           daily_cultivate_stone_day = %s,
+                           daily_cultivate_stone_claimed = %s
+                       WHERE user_id = %s AND state = 1""",
+                    (gain, stone_reward, day_key, new_claimed, user_id),
+                )
+                if int(cur.rowcount or 0) != 1:
+                    raise ValueError("NOT_CULTIVATING")
+    except ValueError as exc:
+        reason = str(exc)
+        if reason in ("NOT_FOUND", "NOT_CULTIVATING"):
+            log_event("cultivate_end", user_id=user_id, success=False, reason="NOT_CULTIVATING")
+            return error("ERROR", "Not cultivating", 400)
+        log_event("cultivate_end", user_id=user_id, success=False, reason=reason)
+        return error("ERROR", "操作过快，请重试", 409)
+
+    if recovered:
         log_event(
             "cultivate_end",
             user_id=user_id,
             success=True,
-            rank=int(user.get("rank", 1) or 1),
+            rank=rank_now,
             meta={"recovered": True, "gain": 0},
         )
         return success(
             gain=0,
             total_exp=current_exp,
-            can_breakthrough=can_breakthrough(current_exp, user.get("rank", 1)),
+            can_breakthrough=can_breakthrough(current_exp, rank_now),
             hours=0,
             efficiency=0,
             tip="修炼记录异常，已重置状态。",
             recovered=True,
         )
 
-    gain_result = calculate_cultivation_progress(timing)
-    gain = int(gain_result["exp"] or 0)
-    if gain <= 0:
-        gain = 1
-        gain_result["exp"] = 1
-        gain_result["tip"] = "修炼时间过短，本次保底获得 1 点修为。"
-    execute("DELETE FROM timings WHERE id = ?", (timing["id"],))
-    execute(
-        "UPDATE users SET state = 0, exp = exp + ? WHERE user_id = ?", (gain, user_id)
-    )
-
-    # Daily cultivation spirit-stone reward (hard-capped per day).
-    rank_now = int(user.get("rank", 1) or 1)
-    stone_cfg = config.get_nested("balance", "cultivation_spirit_stone", default={}) or {}
-    per_session = int(stone_cfg.get("per_session", max(1, rank_now // 10)) or max(1, rank_now // 10))
-    daily_limit = int(stone_cfg.get("daily_limit", max(3, rank_now // 4)) or max(3, rank_now // 4))
-    day_key = local_day_key()
-    last_day = int(user.get("daily_cultivate_stone_day", 0) or 0)
-    claimed_today = int(user.get("daily_cultivate_stone_claimed", 0) or 0) if last_day == day_key else 0
-    stone_reward = max(0, min(per_session, daily_limit - claimed_today))
-    new_claimed = claimed_today + stone_reward
-    execute(
-        "UPDATE users SET daily_cultivate_stone_day = ?, daily_cultivate_stone_claimed = ? WHERE user_id = ?",
-        (day_key, new_claimed, user_id),
-    )
     if stone_reward > 0:
-        execute("UPDATE users SET copper = copper + ? WHERE user_id = ?", (stone_reward, user_id))
         write_audit_log(
             module="cultivation",
             action="daily_spirit_reward",
@@ -218,14 +290,14 @@ def cultivate_end():
         story_update = []
 
     # 检查是否可以突破
-    new_exp = user.get("exp", 0) + gain
-    can_break = can_breakthrough(new_exp, user.get("rank", 1))
+    new_exp = current_exp + gain
+    can_break = can_breakthrough(new_exp, rank_now)
 
     log_event(
         "cultivate_end",
         user_id=user_id,
         success=True,
-        rank=int(user.get("rank", 1) or 1),
+        rank=rank_now,
         meta={
             "gain": gain,
             "hours": gain_result["hours"],
@@ -240,7 +312,7 @@ def cultivate_end():
         delta_exp=int(gain or 0),
         delta_copper=int(stone_reward or 0),
         success=True,
-        rank=int(user.get("rank", 1) or 1),
+        rank=rank_now,
         meta={
             "hours": gain_result["hours"],
             "efficiency": gain_result["efficiency"],
@@ -304,8 +376,20 @@ def realm_trial_status(user_id):
     user = get_user_by_id(user_id)
     if not user:
         return error("ERROR", "User not found", 404)
-    trial = get_or_create_realm_trial(user_id, int(user.get("rank", 1) or 1))
+    trial = get_realm_trial(user_id, int(user.get("rank", 1) or 1))
     return success(trial=trial)
+
+
+@cultivation_bp.route("/api/breakthrough/preview/<user_id>", methods=["GET"])
+def breakthrough_preview(user_id: str):
+    _, auth_error = resolve_actor_path_user_id(user_id)
+    if auth_error:
+        return auth_error
+    strategy = str(request.args.get("strategy", "steady") or "steady")
+    use_pill_raw = str(request.args.get("use_pill", "false") or "false").strip().lower()
+    use_pill = use_pill_raw in ("1", "true", "yes", "on")
+    resp, http_status = get_breakthrough_preview(user_id=user_id, use_pill=use_pill, strategy=strategy)
+    return jsonify(resp), http_status
 
 
 @cultivation_bp.route("/api/breakthrough", methods=["POST"])

@@ -236,6 +236,25 @@ def test_events_uncovered_routes(test_db):
     assert exchange_payload.get("code") == "MISSING_PARAMS"
 
 
+def test_events_exchange_invalid_quantity_returns_400(test_db):
+    create_user("u1", "甲", rank=6)
+    app = Flask(__name__)
+    with app.test_request_context(
+        "/api/events/exchange",
+        method="POST",
+        json={
+            "user_id": "u1",
+            "event_id": "spring_festival",
+            "exchange_id": "sf_spirit_stone",
+            "quantity": "abc",
+        },
+        headers={"X-Actor-User-Id": "u1"},
+    ):
+        status_code, payload = _unwrap_route_result(events_exchange())
+    assert status_code == 400
+    assert payload.get("code") == "INVALID_PARAMS"
+
+
 def test_gacha_pity_route_validation(test_db):
     create_user("u1", "甲", rank=6)
     app = Flask(__name__)

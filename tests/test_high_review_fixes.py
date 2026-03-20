@@ -112,18 +112,20 @@ def test_resource_convert_request_in_progress_returns_409(test_db):
 
 def test_create_tables_dedupes_duplicate_user_keys_and_restores_unique_indexes(test_db):
     conn = test_db
-    conn.execute("DROP INDEX IF EXISTS idx_users_username_unique")
-    conn.execute("DROP INDEX IF EXISTS idx_users_telegram_id_unique")
+    with conn.cursor() as cur:
+        cur.execute("DROP INDEX IF EXISTS idx_users_username_unique")
+        cur.execute("DROP INDEX IF EXISTS idx_users_telegram_id_unique")
     conn.commit()
 
-    conn.execute(
-        "INSERT INTO users (user_id, in_game_username, created_at, telegram_id) VALUES (%s, %s, %s, %s)",
-        ("dup_u1", "重复名", 100, "tg_dup"),
-    )
-    conn.execute(
-        "INSERT INTO users (user_id, in_game_username, created_at, telegram_id) VALUES (%s, %s, %s, %s)",
-        ("dup_u2", "重复名", 200, "tg_dup"),
-    )
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO users (user_id, in_game_username, created_at, telegram_id) VALUES (%s, %s, %s, %s)",
+            ("dup_u1", "重复名", 100, "tg_dup"),
+        )
+        cur.execute(
+            "INSERT INTO users (user_id, in_game_username, created_at, telegram_id) VALUES (%s, %s, %s, %s)",
+            ("dup_u2", "重复名", 200, "tg_dup"),
+        )
     conn.commit()
 
     create_tables(conn)
@@ -141,12 +143,17 @@ def test_create_tables_dedupes_duplicate_user_keys_and_restores_unique_indexes(t
     assert [row_a["telegram_id"], row_b["telegram_id"]].count("tg_dup") == 1
     assert [row_a["telegram_id"], row_b["telegram_id"]].count("") == 1
 
-    username_index = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_users_username_unique'"
-    ).fetchone()
-    telegram_index = conn.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_users_telegram_id_unique'"
-    ).fetchone()
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND indexname = %s",
+            ("idx_users_username_unique",),
+        )
+        username_index = cur.fetchone()
+        cur.execute(
+            "SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND indexname = %s",
+            ("idx_users_telegram_id_unique",),
+        )
+        telegram_index = cur.fetchone()
     assert username_index is not None
     assert telegram_index is not None
 

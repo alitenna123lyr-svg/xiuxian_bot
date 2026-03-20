@@ -195,10 +195,18 @@ def forge_status(user_id):
         return error("ERROR", "User not found", 404)
     cfg = config.get_nested("balance", "forge", default={}) or {}
     high_cfg = cfg.get("high_invest", {}) or {}
+    material_item_id = str(cfg.get("material_item_id", "iron_ore"))
+    material_item = get_item_by_id(material_item_id) or get_item_by_id({
+        "ironore": "iron_ore",
+        "iron-ore": "iron_ore",
+        "iron ore": "iron_ore",
+    }.get(material_item_id.lower(), material_item_id))
+    material_item_name = str((material_item or {}).get("name") or ("铁矿石" if material_item_id.lower() in {"ironore", "iron-ore", "iron ore"} else material_item_id))
     return success(
         enabled=bool(cfg.get("enabled", True)),
         cost_copper=int(cfg.get("base_cost_copper", 500)),
-        material_item_id=str(cfg.get("material_item_id", "iron_ore")),
+        material_item_id=material_item_id,
+        material_item_name=material_item_name,
         material_need=int(cfg.get("material_need", 8)),
         modes={
             "normal": {"enabled": True},
@@ -220,9 +228,10 @@ def forge_post():
     if auth_error:
         return auth_error
     mode = data.get("mode", "normal")
-    log_action("forge", user_id=user_id, mode=mode)
+    request_id = data.get("request_id")
+    log_action("forge", user_id=user_id, mode=mode, request_id=request_id)
     cfg = config.get_nested("balance", "forge", default={}) or {}
-    resp, http_status = do_forge(user_id=user_id, cfg=cfg, mode=mode)
+    resp, http_status = do_forge(user_id=user_id, cfg=cfg, mode=mode, request_id=request_id)
     return jsonify(resp), http_status
 
 
@@ -246,11 +255,12 @@ def forge_targeted_post():
     if auth_error:
         return auth_error
     item_id = data.get("item_id")
-    log_action("forge_targeted", user_id=user_id, item_id=item_id)
+    request_id = data.get("request_id")
+    log_action("forge_targeted", user_id=user_id, item_id=item_id, request_id=request_id)
     if not item_id:
         return error("MISSING_PARAMS", "Missing params", 400)
     cfg = config.get_nested("balance", "forge", default={}) or {}
-    resp, http_status = forge_targeted(user_id=user_id, item_id=item_id, cfg=cfg)
+    resp, http_status = forge_targeted(user_id=user_id, item_id=item_id, cfg=cfg, request_id=request_id)
     return jsonify(resp), http_status
 
 

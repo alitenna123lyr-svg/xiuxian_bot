@@ -38,12 +38,24 @@ def _deduct_material(cur, user_id: str, item_id: str, quantity: int) -> None:
     for row in rows:
         if remaining <= 0:
             break
-        have = int(row["quantity"])
+        have = int(row["quantity"] or 0)
+        if have <= 0:
+            continue
         if have <= remaining:
-            cur.execute("DELETE FROM items WHERE id = ?", (row["id"],))
+            cur.execute(
+                "DELETE FROM items WHERE id = ? AND user_id = ? AND item_id = ? AND item_type = 'material' AND quantity = ?",
+                (row["id"], user_id, item_id, have),
+            )
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INSUFFICIENT_MATERIAL")
             remaining -= have
         else:
-            cur.execute("UPDATE items SET quantity = quantity - ? WHERE id = ?", (remaining, row["id"]))
+            cur.execute(
+                "UPDATE items SET quantity = quantity - ? WHERE id = ? AND user_id = ? AND item_id = ? AND item_type = 'material' AND quantity >= ?",
+                (remaining, row["id"], user_id, item_id, remaining),
+            )
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INSUFFICIENT_MATERIAL")
             remaining = 0
     if remaining > 0:
         raise ValueError("INSUFFICIENT_MATERIAL")
@@ -55,7 +67,10 @@ def list_conversion_options(user_id: str) -> Tuple[Dict[str, Any], int]:
         return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
 
     rank = int(user.get("rank", 1) or 1)
-    cfg = get_resource_conversion_config()
+    try:
+        cfg = get_resource_conversion_config()
+    except ValueError as exc:
+        return {"success": False, "code": "CONFIG", "message": f"转化配置错误：{exc}"}, 500
     routes = cfg["routes"]
     targets = []
     configured_target_count = 0
@@ -123,7 +138,10 @@ def convert_resources(
     if not user:
         return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404)
 
-    cfg = get_resource_conversion_config()
+    try:
+        cfg = get_resource_conversion_config()
+    except ValueError as exc:
+        return _dedup_return({"success": False, "code": "CONFIG", "message": f"转化配置错误：{exc}"}, 500)
     route = (route or "steady").strip().lower()
     if route not in cfg["routes"]:
         return _dedup_return({"success": False, "code": "INVALID", "message": "无效的转化路线"}, 400)
@@ -150,7 +168,11 @@ def convert_resources(
     if qty <= 0:
         return _dedup_return({"success": False, "code": "INVALID", "message": "转化数量必须大于0"}, 400)
     max_batch = int(cfg.get("max_batch", 20))
-    qty = min(qty, max_batch)
+    if qty > max_batch:
+        return _dedup_return(
+            {"success": False, "code": "INVALID", "message": f"单次最多只能转化 {max_batch} 个"},
+            400,
+        )
     stamina_batch_size = int(cfg.get("stamina_batch_size", 5))
     stamina_cost = max(1, int(math.ceil(qty / max(1, stamina_batch_size))))
 
@@ -306,7 +328,7 @@ def convert_resources(
     log_event(
         "resource_convert",
         user_id=user_id,
-        success=True,
+        success=success,
         request_id=request_id,
         rank=rank,
         meta={"target_item_id": target_item_id, "quantity": qty, "route": route, "success": success},
@@ -320,7 +342,7 @@ def convert_resources(
         currency="copper",
         item_id=target_item_id,
         qty=output_qty,
-        success=True,
+        success=success,
         request_id=request_id,
         rank=rank,
         meta={"route": route, "success": success, "catalyst_item_id": catalyst_item_id, "catalyst_used": catalyst_need},

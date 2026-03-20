@@ -34,6 +34,25 @@ from core.services.sect_service import (
 sect_bp = Blueprint("sect", __name__)
 
 
+def _parse_bool_strict(value, *, default: bool = False):
+    if value is None:
+        return default, None
+    if isinstance(value, bool):
+        return value, None
+    if isinstance(value, int):
+        if value in (0, 1):
+            return bool(value), None
+        return None, "布尔参数仅支持 true/false 或 0/1"
+    if isinstance(value, str):
+        text = value.strip().lower()
+        if text in {"1", "true", "yes", "y", "on"}:
+            return True, None
+        if text in {"0", "false", "no", "n", "off"}:
+            return False, None
+        return None, "布尔参数仅支持 true/false 或 0/1"
+    return None, "布尔参数类型无效"
+
+
 @sect_bp.route("/api/sect/create", methods=["POST"])
 def sect_create():
     data, payload_error = parse_json_payload()
@@ -172,8 +191,13 @@ def sect_donate():
     user_id, auth_error = resolve_actor_user_id(data)
     if auth_error:
         return auth_error
-    copper = data.get("copper", 0)
-    gold = data.get("gold", 0)
+    raw_copper = data.get("copper", 0)
+    raw_gold = data.get("gold", 0)
+    try:
+        copper = int(raw_copper or 0)
+        gold = int(raw_gold or 0)
+    except (TypeError, ValueError):
+        return error("INVALID_AMOUNT", "捐献数量必须是整数", 400)
     log_action("sect_donate", user_id=user_id, copper=copper, gold=gold)
     resp, http_status = donate(user_id, copper=copper, gold=gold)
     return jsonify(resp), http_status
@@ -268,7 +292,9 @@ def sect_branch_review():
     if auth_error:
         return auth_error
     request_id = data.get("request_id")
-    approve = bool(data.get("approve", False))
+    approve, bool_error = _parse_bool_strict(data.get("approve"), default=False)
+    if bool_error:
+        return error("INVALID", bool_error, 400)
     log_action("sect_branch_review", user_id=user_id, request_id=request_id, approve=approve)
     if request_id is None:
         return error("MISSING_PARAMS", "Missing parameters", 400)

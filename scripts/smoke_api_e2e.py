@@ -34,20 +34,8 @@ def _checkpoint(name: str) -> None:
     print(f"CHECKPOINT:{name}")
 
 
-def _cleanup_db(db_path: Path) -> None:
-    for suffix in ("", "-wal", "-shm"):
-        path = Path(str(db_path) + suffix)
-        if path.exists():
-            try:
-                path.unlink()
-            except Exception:
-                pass
-
-
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    db_path = root / "data" / f"_tmp_api_e2e_{int(time.time())}.db"
-    os.environ["XXBOT_DB_PATH"] = str(db_path)
     os.environ["XXBOT_INTERNAL_API_TOKEN"] = "test_internal_token"
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
@@ -528,7 +516,6 @@ def main() -> None:
     _checkpoint("smoke_complete")
 
     close_sqlite()
-    _cleanup_db(db_path)
 
 
 if __name__ == "__main__":

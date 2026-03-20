@@ -32,6 +32,22 @@ from core.utils.timeutil import midnight_timestamp
 combat_bp = Blueprint("combat", __name__)
 
 
+def _parse_bool_param(value, *, default: bool) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        text = value.strip().lower()
+        if text in {"1", "true", "yes", "y", "on"}:
+            return True
+        if text in {"0", "false", "no", "n", "off", ""}:
+            return False
+    return default
+
+
 def _check_secret_realm_daily_reset(user_id: str, user: dict) -> dict:
     """Reset secret realm attempts if the stored reset timestamp is from a previous day."""
     now = int(time.time())
@@ -55,7 +71,7 @@ def hunt():
     if auth_error:
         return auth_error
     monster_id = data.get("monster_id")
-    use_active = bool(data.get("use_active", True))
+    use_active = _parse_bool_param(data.get("use_active"), default=True)
     active_skill_id = data.get("active_skill_id")
     request_id = data.get("request_id")
     log_action("hunt", user_id=user_id, request_id=request_id,
@@ -138,10 +154,11 @@ def hunt_turn_action():
     session_id = data.get("session_id")
     action = data.get("action", "normal")
     skill_id = data.get("skill_id")
-    log_action("hunt_turn_action", user_id=user_id, session_id=session_id, skill_id=skill_id, action_type=action)
+    request_id = data.get("request_id")
+    log_action("hunt_turn_action", user_id=user_id, session_id=session_id, request_id=request_id, skill_id=skill_id, action_type=action)
     if not user_id or not session_id:
         return error("MISSING_PARAMS", "Missing parameters", 400)
-    resp, http_status = action_hunt_session(user_id, session_id, action=action, skill_id=skill_id)
+    resp, http_status = action_hunt_session(user_id, session_id, action=action, skill_id=skill_id, request_id=request_id)
     return jsonify(resp), http_status
 
 
@@ -180,7 +197,7 @@ def secret_realms_explore():
     realm_id = data.get("realm_id")
     request_id = data.get("request_id")
     path = data.get("path")
-    multi_step = bool(data.get("multi_step", False))
+    multi_step = _parse_bool_param(data.get("multi_step"), default=False)
     multi_step_nodes = data.get("multi_step_nodes")
     log_action("secret_realm_explore", user_id=user_id, request_id=request_id,
                realm_id=realm_id, path=path, multi_step=multi_step, multi_step_nodes=multi_step_nodes)
@@ -210,7 +227,7 @@ def secret_realms_turn_start():
         return auth_error
     realm_id = data.get("realm_id")
     path = data.get("path")
-    interactive = bool(data.get("interactive", False))
+    interactive = _parse_bool_param(data.get("interactive"), default=False)
     log_action("secret_realm_turn_start", user_id=user_id, realm_id=realm_id, path=path)
     if not user_id or not realm_id:
         return error("MISSING_PARAMS", "Missing parameters", 400)
@@ -236,8 +253,16 @@ def secret_realms_turn_action():
     action = data.get("action", "normal")
     skill_id = data.get("skill_id")
     choice = data.get("choice")
-    log_action("secret_realm_turn_action", user_id=user_id, session_id=session_id, action_type=action, skill_id=skill_id)
+    request_id = data.get("request_id")
+    log_action("secret_realm_turn_action", user_id=user_id, session_id=session_id, request_id=request_id, action_type=action, skill_id=skill_id)
     if not user_id or not session_id:
         return error("MISSING_PARAMS", "Missing parameters", 400)
-    resp, http_status = action_secret_session(user_id, session_id, action=action, skill_id=skill_id, choice=choice)
+    resp, http_status = action_secret_session(
+        user_id,
+        session_id,
+        action=action,
+        skill_id=skill_id,
+        choice=choice,
+        request_id=request_id,
+    )
     return jsonify(resp), http_status

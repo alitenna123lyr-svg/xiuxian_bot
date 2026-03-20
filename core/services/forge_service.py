@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import random
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from core.database.connection import (
     fetch_one,
@@ -20,6 +20,7 @@ from core.database.connection import (
     refresh_user_stamina,
     spend_user_stamina_tx,
 )
+from core.database.migrations import reserve_request, save_response
 from core.game.items import get_item_by_id, generate_material, generate_pill, generate_equipment, Quality
 from core.services.metrics_service import log_event, log_economy_ledger
 from core.utils.number import format_stamina_value
@@ -33,6 +34,23 @@ _QUALITY_ORDER = {
     "divine": 3,
     "holy": 4,
 }
+
+
+def _item_display_name(item_id: str) -> str:
+    raw = str(item_id or "").strip()
+    aliases = {
+        "ironore": "iron_ore",
+        "iron-ore": "iron_ore",
+        "iron ore": "iron_ore",
+    }
+    normalized = aliases.get(raw.lower(), raw)
+    base = get_item_by_id(normalized) or {}
+    name = str(base.get("name") or "").strip()
+    if name:
+        return name
+    if raw.lower() in aliases:
+        return "铁矿石"
+    return normalized
 
 
 def _normalize_mode(mode: str) -> str:
@@ -152,52 +170,75 @@ def _deduct_material(cur, user_id: str, item_id: str, quantity: int) -> None:
         raise ValueError("INSUFFICIENT_MATERIAL")
 
 
-def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[Dict[str, Any], int]:
+def forge(
+    *,
+    user_id: str,
+    cfg: Dict[str, Any],
+    mode: str = "normal",
+    request_id: Optional[str] = None,
+) -> Tuple[Dict[str, Any], int]:
+    if request_id:
+        status, cached = reserve_request(request_id, user_id=user_id, action="forge")
+        if status == "cached" and cached:
+            return cached, 200
+        if status == "in_progress":
+            return {
+                "success": False,
+                "code": "REQUEST_IN_PROGRESS",
+                "message": "请求处理中，请稍后重试",
+            }, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if request_id:
+            save_response(request_id, user_id, "forge", resp)
+        return resp, http_status
+
     if not cfg.get("enabled", True):
-        log_event("forge", user_id=user_id, success=False, reason="DISABLED")
-        return {"success": False, "code": "DISABLED", "message": "锻造功能未开启"}, 400
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="DISABLED")
+        return _dedup_return({"success": False, "code": "DISABLED", "message": "锻造功能未开启"}, 400)
 
     mode_key = _normalize_mode(mode)
     high_cfg = cfg.get("high_invest", {}) or {}
     if mode_key == "high" and not bool(high_cfg.get("enabled", True)):
-        log_event("forge", user_id=user_id, success=False, reason="HIGH_MODE_DISABLED")
-        return {"success": False, "code": "DISABLED", "message": "高投入锻造未开启"}, 400
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="HIGH_MODE_DISABLED")
+        return _dedup_return({"success": False, "code": "DISABLED", "message": "高投入锻造未开启"}, 400)
 
     base_cost = int(cfg.get("base_cost_copper", 500))
     mat_id = str(cfg.get("material_item_id", "iron_ore"))
+    mat_name = _item_display_name(mat_id)
     mat_need = int(cfg.get("material_need", 8))
     if mode_key == "high":
         base_cost = max(1, int(round(base_cost * float(high_cfg.get("cost_mult", 2.5) or 2.5))))
         mat_need = max(1, int(round(mat_need * float(high_cfg.get("material_mult", 2.0) or 2.0))))
     pool = _boosted_pool(cfg.get("reward_pool") or [], high_cfg=high_cfg, mode=mode_key)
     if not pool:
-        log_event("forge", user_id=user_id, success=False, reason="CONFIG")
-        return {"success": False, "code": "CONFIG", "message": "锻造奖励池未配置"}, 500
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="CONFIG")
+        return _dedup_return({"success": False, "code": "CONFIG", "message": "锻造奖励池未配置"}, 500)
     for entry in pool:
         entry_item_id = str(entry.get("item_id", "") or "").strip()
         if not entry_item_id or not get_item_by_id(entry_item_id):
             invalid = entry_item_id or "EMPTY_ITEM_ID"
-            log_event("forge", user_id=user_id, success=False, reason="CONFIG", meta={"invalid_item_id": invalid})
-            return {"success": False, "code": "CONFIG", "message": f"锻造奖励池配置错误：{invalid}"}, 500
+            log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="CONFIG", meta={"invalid_item_id": invalid})
+            return _dedup_return({"success": False, "code": "CONFIG", "message": f"锻造奖励池配置错误：{invalid}"}, 500)
 
     user = fetch_one("SELECT user_id, copper, rank FROM users WHERE user_id = ?", (user_id,))
     if not user:
-        log_event("forge", user_id=user_id, success=False, reason="USER_NOT_FOUND")
-        return {"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="USER_NOT_FOUND")
+        return _dedup_return({"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404)
 
     if int(user.get("copper", 0) or 0) < base_cost:
-        log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400)
 
     have = _sum_material(user_id, mat_id)
     if have < mat_need:
-        log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
-        return {
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({
             "success": False,
             "code": "INSUFFICIENT_MATERIAL",
-            "message": f"材料不足，需要 {mat_need} 个 {mat_id}",
-            "material": {"item_id": mat_id, "need": mat_need, "have": have},
-        }, 400
+            "message": f"材料不足，需要 {mat_need} 个 {mat_name}",
+            "material": {"item_id": mat_id, "item_name": mat_name, "need": mat_need, "have": have},
+        }, 400)
 
     picked = _pick(pool)
     item_id = picked.get("item_id")
@@ -206,8 +247,8 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
 
     base_item = get_item_by_id(item_id)
     if not base_item:
-        log_event("forge", user_id=user_id, success=False, reason="CONFIG", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "CONFIG", "message": f"锻造奖励池配置错误：{item_id}"}, 500
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="CONFIG", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "CONFIG", "message": f"锻造奖励池配置错误：{item_id}"}, 500)
     drop = None
     it = base_item.get("type")
     it_val = getattr(it, "value", it)
@@ -248,25 +289,25 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
         reason = str(exc)
         if reason == "INSUFFICIENT_STAMINA":
             current = get_user_by_id(user_id) or stamina_user or user
-            log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT_STAMINA", rank=int(user.get("rank", 1) or 1))
-            return {
+            log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_STAMINA", rank=int(user.get("rank", 1) or 1))
+            return _dedup_return({
                 "success": False,
                 "code": "INSUFFICIENT_STAMINA",
                 "message": f"精力不足，锻造需要 {stamina_cost} 点精力",
                 "stamina": format_stamina_value((current or {}).get("stamina", 0)),
                 "stamina_cost": stamina_cost,
-            }, 400
+            }, 400)
         if reason == "INSUFFICIENT_MATERIAL":
             current_have = _sum_material(user_id, mat_id)
-            log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
-            return {
+            log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
+            return _dedup_return({
                 "success": False,
                 "code": "INSUFFICIENT_MATERIAL",
-                "message": f"材料不足，需要 {mat_need} 个 {mat_id}",
-                "material": {"item_id": mat_id, "need": mat_need, "have": current_have},
-            }, 400
-        log_event("forge", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400
+                "message": f"材料不足，需要 {mat_need} 个 {mat_name}",
+                "material": {"item_id": mat_id, "item_name": mat_name, "need": mat_need, "have": current_have},
+            }, 400)
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400)
 
     if drop:
         try:
@@ -284,6 +325,7 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
         "forge",
         user_id=user_id,
         success=True,
+        request_id=request_id,
         rank=int(user.get("rank", 1) or 1),
         meta={"item_id": drop.get("item_id") if drop else None, "quantity": drop.get("quantity", 1) if drop else 0},
     )
@@ -296,17 +338,18 @@ def forge(*, user_id: str, cfg: Dict[str, Any], mode: str = "normal") -> Tuple[D
         item_id=drop.get("item_id") if drop else None,
         qty=drop.get("quantity", 1) if drop else 0,
         success=True,
+        request_id=request_id,
         rank=int(user.get("rank", 1) or 1),
         meta={"material_item_id": mat_id, "material_used": mat_need, "mode": mode_key},
     )
-    return {
+    return _dedup_return({
         "success": True,
         "message": "锻造成功！" if mode_key == "normal" else "高投入锻造成功！",
         "mode": mode_key,
-        "cost": {"copper": base_cost, "material": {"item_id": mat_id, "used": mat_need}},
+        "cost": {"copper": base_cost, "material": {"item_id": mat_id, "item_name": mat_name, "used": mat_need}},
         "stamina_cost": stamina_cost,
         "reward": drop,
-    }, 200
+    }, 200)
 
 
 def forge_catalog(user_id: str) -> List[Dict[str, Any]]:
@@ -333,42 +376,69 @@ def forge_catalog(user_id: str) -> List[Dict[str, Any]]:
     return result
 
 
-def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[Dict[str, Any], int]:
+def forge_targeted(
+    *,
+    user_id: str,
+    item_id: str,
+    cfg: Dict[str, Any],
+    request_id: Optional[str] = None,
+) -> Tuple[Dict[str, Any], int]:
+    if request_id:
+        status, cached = reserve_request(request_id, user_id=user_id, action="forge_targeted")
+        if status == "cached" and cached:
+            return cached, 200
+        if status == "in_progress":
+            return {
+                "success": False,
+                "code": "REQUEST_IN_PROGRESS",
+                "message": "请求处理中，请稍后重试",
+            }, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if request_id:
+            save_response(request_id, user_id, "forge_targeted", resp)
+        return resp, http_status
+
+    if not cfg.get("enabled", True):
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="DISABLED")
+        return _dedup_return({"success": False, "code": "DISABLED", "message": "锻造功能未开启"}, 400)
+
     user = get_user_by_id(user_id)
     if not user:
-        log_event("forge_targeted", user_id=user_id, success=False, reason="USER_NOT_FOUND")
-        return {"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="USER_NOT_FOUND")
+        return _dedup_return({"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404)
     base_item = get_item_by_id(item_id)
     if not base_item:
-        log_event("forge_targeted", user_id=user_id, success=False, reason="NOT_FOUND")
-        return {"success": False, "code": "NOT_FOUND", "message": "目标装备不存在"}, 404
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="NOT_FOUND")
+        return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "目标装备不存在"}, 404)
     item_type = getattr(base_item.get("type"), "value", base_item.get("type"))
     if item_type not in ("weapon", "armor", "accessory"):
-        log_event("forge_targeted", user_id=user_id, success=False, reason="INVALID")
-        return {"success": False, "code": "INVALID", "message": "只能定向锻造装备"}, 400
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INVALID")
+        return _dedup_return({"success": False, "code": "INVALID", "message": "只能定向锻造装备"}, 400)
     if int(user.get("rank", 1) or 1) < int(base_item.get("min_rank", 1) or 1):
-        log_event("forge_targeted", user_id=user_id, success=False, reason="FORBIDDEN", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "FORBIDDEN", "message": "境界不足，无法定向该装备"}, 400
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="FORBIDDEN", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "FORBIDDEN", "message": "境界不足，无法定向该装备"}, 400)
     codex_row = fetch_one(
         "SELECT total_obtained FROM codex_items WHERE user_id = ? AND item_id = ?",
         (user_id, item_id),
     )
     if not codex_row:
-        log_event("forge_targeted", user_id=user_id, success=False, reason="LOCKED", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "LOCKED", "message": "尚未收录该装备，无法定向锻造"}, 400
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="LOCKED", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "LOCKED", "message": "尚未收录该装备，无法定向锻造"}, 400)
 
     base_cost = int(cfg.get("base_cost_copper", 500))
     mat_need = int(cfg.get("material_need", 8))
     target_cost = base_cost * 2
     target_mat_need = mat_need * 2
     mat_id = str(cfg.get("material_item_id", "iron_ore"))
+    mat_name = _item_display_name(mat_id)
     have = _sum_material(user_id, mat_id)
     if int(user.get("copper", 0) or 0) < target_cost:
-        log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400)
     if have < target_mat_need:
-        log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_id}"}, 400
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_name}"}, 400)
 
     reward = generate_equipment(base_item, Quality.SPIRIT if int(user.get("rank", 1) or 1) >= 10 else Quality.COMMON, 1)
     now = int(time.time())
@@ -389,19 +459,19 @@ def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[
         reason = str(exc)
         if reason == "INSUFFICIENT_STAMINA":
             current = get_user_by_id(user_id) or stamina_user or user
-            log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT_STAMINA", rank=int(user.get("rank", 1) or 1))
-            return {
+            log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_STAMINA", rank=int(user.get("rank", 1) or 1))
+            return _dedup_return({
                 "success": False,
                 "code": "INSUFFICIENT_STAMINA",
                 "message": "精力不足，定向锻造需要 1 点精力",
                 "stamina": format_stamina_value((current or {}).get("stamina", 0)),
                 "stamina_cost": 1,
-            }, 400
+            }, 400)
         if reason == "INSUFFICIENT_MATERIAL":
-            log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
-            return {"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_id}"}, 400
-        log_event("forge_targeted", user_id=user_id, success=False, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
-        return {"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400
+            log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT_MATERIAL", rank=int(user.get("rank", 1) or 1))
+            return _dedup_return({"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_name}"}, 400)
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400)
     try:
         from core.services.codex_service import ensure_item
         ensure_item(user_id, reward["item_id"], 1)
@@ -416,6 +486,7 @@ def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[
         "forge_targeted",
         user_id=user_id,
         success=True,
+        request_id=request_id,
         rank=int(user.get("rank", 1) or 1),
         meta={"item_id": reward.get("item_id")},
     )
@@ -428,10 +499,16 @@ def forge_targeted(*, user_id: str, item_id: str, cfg: Dict[str, Any]) -> Tuple[
         item_id=reward.get("item_id"),
         qty=1,
         success=True,
+        request_id=request_id,
         rank=int(user.get("rank", 1) or 1),
         meta={"material_item_id": mat_id, "material_used": target_mat_need},
     )
-    return {"success": True, "message": f"定向锻造成功：{reward['item_name']}", "reward": reward, "cost": {"copper": target_cost, "material": {"item_id": mat_id, "used": target_mat_need}}}, 200
+    return _dedup_return({
+        "success": True,
+        "message": f"定向锻造成功：{reward['item_name']}",
+        "reward": reward,
+        "cost": {"copper": target_cost, "material": {"item_id": mat_id, "item_name": mat_name, "used": target_mat_need}},
+    }, 200)
 
 
 def decompose_item(*, user_id: str, item_db_id: int) -> Tuple[Dict[str, Any], int]:

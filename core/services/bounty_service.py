@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from typing import Any, Dict, List, Tuple
 
-from core.database.connection import db_transaction, fetch_all, fetch_one, get_user_by_id
+from core.database.connection import db_transaction, fetch_all, fetch_one, get_user_by_id, get_sqlite
 from core.game.items import get_item_by_id
 from core.services.audit_log_service import write_audit_log
 from core.services.metrics_service import log_event, log_economy_ledger
@@ -15,6 +16,8 @@ BOUNTY_STATUS_OPEN = "open"
 BOUNTY_STATUS_CLAIMED = "claimed"
 BOUNTY_STATUS_COMPLETED = "completed"
 BOUNTY_STATUS_CANCELLED = "cancelled"
+_BOUNTY_SCHEMA_READY = False
+_BOUNTY_SCHEMA_LOCK = threading.Lock()
 
 
 def _as_int(value: Any, default: int = 0) -> int:
@@ -22,6 +25,31 @@ def _as_int(value: Any, default: int = 0) -> int:
         return int(value)
     except (TypeError, ValueError):
         return int(default)
+
+
+def _ensure_bounty_schema() -> None:
+    conn = get_sqlite()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'bounty_orders'"
+    )
+    cols = {str(row[0]) for row in (cur.fetchall() or [])}
+    if "is_escrowed" not in cols:
+        cur.execute("ALTER TABLE bounty_orders ADD COLUMN is_escrowed INTEGER DEFAULT 0")
+    if "escrow_copper" not in cols:
+        cur.execute("ALTER TABLE bounty_orders ADD COLUMN escrow_copper INTEGER DEFAULT 0")
+    conn.commit()
+
+
+def _ensure_bounty_schema_once() -> None:
+    global _BOUNTY_SCHEMA_READY
+    if _BOUNTY_SCHEMA_READY:
+        return
+    with _BOUNTY_SCHEMA_LOCK:
+        if _BOUNTY_SCHEMA_READY:
+            return
+        _ensure_bounty_schema()
+        _BOUNTY_SCHEMA_READY = True
 
 
 def _deduct_item_tx(cur: Any, *, user_id: str, item_id: str, quantity: int) -> Dict[str, Any] | None:
@@ -32,7 +60,7 @@ def _deduct_item_tx(cur: Any, *, user_id: str, item_id: str, quantity: int) -> D
                attack_bonus, defense_bonus, hp_bonus, mp_bonus,
                first_round_reduction_pct, crit_heal_pct, element_damage_pct, low_hp_shield_pct
         FROM items
-        WHERE user_id = %s AND item_id = %s
+        WHERE user_id = %s AND item_id = %s AND item_type = 'material'
         ORDER BY id ASC
         """,
         (user_id, item_id),
@@ -51,9 +79,19 @@ def _deduct_item_tx(cur: Any, *, user_id: str, item_id: str, quantity: int) -> D
         if consume <= 0:
             continue
         if consume == row_qty:
-            cur.execute("DELETE FROM items WHERE id = %s", (row["id"],))
+            cur.execute(
+                "DELETE FROM items WHERE id = %s AND user_id = %s AND item_id = %s AND item_type = 'material' AND quantity = %s",
+                (row["id"], user_id, item_id, row_qty),
+            )
+            if int(cur.rowcount or 0) == 0:
+                return None
         else:
-            cur.execute("UPDATE items SET quantity = quantity - %s WHERE id = %s", (consume, row["id"]))
+            cur.execute(
+                "UPDATE items SET quantity = quantity - %s WHERE id = %s AND user_id = %s AND item_id = %s AND item_type = 'material' AND quantity >= %s",
+                (consume, row["id"], user_id, item_id, consume),
+            )
+            if int(cur.rowcount or 0) == 0:
+                return None
         remain -= consume
     return template
 
@@ -61,16 +99,18 @@ def _deduct_item_tx(cur: Any, *, user_id: str, item_id: str, quantity: int) -> D
 def _grant_item_tx(cur: Any, *, user_id: str, template: Dict[str, Any], quantity: int) -> None:
     qty = max(1, int(quantity or 1))
     item_id = str(template.get("item_id") or "")
-    item_type = str(template.get("item_type") or "material")
-    quality = str(template.get("quality") or "common")
-    level = max(1, _as_int(template.get("level", 1), 1))
+    item_type = "material"
+    quality = "common"
+    level = 1
+    item_def = get_item_by_id(item_id) or {}
+    item_name = str(item_def.get("name") or template.get("item_name") or item_id)
     cur.execute(
         """
         SELECT id FROM items
-        WHERE user_id = %s AND item_id = %s AND item_type = %s AND quality = %s AND level = %s
+        WHERE user_id = %s AND item_id = %s AND item_type = 'material'
         ORDER BY id ASC LIMIT 1
         """,
-        (user_id, item_id, item_type, quality, level),
+        (user_id, item_id),
     )
     row = cur.fetchone()
     if row:
@@ -88,7 +128,7 @@ def _grant_item_tx(cur: Any, *, user_id: str, template: Dict[str, Any], quantity
         (
             user_id,
             item_id,
-            template.get("item_name") or item_id,
+            item_name,
             item_type,
             quality,
             qty,
@@ -113,6 +153,7 @@ def publish_bounty(
     reward_spirit_low: int,
     description: str = "",
 ) -> Tuple[Dict[str, Any], int]:
+    _ensure_bounty_schema_once()
     poster = get_user_by_id(user_id)
     if not poster:
         return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
@@ -123,6 +164,9 @@ def publish_bounty(
     item_def = get_item_by_id(item_id)
     if not item_def:
         return {"success": False, "code": "INVALID_ITEM", "message": "道具不存在，无法发布悬赏"}, 400
+    item_type = getattr(item_def.get("type"), "value", item_def.get("type"))
+    if str(item_type) != "material":
+        return {"success": False, "code": "INVALID_ITEM", "message": "悬赏当前仅支持材料类道具"}, 400
 
     qty = _as_int(wanted_quantity, 0)
     reward = _as_int(reward_spirit_low, 0)
@@ -133,20 +177,29 @@ def publish_bounty(
 
     now = int(time.time())
     desc = str(description or "").strip()
-    with db_transaction() as cur:
-        cur.execute(
-            """
-            INSERT INTO bounty_orders (
-                poster_user_id, wanted_item_id, wanted_item_name, wanted_quantity,
-                reward_spirit_low, description, status, created_at
+    try:
+        with db_transaction() as cur:
+            cur.execute(
+                "UPDATE users SET copper = copper - %s WHERE user_id = %s AND copper >= %s",
+                (reward, user_id, reward),
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id
-            """,
-            (user_id, item_id, item_def.get("name") or item_id, qty, reward, desc, BOUNTY_STATUS_OPEN, now),
-        )
-        row = cur.fetchone()
-        bounty_id = int(row["id"])
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INSUFFICIENT")
+            cur.execute(
+                """
+                INSERT INTO bounty_orders (
+                    poster_user_id, wanted_item_id, wanted_item_name, wanted_quantity,
+                    reward_spirit_low, escrow_copper, is_escrowed, description, status, created_at
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, 1, %s, %s, %s)
+                RETURNING id
+                """,
+                (user_id, item_id, item_def.get("name") or item_id, qty, reward, reward, desc, BOUNTY_STATUS_OPEN, now),
+            )
+            row = cur.fetchone()
+            bounty_id = int(row["id"])
+    except ValueError:
+        return {"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足，无法发布悬赏"}, 400
 
     log_event(
         "bounty_publish",
@@ -161,6 +214,15 @@ def publish_bounty(
         user_id=user_id,
         success=True,
         detail={"bounty_id": bounty_id, "item_id": item_id, "qty": qty, "reward_spirit_low": reward},
+    )
+    log_economy_ledger(
+        user_id=user_id,
+        module="bounty",
+        action="bounty_publish",
+        delta_copper=-reward,
+        success=True,
+        rank=int(poster.get("rank", 1) or 1),
+        meta={"bounty_id": bounty_id, "item_id": item_id, "qty": qty, "escrow": True},
     )
     return {
         "success": True,
@@ -240,51 +302,93 @@ def accept_bounty(*, user_id: str, bounty_id: int) -> Tuple[Dict[str, Any], int]
 
 
 def submit_bounty(*, user_id: str, bounty_id: int) -> Tuple[Dict[str, Any], int]:
+    _ensure_bounty_schema_once()
     claimer = get_user_by_id(user_id)
     if not claimer:
         return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
     now = int(time.time())
+    poster_id = ""
+    wanted_item_id = ""
+    wanted_qty = 0
+    reward_low = 0
+    try:
+        with db_transaction() as cur:
+            cur.execute("SELECT * FROM bounty_orders WHERE id = %s FOR UPDATE", (int(bounty_id),))
+            bounty = cur.fetchone()
+            if not bounty:
+                raise ValueError("NOT_FOUND")
+            bounty = dict(bounty)
+            if str(bounty.get("status")) != BOUNTY_STATUS_CLAIMED:
+                raise ValueError("INVALID_STATUS")
+            if str(bounty.get("claimer_user_id") or "") != str(user_id):
+                raise ValueError("FORBIDDEN")
 
-    with db_transaction() as cur:
-        cur.execute("SELECT * FROM bounty_orders WHERE id = %s", (int(bounty_id),))
-        bounty = cur.fetchone()
-        if not bounty:
+            poster_id = str(bounty.get("poster_user_id") or "")
+            if not poster_id:
+                raise ValueError("POSTER_NOT_FOUND")
+            cur.execute("SELECT user_id FROM users WHERE user_id = %s FOR UPDATE", (poster_id,))
+            if not cur.fetchone():
+                raise ValueError("POSTER_NOT_FOUND")
+
+            wanted_item_id = str(bounty.get("wanted_item_id") or "")
+            wanted_qty = _as_int(bounty.get("wanted_quantity", 0), 0)
+            reward_low = _as_int(bounty.get("reward_spirit_low", 0), 0)
+            if wanted_qty <= 0 or reward_low <= 0:
+                raise ValueError("INVALID")
+            item_def = get_item_by_id(wanted_item_id) or {}
+            item_type = getattr(item_def.get("type"), "value", item_def.get("type"))
+            if str(item_type) != "material":
+                raise ValueError("INVALID_ITEM")
+
+            template = _deduct_item_tx(cur, user_id=user_id, item_id=wanted_item_id, quantity=wanted_qty)
+            if not template:
+                raise ValueError("INSUFFICIENT_ITEM")
+            _grant_item_tx(cur, user_id=poster_id, template=template, quantity=wanted_qty)
+
+            is_escrowed = int(bounty.get("is_escrowed", 0) or 0) == 1
+            escrow_copper = _as_int(bounty.get("escrow_copper", reward_low), reward_low)
+            payout = reward_low if is_escrowed else reward_low
+            if is_escrowed and escrow_copper < reward_low:
+                payout = max(0, escrow_copper)
+
+            if not is_escrowed:
+                cur.execute(
+                    "UPDATE users SET copper = copper - %s WHERE user_id = %s AND copper >= %s",
+                    (reward_low, poster_id, reward_low),
+                )
+                if int(cur.rowcount or 0) == 0:
+                    raise ValueError("POSTER_FUNDS")
+
+            cur.execute("UPDATE users SET copper = copper + %s WHERE user_id = %s", (payout, user_id))
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("USER_NOT_FOUND")
+
+            cur.execute(
+                """UPDATE bounty_orders
+                   SET status = %s, completed_at = %s, escrow_copper = CASE WHEN is_escrowed = 1 THEN 0 ELSE escrow_copper END
+                   WHERE id = %s AND status = %s AND claimer_user_id = %s""",
+                (BOUNTY_STATUS_COMPLETED, now, int(bounty_id), BOUNTY_STATUS_CLAIMED, user_id),
+            )
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INVALID_STATUS")
+            reward_low = payout
+    except ValueError as exc:
+        reason = str(exc)
+        if reason == "NOT_FOUND":
             return {"success": False, "code": "NOT_FOUND", "message": "悬赏不存在"}, 404
-        bounty = dict(bounty)
-        if str(bounty.get("status")) != BOUNTY_STATUS_CLAIMED:
+        if reason == "INVALID_STATUS":
             return {"success": False, "code": "INVALID_STATUS", "message": "该悬赏未处于进行中"}, 400
-        if str(bounty.get("claimer_user_id") or "") != str(user_id):
+        if reason == "FORBIDDEN":
             return {"success": False, "code": "FORBIDDEN", "message": "仅接取者可提交悬赏"}, 403
-
-        poster_id = str(bounty.get("poster_user_id") or "")
-        poster = get_user_by_id(poster_id)
-        if not poster:
+        if reason == "POSTER_NOT_FOUND":
             return {"success": False, "code": "POSTER_NOT_FOUND", "message": "发布者不存在"}, 404
-
-        wanted_item_id = str(bounty.get("wanted_item_id") or "")
-        wanted_qty = _as_int(bounty.get("wanted_quantity", 0), 0)
-        reward_low = _as_int(bounty.get("reward_spirit_low", 0), 0)
-        if int(poster.get("copper", 0) or 0) < reward_low:
-            return {"success": False, "code": "POSTER_FUNDS", "message": "发布者下品灵石不足，暂无法结算"}, 400
-
-        template = _deduct_item_tx(cur, user_id=user_id, item_id=wanted_item_id, quantity=wanted_qty)
-        if not template:
+        if reason == "INSUFFICIENT_ITEM":
             return {"success": False, "code": "INSUFFICIENT_ITEM", "message": "提交失败，你的道具数量不足"}, 400
-
-        _grant_item_tx(cur, user_id=poster_id, template=template, quantity=wanted_qty)
-
-        cur.execute(
-            "UPDATE users SET copper = copper - %s WHERE user_id = %s AND copper >= %s",
-            (reward_low, poster_id, reward_low),
-        )
-        if cur.rowcount == 0:
+        if reason == "POSTER_FUNDS":
             return {"success": False, "code": "POSTER_FUNDS", "message": "发布者下品灵石不足，暂无法结算"}, 400
-        cur.execute("UPDATE users SET copper = copper + %s WHERE user_id = %s", (reward_low, user_id))
-
-        cur.execute(
-            "UPDATE bounty_orders SET status = %s, completed_at = %s WHERE id = %s",
-            (BOUNTY_STATUS_COMPLETED, now, int(bounty_id)),
-        )
+        if reason == "INVALID_ITEM":
+            return {"success": False, "code": "INVALID_ITEM", "message": "该悬赏仅支持材料类道具结算"}, 400
+        return {"success": False, "code": "INVALID", "message": "悬赏配置异常，无法结算"}, 400
 
     log_event(
         "bounty_submit",

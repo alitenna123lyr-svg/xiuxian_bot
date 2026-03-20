@@ -100,6 +100,12 @@ def list_events() -> List[Dict[str, Any]]:
 
 
 def get_world_boss_config() -> Dict[str, Any]:
+    def _to_int(value: Any, default: int) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return int(default)
+
     configured = config.get_nested("events", "world_boss", default=None)
     if not isinstance(configured, dict):
         return deepcopy(WORLD_BOSS)
@@ -107,8 +113,8 @@ def get_world_boss_config() -> Dict[str, Any]:
     merged.update(configured)
     merged["id"] = str(merged.get("id") or WORLD_BOSS["id"])
     merged["name"] = str(merged.get("name") or WORLD_BOSS["name"])
-    merged["max_hp"] = int(merged.get("max_hp", WORLD_BOSS["max_hp"]) or WORLD_BOSS["max_hp"])
-    merged["reward_copper"] = int(merged.get("reward_copper", WORLD_BOSS["reward_copper"]) or WORLD_BOSS["reward_copper"])
-    merged["reward_exp"] = int(merged.get("reward_exp", WORLD_BOSS["reward_exp"]) or WORLD_BOSS["reward_exp"])
-    merged["reward_gold"] = int(merged.get("reward_gold", WORLD_BOSS.get("reward_gold", 0)) or WORLD_BOSS.get("reward_gold", 0))
+    merged["max_hp"] = max(1, _to_int(merged.get("max_hp", WORLD_BOSS["max_hp"]), WORLD_BOSS["max_hp"]))
+    merged["reward_copper"] = max(0, _to_int(merged.get("reward_copper", WORLD_BOSS["reward_copper"]), WORLD_BOSS["reward_copper"]))
+    merged["reward_exp"] = max(0, _to_int(merged.get("reward_exp", WORLD_BOSS["reward_exp"]), WORLD_BOSS["reward_exp"]))
+    merged["reward_gold"] = max(0, _to_int(merged.get("reward_gold", WORLD_BOSS.get("reward_gold", 0)), WORLD_BOSS.get("reward_gold", 0)))
     return merged

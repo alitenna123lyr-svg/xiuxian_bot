@@ -54,11 +54,174 @@ def _pill_buff_cfg() -> Dict[str, Any]:
     }
 
 
+def _realm_trial_requirement_payload(trial: Dict[str, Any]) -> Dict[str, Any]:
+    hunt_target = max(0, int((trial or {}).get("hunt_target", 0) or 0))
+    hunt_progress = max(0, int((trial or {}).get("hunt_progress", 0) or 0))
+    secret_target = max(0, int((trial or {}).get("secret_target", 0) or 0))
+    secret_progress = max(0, int((trial or {}).get("secret_progress", 0) or 0))
+    return {
+        "hunt": {
+            "progress": hunt_progress,
+            "target": hunt_target,
+            "remaining": max(0, hunt_target - hunt_progress),
+        },
+        "secret": {
+            "progress": secret_progress,
+            "target": secret_target,
+            "remaining": max(0, secret_target - secret_progress),
+        },
+    }
+
+
+def _realm_trial_requirement_text(trial: Dict[str, Any]) -> str:
+    req = _realm_trial_requirement_payload(trial)
+    parts = []
+    hunt = req["hunt"]
+    if int(hunt.get("target", 0) or 0) > 0:
+        parts.append(f"狩猎 {hunt['progress']}/{hunt['target']}（还差 {hunt['remaining']}）")
+    secret = req["secret"]
+    if int(secret.get("target", 0) or 0) > 0:
+        parts.append(f"秘境 {secret['progress']}/{secret['target']}（还差 {secret['remaining']}）")
+    return "，".join(parts) if parts else "当前境界无额外试炼要求"
+
+
 def _current_period_key(period: str) -> str:
     day_key = local_day_key()
     if period == "week":
         return f"week:{day_key // 7}"
     return f"day:{day_key}"
+
+
+def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: str = "steady") -> Tuple[Dict[str, Any], int]:
+    from core.game.realms import get_next_realm, calculate_breakthrough_cost, get_realm_by_id
+    from core.services.breakthrough_pity import bonus as pity_bonus, get_hard_pity_threshold
+
+    user = get_user_by_id(user_id)
+    if not user:
+        return {"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404
+
+    current_rank = int(user.get("rank", 1) or 1)
+    current_realm = get_realm_by_id(current_rank) or {"name": "当前境界"}
+    next_realm = get_next_realm(current_rank)
+    if not next_realm:
+        return {
+            "success": False,
+            "code": "MAX",
+            "message": "你已站上当前世界的修行尽头。",
+            "preview": {
+                "strategy": "normal",
+                "strategy_name": "普通冲关",
+                "preview_text": "你已站上当前世界的修行尽头。",
+                "strategy_notes": "",
+            },
+        }, 200
+
+    strategy = (strategy or "normal").strip().lower()
+    if strategy not in ("normal", "steady", "protect", "desperate"):
+        strategy = "normal"
+    if use_pill and strategy == "normal":
+        strategy = "steady"
+
+    now = int(time.time())
+    protect_cfg = _pill_buff_cfg()["breakthrough_protect"]
+    protect_until = int(user.get("breakthrough_protect_until", 0) or 0)
+    protect_active = protect_until > now
+    boost_until = int(user.get("breakthrough_boost_until", 0) or 0)
+    boost_pct = float(user.get("breakthrough_boost_pct", 0) or 0)
+    boost_active = boost_until > now and boost_pct > 0
+
+    cost = calculate_breakthrough_cost(current_rank)
+    threshold = get_hard_pity_threshold(current_rank)
+    pity = int(user.get("breakthrough_pity", 0) or 0)
+    base_rate = float(next_realm.get("break_rate", 0.0) or 0.0)
+    rate_parts = [f"基础成功率 {int(base_rate * 100)}%"]
+    shown_rate = base_rate
+    if user.get("element") == "火":
+        shown_rate = min(1.0, shown_rate + 0.03)
+        rate_parts.append("火灵根 +3%")
+
+    if protect_active:
+        protect_bonus = float(protect_cfg.get("success_bonus", 0.05))
+        if protect_bonus > 0:
+            shown_rate = min(1.0, shown_rate + protect_bonus)
+            rate_parts.append(f"保护丹 +{int(protect_bonus * 100)}%")
+    if boost_active:
+        shown_rate = min(1.0, shown_rate + boost_pct / 100.0)
+        rate_parts.append(f"突破增益 +{int(boost_pct)}%")
+
+    strategy_name = {
+        "normal": "普通冲关",
+        "steady": "稳妥突破",
+        "protect": "护脉突破",
+        "desperate": "生死突破",
+    }.get(strategy, "普通冲关")
+
+    extra_cost_text = "无额外材料"
+    if strategy == "steady":
+        shown_rate = min(1.0, shown_rate + 0.10)
+        rate_parts.append("突破丹 +10%")
+        extra_cost_text = "额外消耗: 突破丹 x1"
+    elif strategy == "protect":
+        protect_need = 2 + max(0, current_rank // 10)
+        extra_cost_text = f"额外消耗: 灵石 x{protect_need}"
+        rate_parts.append("护脉: 失败不进虚弱")
+    elif strategy == "desperate":
+        extra_cost_text = "额外效果: 成功额外奖励，失败惩罚更重"
+
+    pity_rate = pity_bonus(pity)
+    if pity_rate > 0:
+        shown_rate = min(1.0, shown_rate + pity_rate)
+        rate_parts.append(f"心魔值加成 +{int(pity_rate * 100)}%")
+
+    base_for_notes = float(next_realm.get("break_rate", 0.0) or 0.0)
+    if user.get("element") == "火":
+        base_for_notes = min(1.0, base_for_notes + 0.03)
+    if protect_active:
+        base_for_notes = min(1.0, base_for_notes + float(protect_cfg.get("success_bonus", 0.05)))
+    if boost_active:
+        base_for_notes = min(1.0, base_for_notes + boost_pct / 100.0)
+    base_for_notes = min(1.0, base_for_notes + pity_bonus(pity))
+    protect_need = 2 + max(0, current_rank // 10)
+    steady_rate = min(1.0, base_for_notes + 0.10)
+    protect_rate = base_for_notes
+    desperate_rate = base_for_notes
+
+    preview_text = (
+        f"⚡ *渡劫预告*\n"
+        f"策略: *{strategy_name}*\n"
+        f"你将从 *{current_realm.get('name', '当前境界')}* 冲击 *{next_realm.get('name', '下一境界')}*。\n"
+        f"消耗: {cost:,} 下品灵石\n"
+        "额外消耗: 1 点精力\n"
+        f"{extra_cost_text}\n"
+        f"预计成功率: *{int(shown_rate * 100)}%*\n"
+        f"保底进度: {pity}/{threshold}\n"
+        f"加成构成: {' ｜ '.join(rate_parts)}"
+    )
+    strategy_notes = (
+        f"稳妥突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
+        f"护脉突破：消耗下品灵石 + 灵石 x{protect_need}，成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
+        f"生死突破：只消耗下品灵石，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重"
+    )
+
+    return {
+        "success": True,
+        "preview": {
+            "strategy": strategy,
+            "strategy_name": strategy_name,
+            "current_rank": current_rank,
+            "current_realm": current_realm.get("name", "当前境界"),
+            "next_realm": next_realm.get("name", "下一境界"),
+            "cost_copper": int(cost),
+            "stamina_cost": 1,
+            "success_rate": float(shown_rate),
+            "success_rate_pct": int(shown_rate * 100),
+            "pity": int(pity),
+            "pity_threshold": int(threshold),
+            "rate_parts": rate_parts,
+            "preview_text": preview_text,
+            "strategy_notes": strategy_notes,
+        },
+    }, 200
 
 
 def get_shop_remaining_limit(user_id: str, item_id: str, offer: Dict[str, Any]) -> int | None:
@@ -533,11 +696,13 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
     rank = int(current_rank or 1)
     if not is_realm_trial_complete(user_id, rank):
         trial = get_or_create_realm_trial(user_id, rank) or {}
+        requirement_text = _realm_trial_requirement_text(trial)
         return {
             "success": False,
             "code": "REALM_TRIAL",
-            "message": "需完成当前境界试炼后方可突破",
+            "message": f"需完成当前境界试炼后方可突破：{requirement_text}",
             "trial": trial,
+            "trial_requirements": _realm_trial_requirement_payload(trial),
         }, 400
     now = int(time.time())
     protect_cfg = _pill_buff_cfg()["breakthrough_protect"]
@@ -1017,7 +1182,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
     log_event(
         "breakthrough",
         user_id=user_id,
-        success=True,
+        success=False,
         rank=rank,
         meta={
             "strategy": strategy,
@@ -1046,6 +1211,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
         meta={
             "strategy": strategy,
             "breakthrough_success": False,
+            "business_success": False,
             "from_rank": current_rank,
             "to_rank": current_rank,
             "shown_rate": shown_rate,

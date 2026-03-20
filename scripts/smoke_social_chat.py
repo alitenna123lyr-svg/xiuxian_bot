@@ -29,24 +29,12 @@ def _expect(
     return payload
 
 
-def _cleanup_db(db_path: Path) -> None:
-    for suffix in ("", "-wal", "-shm"):
-        path = Path(str(db_path) + suffix)
-        if path.exists():
-            try:
-                path.unlink()
-            except Exception:
-                pass
-
-
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    db_path = root / "data" / f"_tmp_social_chat_test_{int(time.time())}.db"
-    os.environ["XXBOT_DB_PATH"] = str(db_path)
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
 
-    from core.database.connection import create_tables, execute, fetch_one, close_sqlite
+    from core.database.connection import connect_sqlite, create_tables, execute, fetch_one, close_sqlite
     from core.services.social_service import (
         CHAT_REQUEST_TTL_SECONDS,
         accept_chat_request,
@@ -55,6 +43,7 @@ def main() -> None:
     )
     from core.utils.timeutil import midnight_timestamp
 
+    connect_sqlite()
     create_tables()
     now = int(time.time())
 
@@ -336,7 +325,6 @@ def main() -> None:
         )
     finally:
         close_sqlite()
-        _cleanup_db(db_path)
 
 
 if __name__ == "__main__":

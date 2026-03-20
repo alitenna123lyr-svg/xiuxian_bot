@@ -42,11 +42,29 @@ def _refresh_chat_energy(user_id: str, user: Dict[str, Any], now: int) -> Dict[s
     return user
 
 
-def _chat_gain_for(user: Dict[str, Any], *, initiated_today: int = 0) -> float:
+def _chat_gain_for(user: Dict[str, Any]) -> float:
     current = _coerce_float(user.get("chat_energy_today", 0), 0.0)
     if current < CHAT_DAILY_LIMIT:
         return 1.0
     return 0.0
+
+
+def _chat_exp_for(user: Dict[str, Any]) -> int:
+    # Rank-scaled chat exp:
+    # exp = base + floor((rank - 1) / rank_step) * per_step (capped by max_bonus).
+    legacy_fixed = int(config.get_nested("balance", "social_chat_exp", default=0) or 0)
+    configured_base = int(config.get_nested("balance", "social_chat_exp_base", default=0) or 0)
+    base = configured_base if configured_base > 0 else (legacy_fixed if legacy_fixed > 0 else 18)
+    base = max(12, base)
+
+    rank_step = max(1, int(config.get_nested("balance", "social_chat_exp_rank_step", default=3) or 3))
+    per_step = max(0, int(config.get_nested("balance", "social_chat_exp_per_step", default=2) or 2))
+    max_bonus = max(0, int(config.get_nested("balance", "social_chat_exp_max_bonus", default=120) or 120))
+
+    rank = max(1, int(user.get("rank", 1) or 1))
+    bonus_steps = max(0, (rank - 1) // rank_step)
+    bonus = min(max_bonus, bonus_steps * per_step)
+    return max(1, int(base + bonus))
 
 
 def _expire_chat_requests(now: int) -> None:
@@ -164,83 +182,90 @@ def accept_chat_request(*, user_id: str, request_id: int) -> Tuple[Dict[str, Any
     to_user = _refresh_chat_energy(to_id, to_user, now)
 
     day_start = midnight_timestamp()
-    from_initiated = _daily_chat_requests(from_id, day_start)
-    to_initiated = _daily_chat_requests(to_id, day_start)
-    from_gain = _chat_gain_for(from_user, initiated_today=from_initiated)
-    to_gain = _chat_gain_for(to_user, initiated_today=to_initiated)
+    from_gain = _chat_gain_for(from_user)
+    to_gain = _chat_gain_for(to_user)
 
-    exp_gain = int(config.get_nested("balance", "social_chat_exp", default=10) or 10)
-    from_exp_gain = exp_gain if from_gain > 0 else 0
-    to_exp_gain = exp_gain if to_gain > 0 else 0
+    from_exp_base = _chat_exp_for(from_user)
+    to_exp_base = _chat_exp_for(to_user)
+    from_exp_gain = from_exp_base if from_gain > 0 else 0
+    to_exp_gain = to_exp_base if to_gain > 0 else 0
+    # Keep legacy field for compatibility; it now reflects acceptor's effective gain.
+    exp_gain = to_exp_gain
 
     refreshed_from = refresh_user_stamina(from_id, now=now) or from_user
     refreshed_to = refresh_user_stamina(to_id, now=now) or to_user
     before_from_stamina = _coerce_float(refreshed_from.get("stamina", DEFAULT_STAMINA_MAX), float(DEFAULT_STAMINA_MAX))
     before_to_stamina = _coerce_float(refreshed_to.get("stamina", DEFAULT_STAMINA_MAX), float(DEFAULT_STAMINA_MAX))
 
-    with db_transaction() as cur:
-        cur.execute(
-            """
-            UPDATE social_chat_requests
-            SET status = 'accepted', responded_at = %s
-            WHERE id = %s AND status = 'pending'
-            """,
-            (now, request_id),
-        )
-        if cur.rowcount == 0:
+    try:
+        with db_transaction() as cur:
+            cur.execute(
+                """
+                UPDATE social_chat_requests
+                SET status = 'accepted', responded_at = %s
+                WHERE id = %s AND status = 'pending'
+                """,
+                (now, request_id),
+            )
+            if cur.rowcount == 0:
+                raise ValueError("INVALID")
+            cur.execute(
+                """
+                UPDATE users
+                SET stamina = LEAST(%s, stamina + %s),
+                    stamina_updated_at = CASE WHEN stamina + %s >= %s THEN %s ELSE stamina_updated_at END,
+                    exp = exp + %s,
+                    chat_energy_today = (CASE WHEN chat_energy_reset < %s THEN 0 ELSE chat_energy_today END) + %s,
+                    chat_energy_reset = CASE WHEN chat_energy_reset < %s THEN %s ELSE chat_energy_reset END
+                WHERE user_id = %s
+                """,
+                (
+                    float(DEFAULT_STAMINA_MAX),
+                    float(from_gain),
+                    float(from_gain),
+                    float(DEFAULT_STAMINA_MAX),
+                    now,
+                    from_exp_gain,
+                    day_start,
+                    float(from_gain),
+                    day_start,
+                    now,
+                    from_id,
+                ),
+            )
+            if cur.rowcount == 0:
+                raise ValueError("USER_NOT_FOUND")
+            cur.execute(
+                """
+                UPDATE users
+                SET stamina = LEAST(%s, stamina + %s),
+                    stamina_updated_at = CASE WHEN stamina + %s >= %s THEN %s ELSE stamina_updated_at END,
+                    exp = exp + %s,
+                    chat_energy_today = (CASE WHEN chat_energy_reset < %s THEN 0 ELSE chat_energy_today END) + %s,
+                    chat_energy_reset = CASE WHEN chat_energy_reset < %s THEN %s ELSE chat_energy_reset END
+                WHERE user_id = %s
+                """,
+                (
+                    float(DEFAULT_STAMINA_MAX),
+                    float(to_gain),
+                    float(to_gain),
+                    float(DEFAULT_STAMINA_MAX),
+                    now,
+                    to_exp_gain,
+                    day_start,
+                    float(to_gain),
+                    day_start,
+                    now,
+                    to_id,
+                ),
+            )
+            if cur.rowcount == 0:
+                raise ValueError("USER_NOT_FOUND")
+    except ValueError as exc:
+        reason = str(exc)
+        if reason == "INVALID":
             return {"success": False, "code": "INVALID", "message": "请求已处理"}, 400
-        cur.execute(
-            """
-            UPDATE users
-            SET stamina = LEAST(%s, stamina + %s),
-                stamina_updated_at = CASE WHEN stamina + %s >= %s THEN %s ELSE stamina_updated_at END,
-                exp = exp + %s,
-                chat_energy_today = (CASE WHEN chat_energy_reset < %s THEN 0 ELSE chat_energy_today END) + %s,
-                chat_energy_reset = CASE WHEN chat_energy_reset < %s THEN %s ELSE chat_energy_reset END
-            WHERE user_id = %s
-            """,
-            (
-                float(DEFAULT_STAMINA_MAX),
-                float(from_gain),
-                float(from_gain),
-                float(DEFAULT_STAMINA_MAX),
-                now,
-                from_exp_gain,
-                day_start,
-                float(from_gain),
-                day_start,
-                now,
-                from_id,
-            ),
-        )
-        if cur.rowcount == 0:
-            return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
-        cur.execute(
-            """
-            UPDATE users
-            SET stamina = LEAST(%s, stamina + %s),
-                stamina_updated_at = CASE WHEN stamina + %s >= %s THEN %s ELSE stamina_updated_at END,
-                exp = exp + %s,
-                chat_energy_today = (CASE WHEN chat_energy_reset < %s THEN 0 ELSE chat_energy_today END) + %s,
-                chat_energy_reset = CASE WHEN chat_energy_reset < %s THEN %s ELSE chat_energy_reset END
-            WHERE user_id = %s
-            """,
-            (
-                float(DEFAULT_STAMINA_MAX),
-                float(to_gain),
-                float(to_gain),
-                float(DEFAULT_STAMINA_MAX),
-                now,
-                to_exp_gain,
-                day_start,
-                float(to_gain),
-                day_start,
-                now,
-                to_id,
-            ),
-        )
-        if cur.rowcount == 0:
-            return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
+        return {"success": False, "code": "USER_NOT_FOUND", "message": "玩家不存在"}, 404
 
     updated_from = get_user_by_id(from_id) or refreshed_from
     updated_to = get_user_by_id(to_id) or refreshed_to

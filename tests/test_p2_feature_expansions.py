@@ -12,7 +12,7 @@ from core.services.events_service import (
 )
 from core.services.forge_service import forge
 from core.services.settlement import settle_secret_realm_explore
-from core.services.balance_service import hunt_base_exp
+from core.services.balance_service import hunt_base_exp, hunt_rewards
 from tests.conftest import create_user
 
 
@@ -163,3 +163,29 @@ def test_piecewise_rank_curve_is_supported():
         ],
     )
     assert curved < plain
+
+
+def test_hunt_rewards_scale_with_monster_exp_when_available(monkeypatch):
+    monkeypatch.setattr("core.services.balance_service.random.randint", lambda low, high: high)
+    cfg = {
+        "base_exp": 20,
+        "growth": 1.25,
+        "copper_ratio": 0.6,
+        "copper_rand": 0.2,
+        "currency_gain_mult": 0.25,
+    }
+    rank = 3
+
+    baseline = hunt_rewards(rank, cfg)
+    wild = hunt_rewards(rank, cfg, monster={"exp_reward": 20})
+    spirit_rat = hunt_rewards(rank, cfg, monster={"exp_reward": 50})
+    giant_snake = hunt_rewards(rank, cfg, monster={"exp_reward": 60})
+
+    # Weak monsters should not drop below the rank baseline.
+    assert wild["exp"] == baseline["exp"]
+    # Stronger monsters should reward more than weaker ones.
+    assert spirit_rat["exp"] > wild["exp"]
+    assert giant_snake["exp"] > spirit_rat["exp"]
+    # Copper uses the same reward base, so higher-exp monsters should trend higher.
+    assert spirit_rat["copper"] > wild["copper"]
+    assert giant_snake["copper"] > spirit_rat["copper"]

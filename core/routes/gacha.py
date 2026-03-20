@@ -16,6 +16,25 @@ from core.services.gacha_service import list_banners, get_pity, pull_gacha, get_
 gacha_bp = Blueprint("gacha", __name__)
 
 
+def _parse_bool_strict(value, *, default: bool = False):
+    if value is None:
+        return default, None
+    if isinstance(value, bool):
+        return value, None
+    if isinstance(value, int):
+        if value in (0, 1):
+            return bool(value), None
+        return None, "布尔参数仅支持 true/false 或 0/1"
+    if isinstance(value, str):
+        text = value.strip().lower()
+        if text in {"1", "true", "yes", "y", "on"}:
+            return True, None
+        if text in {"0", "false", "no", "n", "off"}:
+            return False, None
+        return None, "布尔参数仅支持 true/false 或 0/1"
+    return None, "布尔参数类型无效"
+
+
 @gacha_bp.route("/api/gacha/banners", methods=["GET"])
 def gacha_banners():
     banners = list_banners()
@@ -55,8 +74,11 @@ def gacha_pull():
         return auth_error
     banner_id = data.get("banner_id")
     count = data.get("count", 1)
-    force_paid = bool(data.get("force_paid", False))
-    log_action("gacha_pull", user_id=user_id, banner_id=banner_id, count=count)
+    request_id = data.get("request_id")
+    force_paid, bool_error = _parse_bool_strict(data.get("force_paid"), default=False)
+    if bool_error:
+        return error("INVALID", bool_error, 400)
+    log_action("gacha_pull", user_id=user_id, request_id=request_id, banner_id=banner_id, count=count, force_paid=force_paid)
     if banner_id is None:
         return error("MISSING_PARAMS", "Missing parameters", 400)
     try:
@@ -67,5 +89,5 @@ def gacha_pull():
         count = int(count or 1)
     except (TypeError, ValueError):
         return error("INVALID", "Invalid count", 400)
-    resp, http_status = pull_gacha(user_id, banner_id, count=count, force_paid=force_paid)
+    resp, http_status = pull_gacha(user_id, banner_id, count=count, force_paid=force_paid, request_id=request_id)
     return jsonify(resp), http_status

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import random
+import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -17,6 +18,7 @@ from core.database.connection import (
     refresh_user_stamina,
     spend_user_stamina_tx,
 )
+from core.database.migrations import reserve_request, save_response
 from core.utils.number import format_stamina_value
 from core.game.items import get_item_by_id, generate_pill, generate_material, generate_equipment, generate_skill_book, Quality
 from core.services.metrics_service import log_event, log_economy_ledger
@@ -27,6 +29,8 @@ GACHA_PAID_DAILY_LIMIT = 15
 GACHA_FIVE_PULL_COUNT = 5
 GACHA_FIVE_PULL_PRICE_GOLD = 4
 GACHA_FIVE_PULL_STAMINA = 4
+_GACHA_TABLES_READY = False
+_GACHA_TABLES_LOCK = threading.Lock()
 
 
 def _ensure_gacha_tables() -> None:
@@ -58,6 +62,17 @@ def _ensure_gacha_tables() -> None:
         """
     )
     conn.commit()
+
+
+def _prepare_gacha_tables_once() -> None:
+    global _GACHA_TABLES_READY
+    if _GACHA_TABLES_READY:
+        return
+    with _GACHA_TABLES_LOCK:
+        if _GACHA_TABLES_READY:
+            return
+        _ensure_gacha_tables()
+        _GACHA_TABLES_READY = True
 
 
 def _gacha_path() -> str:
@@ -250,7 +265,7 @@ def _ensure_item(cur, user_id: str, item_id: str, rarity: str, *, user_rank: int
 
 
 def get_pity(user_id: str, banner_id: int) -> Dict[str, Any]:
-    _ensure_gacha_tables()
+    _prepare_gacha_tables_once()
     row = fetch_one(
         "SELECT pity_count, sr_pity_count, total_pulls FROM gacha_pity WHERE user_id = %s AND banner_id = %s",
         (user_id, banner_id),
@@ -287,12 +302,35 @@ def _reset_daily_gacha_if_needed(user: Dict[str, Any]) -> Dict[str, Any]:
     return fresh or user
 
 
-def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool = False) -> Tuple[Dict[str, Any], int]:
-    _ensure_gacha_tables()
+def pull_gacha(
+    user_id: str,
+    banner_id: int,
+    count: int = 1,
+    *,
+    force_paid: bool = False,
+    request_id: Optional[str] = None,
+) -> Tuple[Dict[str, Any], int]:
+    _prepare_gacha_tables_once()
+    if request_id:
+        status, cached = reserve_request(request_id, user_id=user_id, action="gacha_pull")
+        if status == "cached" and cached:
+            return cached, 200
+        if status == "in_progress":
+            return {
+                "success": False,
+                "code": "REQUEST_IN_PROGRESS",
+                "message": "请求处理中，请稍后重试",
+            }, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if request_id:
+            save_response(request_id, user_id, "gacha_pull", resp)
+        return resp, http_status
+
     user = get_user_by_id(user_id)
     if not user:
-        log_event("gacha_pull", user_id=user_id, success=False, reason="USER_NOT_FOUND", meta={"banner_id": banner_id})
-        return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
+        log_event("gacha_pull", user_id=user_id, success=False, request_id=request_id, reason="USER_NOT_FOUND", meta={"banner_id": banner_id})
+        return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404)
     user = _reset_daily_gacha_if_needed(user)
     banner = _get_banner(banner_id)
     requested_count = int(count or 1)
@@ -307,6 +345,7 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
             "gacha_pull",
             user_id=user_id,
             success=False,
+            request_id=request_id,
             rank=rank,
             reason=reason,
             meta=payload,
@@ -314,16 +353,26 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
 
     if not banner:
         _log_failure("INVALID_BANNER")
-        return {"success": False, "code": "INVALID", "message": "卡池不存在"}, 404
+        return _dedup_return({"success": False, "code": "INVALID", "message": "卡池不存在"}, 404)
     if not _is_banner_active(banner):
         _log_failure("EXPIRED")
-        return {"success": False, "code": "EXPIRED", "message": "卡池未开启或已结束"}, 400
+        return _dedup_return({"success": False, "code": "EXPIRED", "message": "卡池未开启或已结束"}, 400)
 
     count = GACHA_FIVE_PULL_COUNT if requested_count >= GACHA_FIVE_PULL_COUNT else 1
     currency = banner.get("currency", "gold")
     free_today = int(user.get("gacha_free_today", 0) or 0)
     paid_today = int(user.get("gacha_paid_today", 0) or 0)
-    is_free_pull = count == 1 and (not force_paid) and free_today < GACHA_FREE_DAILY_LIMIT
+    requested_free_pull = count == 1 and (not force_paid)
+    if requested_free_pull and free_today >= GACHA_FREE_DAILY_LIMIT:
+        _log_failure("FREE_LIMIT", meta={"free_remaining": 0})
+        return _dedup_return({
+            "success": False,
+            "code": "FREE_LIMIT",
+            "message": "今日免费抽奖次数已用尽，请使用付费单抽或五连",
+            "free_remaining": 0,
+            "paid_remaining": max(0, GACHA_PAID_DAILY_LIMIT - paid_today),
+        }, 400)
+    is_free_pull = requested_free_pull and free_today < GACHA_FREE_DAILY_LIMIT
     price_single = int(banner.get("price_single", 1) or 1)
     if count == GACHA_FIVE_PULL_COUNT:
         price = GACHA_FIVE_PULL_PRICE_GOLD if currency == "gold" else price_single * 4
@@ -339,32 +388,28 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
     if paid_today + paid_increment > GACHA_PAID_DAILY_LIMIT:
         remaining = max(0, GACHA_PAID_DAILY_LIMIT - paid_today)
         _log_failure("DAILY_LIMIT", meta={"paid_remaining": remaining})
-        return {
+        return _dedup_return({
             "success": False,
             "code": "DAILY_LIMIT",
             "message": f"今日付费抽奖次数已达上限，剩余可付费抽奖 {remaining} 次",
             "free_remaining": max(0, GACHA_FREE_DAILY_LIMIT - free_today),
             "paid_remaining": remaining,
-        }, 400
+        }, 400)
 
     if price > 0:
         if currency == "gold":
             if int(user.get("gold", 0) or 0) < price:
                 _log_failure("INSUFFICIENT_GOLD", meta={"currency": currency, "price": price})
-                return {"success": False, "code": "INSUFFICIENT", "message": "中品灵石不足"}, 400
+                return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "中品灵石不足"}, 400)
         else:
             if int(user.get("copper", 0) or 0) < price:
                 _log_failure("INSUFFICIENT_COPPER", meta={"currency": currency, "price": price})
-                return {"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400
-    pity = get_pity(user_id, banner_id)
-    pity_count = int(pity.get("pity_count", 0) or 0)
-    sr_pity = int(pity.get("sr_pity_count", 0) or 0)
-    total_pulls = int(pity.get("total_pulls", 0) or 0)
+                return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400)
 
     pools = banner.get("pools", [])
     if not pools or any(not p.get("items") for p in pools):
         _log_failure("INVALID_CONFIG", meta={"currency": currency})
-        return {"success": False, "code": "INVALID", "message": "卡池配置无效"}, 400
+        return _dedup_return({"success": False, "code": "INVALID", "message": "卡池配置无效"}, 400)
     invalid_items: set[str] = set()
     checked_items: set[str] = set()
     for pool in pools:
@@ -381,24 +426,41 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
     if invalid_items:
         invalid_list = "、".join(sorted(invalid_items))
         _log_failure("INVALID_ITEM", meta={"invalid_items": invalid_list})
-        return {"success": False, "code": "INVALID", "message": f"卡池配置包含无效物品：{invalid_list}"}, 400
+        return _dedup_return({"success": False, "code": "INVALID", "message": f"卡池配置包含无效物品：{invalid_list}"}, 400)
     normalized_pools, normalized_rates = _normalize_pools(pools)
     if normalized_pools is None:
         _log_failure("INVALID_RATE", meta={"currency": currency})
-        return {"success": False, "code": "INVALID", "message": "卡池概率配置无效"}, 400
+        return _dedup_return({"success": False, "code": "INVALID", "message": "卡池概率配置无效"}, 400)
     pools = normalized_pools
-    result_items = []
+    result_items: List[Dict[str, Any]] = []
     now = int(time.time())
     stamina_user = None
     if stamina_cost > 0:
         stamina_user = refresh_user_stamina(user_id, now=now)
 
+    pity_count = 0
+    sr_pity = 0
+    total_pulls = 0
     try:
         with db_transaction() as cur:
+            cur.execute(
+                """INSERT INTO gacha_pity (user_id, banner_id, pity_count, sr_pity_count, total_pulls)
+                   VALUES (%s, %s, 0, 0, 0)
+                   ON CONFLICT (user_id, banner_id) DO NOTHING""",
+                (user_id, banner_id),
+            )
+            cur.execute(
+                "SELECT pity_count, sr_pity_count, total_pulls FROM gacha_pity WHERE user_id = %s AND banner_id = %s FOR UPDATE",
+                (user_id, banner_id),
+            )
+            pity_row = cur.fetchone()
+            pity_count = int((pity_row or {}).get("pity_count", 0) or 0)
+            sr_pity = int((pity_row or {}).get("sr_pity_count", 0) or 0)
+            total_pulls = int((pity_row or {}).get("total_pulls", 0) or 0)
+
             if stamina_cost > 0:
                 if not spend_user_stamina_tx(cur, user_id, stamina_cost, now=now):
                     raise ValueError("INSUFFICIENT_STAMINA")
-            # deduct currency with conditional guard
             if price > 0 and currency == "gold":
                 cur.execute(
                     "UPDATE users SET gold = gold - %s WHERE user_id = %s AND gold >= %s",
@@ -471,53 +533,63 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
                 elif rarity == "SR":
                     sr_pity = 0
 
-            # upsert pity
             cur.execute(
-                "SELECT id FROM gacha_pity WHERE user_id = %s AND banner_id = %s",
-                (user_id, banner_id),
+                """UPDATE gacha_pity
+                   SET pity_count = %s, sr_pity_count = %s, total_pulls = %s
+                   WHERE user_id = %s AND banner_id = %s""",
+                (pity_count, sr_pity, total_pulls, user_id, banner_id),
             )
-            existing = cur.fetchone()
-            if existing:
-                cur.execute(
-                    "UPDATE gacha_pity SET pity_count = %s, sr_pity_count = %s, total_pulls = %s WHERE id = %s",
-                    (pity_count, sr_pity, total_pulls, existing["id"]),
-                )
-            else:
-                cur.execute(
-                    "INSERT INTO gacha_pity (user_id, banner_id, pity_count, sr_pity_count, total_pulls) VALUES (%s, %s, %s, %s, %s)",
-                    (user_id, banner_id, pity_count, sr_pity, total_pulls),
-                )
     except ValueError as exc:
         reason = str(exc)
         if reason == "INSUFFICIENT_STAMINA":
             current = get_user_by_id(user_id) or stamina_user or user
             _log_failure("INSUFFICIENT_STAMINA", meta={"stamina_cost": stamina_cost})
-            return {
+            return _dedup_return({
                 "success": False,
                 "code": "INSUFFICIENT_STAMINA",
                 "message": f"精力不足，抽奖需要 {stamina_cost} 点精力",
                 "stamina": format_stamina_value((current or {}).get("stamina", 0)),
                 "stamina_cost": stamina_cost,
-            }, 400
+            }, 400)
+        if reason == "FREE_LIMIT":
+            latest_user = get_user_by_id(user_id) or user
+            free_remaining = max(0, GACHA_FREE_DAILY_LIMIT - int((latest_user or {}).get("gacha_free_today", 0) or 0))
+            paid_remaining = max(0, GACHA_PAID_DAILY_LIMIT - int((latest_user or {}).get("gacha_paid_today", 0) or 0))
+            _log_failure("FREE_LIMIT", meta={"free_remaining": free_remaining, "paid_remaining": paid_remaining})
+            return _dedup_return({
+                "success": False,
+                "code": "FREE_LIMIT",
+                "message": "今日免费抽奖次数已用尽，请使用付费单抽或五连",
+                "free_remaining": free_remaining,
+                "paid_remaining": paid_remaining,
+            }, 400)
         if reason == "INVALID_ITEM":
             _log_failure("INVALID_ITEM")
-            return {"success": False, "code": "INVALID", "message": "卡池配置无效，包含不存在的物品"}, 400
+            return _dedup_return({"success": False, "code": "INVALID", "message": "卡池配置无效，包含不存在的物品"}, 400)
         if reason in {"INSUFFICIENT_GOLD", "INSUFFICIENT_COPPER"}:
             _log_failure(reason, meta={"currency": currency, "price": price})
-            return {
+            return _dedup_return({
                 "success": False,
                 "code": "INSUFFICIENT",
                 "message": "中品灵石不足" if reason == "INSUFFICIENT_GOLD" else "下品灵石不足",
-            }, 400
-        remaining = max(0, GACHA_PAID_DAILY_LIMIT - int((get_user_by_id(user_id) or {}).get("gacha_paid_today", 0) or 0))
-        _log_failure("DAILY_LIMIT", meta={"paid_remaining": remaining})
-        return {
-            "success": False,
-            "code": "DAILY_LIMIT",
-            "message": f"今日付费抽奖次数已达上限，剩余可付费抽奖 {remaining} 次",
-            "free_remaining": max(0, GACHA_FREE_DAILY_LIMIT - int((get_user_by_id(user_id) or {}).get("gacha_free_today", 0) or 0)),
-            "paid_remaining": remaining,
-        }, 400
+            }, 400)
+        if reason in {"PAID_LIMIT", "DAILY_LIMIT"}:
+            latest = get_user_by_id(user_id) or {}
+            remaining = max(0, GACHA_PAID_DAILY_LIMIT - int(latest.get("gacha_paid_today", 0) or 0))
+            free_remaining = max(0, GACHA_FREE_DAILY_LIMIT - int(latest.get("gacha_free_today", 0) or 0))
+            _log_failure("DAILY_LIMIT", meta={"paid_remaining": remaining})
+            return _dedup_return({
+                "success": False,
+                "code": "DAILY_LIMIT",
+                "message": f"今日付费抽奖次数已达上限，剩余可付费抽奖 {remaining} 次",
+                "free_remaining": free_remaining,
+                "paid_remaining": remaining,
+            }, 400)
+        _log_failure("UNKNOWN", meta={"reason": reason})
+        return _dedup_return({"success": False, "code": "INVALID", "message": "抽卡请求无效"}, 400)
+    except Exception as exc:
+        _log_failure("DB_ERROR", meta={"error_type": type(exc).__name__})
+        return _dedup_return({"success": False, "code": "CONFLICT", "message": "抽卡请求冲突，请稍后重试"}, 409)
 
     rarity_counts: Dict[str, int] = {}
     for item in result_items:
@@ -529,6 +601,7 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
         "gacha_pull",
         user_id=user_id,
         success=True,
+        request_id=request_id,
         rank=rank,
         meta={
             "banner_id": banner_id,
@@ -553,6 +626,7 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
         shown_price=price if price > 0 else None,
         actual_price=price if price > 0 else None,
         success=True,
+        request_id=request_id,
         rank=rank,
         meta={
             "banner_id": banner_id,
@@ -564,7 +638,7 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
         },
     )
 
-    return {
+    return _dedup_return({
         "success": True,
         "results": result_items,
         "cost": {"currency": currency, "amount": price},
@@ -573,4 +647,4 @@ def pull_gacha(user_id: str, banner_id: int, count: int = 1, *, force_paid: bool
         "free_remaining": max(0, GACHA_FREE_DAILY_LIMIT - (free_today + (1 if is_free_pull else 0))),
         "paid_remaining": max(0, GACHA_PAID_DAILY_LIMIT - (paid_today + paid_increment)),
         "pity": {"pity_count": pity_count, "sr_pity_count": sr_pity, "total_pulls": total_pulls},
-    }, 200
+    }, 200)

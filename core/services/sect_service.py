@@ -30,6 +30,8 @@ SECT_BRANCH_MAX = 5
 SECT_BRANCH_CREATE_COST_COPPER = 3000
 SECT_BRANCH_CREATE_COST_GOLD = 3
 SECT_BRANCH_BUFF_RATE = 0.9
+WEAK_DEBUFF_PCT = 30
+WEAK_DEBUFF_MULT = 1.0 - WEAK_DEBUFF_PCT / 100.0
 
 SECT_QUEST_DEFS: Dict[str, Dict[str, Any]] = {
     "donate": {"target": 5000, "reward_copper": 1000, "reward_exp": 500},
@@ -300,7 +302,45 @@ def apply_sect_stat_buffs(user: Dict[str, Any]) -> Dict[str, Any]:
     def_val = int(enriched.get("defense_buff_value", 0) or 0)
     if def_val > 0 and def_until > now:
         enriched["defense"] = max(0, int(enriched["defense"]) + def_val)
+
+    weak_until = int(enriched.get("weak_until", 0) or 0)
+    weak_remaining_seconds = max(0, weak_until - now)
+    is_weak = weak_remaining_seconds > 0
+    if is_weak:
+        # Breakthrough failure debuff: temporary -30% to core combat attributes.
+        max_hp = int(enriched.get("max_hp", user.get("max_hp", 100)) or user.get("max_hp", 100) or 100)
+        max_mp = int(enriched.get("max_mp", user.get("max_mp", 50)) or user.get("max_mp", 50) or 50)
+        hp = int(enriched.get("hp", max_hp) or max_hp)
+        mp = int(enriched.get("mp", max_mp) or max_mp)
+        attack = int(enriched.get("attack", user.get("attack", 10)) or user.get("attack", 10) or 10)
+        defense = int(enriched.get("defense", user.get("defense", 5)) or user.get("defense", 5) or 5)
+        crit_rate = float(enriched.get("crit_rate", user.get("crit_rate", 0.05)) or user.get("crit_rate", 0.05) or 0.05)
+
+        debuffed_max_hp = max(1, int(round(max_hp * WEAK_DEBUFF_MULT)))
+        debuffed_max_mp = max(1, int(round(max_mp * WEAK_DEBUFF_MULT)))
+        debuffed_attack = max(1, int(round(attack * WEAK_DEBUFF_MULT)))
+        debuffed_defense = max(0, int(round(defense * WEAK_DEBUFF_MULT)))
+
+        enriched["max_hp"] = debuffed_max_hp
+        enriched["max_mp"] = debuffed_max_mp
+        enriched["hp"] = min(debuffed_max_hp, max(0, hp))
+        enriched["mp"] = min(debuffed_max_mp, max(0, mp))
+        enriched["attack"] = debuffed_attack
+        enriched["defense"] = debuffed_defense
+        enriched["crit_rate"] = max(0.0, crit_rate * WEAK_DEBUFF_MULT)
     enriched["sect_buffs"] = buffs
+    enriched["is_weak"] = is_weak
+    enriched["weak_remaining_seconds"] = weak_remaining_seconds
+    enriched["weak_debuff_pct"] = WEAK_DEBUFF_PCT
+    enriched["_weak_debuff_applied"] = is_weak
+    enriched["_combat_stats_precomputed"] = True
+    if is_weak:
+        enriched["weak_effects"] = [
+            "不能开始修炼",
+            "HP/MP/攻击/防御/暴击率 -30%",
+        ]
+    else:
+        enriched["weak_effects"] = []
     return enriched
 
 
@@ -466,6 +506,10 @@ def create_branch_request(user_id: str, name: str, description: str = "") -> Tup
     sect = get_user_sect(user_id)
     if not sect:
         return {"success": False, "code": "NOT_FOUND", "message": "你尚未加入宗门"}, 404
+    if sect.get("membership_kind") != "sect":
+        return {"success": False, "code": "FORBIDDEN", "message": "仅主宗直系成员可申请创建别院"}, 403
+    if _get_member_role(sect["sect_id"], user_id) is None:
+        return {"success": False, "code": "FORBIDDEN", "message": "仅主宗直系成员可申请创建别院"}, 403
     if not name or len(name) > 12:
         return {"success": False, "code": "INVALID", "message": "别院名称无效"}, 400
     base_name = name[:-2] if name.endswith("别院") else name
@@ -863,8 +907,12 @@ def donate(user_id: str, copper: int = 0, gold: int = 0) -> Tuple[Dict[str, Any]
     if not sect:
         log_event("sect_donate", user_id=user_id, success=False, reason="NOT_FOUND")
         return {"success": False, "code": "NOT_FOUND", "message": "你尚未加入宗门"}, 404
-    copper = max(0, int(copper or 0))
-    gold = max(0, int(gold or 0))
+    try:
+        copper = max(0, int(copper or 0))
+        gold = max(0, int(gold or 0))
+    except (TypeError, ValueError):
+        log_event("sect_donate", user_id=user_id, success=False, reason="INVALID_AMOUNT")
+        return {"success": False, "code": "INVALID_AMOUNT", "message": "捐献数量必须是整数"}, 400
     if copper <= 0 and gold <= 0:
         log_event("sect_donate", user_id=user_id, success=False, reason="INVALID_AMOUNT")
         return {"success": False, "code": "INVALID", "message": "请输入捐献数量"}, 400

@@ -62,7 +62,13 @@ def events_exchange():
         return auth_error
     event_id = data.get("event_id")
     exchange_id = data.get("exchange_id")
-    quantity = data.get("quantity", 1)
+    raw_quantity = data.get("quantity", 1)
+    try:
+        quantity = int(raw_quantity)
+    except (TypeError, ValueError):
+        return error("INVALID_PARAMS", "quantity 必须是整数且大于 0", 400)
+    if quantity <= 0:
+        return error("INVALID_PARAMS", "quantity 必须是整数且大于 0", 400)
     if not event_id or not exchange_id:
         return error("MISSING_PARAMS", "Missing parameters", 400)
     log_action("event_exchange", user_id=user_id, event_id=event_id, exchange_id=exchange_id, quantity=quantity)

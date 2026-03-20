@@ -244,6 +244,29 @@ def test_accept_chat_request_expired(test_db):
     assert payload.get("code") == "EXPIRED"
 
 
+def test_chat_exp_scales_with_rank(test_db):
+    create_user("u_low", "低", rank=3)
+    create_user("u_high", "高", rank=18)
+    execute("UPDATE users SET telegram_id = %s WHERE user_id = %s", ("tg-low", "u_low"))
+    execute("UPDATE users SET telegram_id = %s WHERE user_id = %s", ("tg-high", "u_high"))
+
+    req, status = social_service.request_chat(user_id="u_low", target_user_id="u_high")
+    assert status == 200
+
+    payload, status = social_service.accept_chat_request(user_id="u_high", request_id=int(req["request_id"]))
+    assert status == 200
+
+    low_exp_gain = int(payload.get("from_exp_gain", 0) or 0)
+    high_exp_gain = int(payload.get("to_exp_gain", 0) or 0)
+    assert low_exp_gain > 0
+    assert high_exp_gain > low_exp_gain
+
+    low_row = fetch_one("SELECT exp FROM users WHERE user_id = %s", ("u_low",))
+    high_row = fetch_one("SELECT exp FROM users WHERE user_id = %s", ("u_high",))
+    assert int(low_row["exp"]) == 1000 + low_exp_gain
+    assert int(high_row["exp"]) == 1000 + high_exp_gain
+
+
 def test_request_chat_daily_limit(monkeypatch, test_db):
     create_user("u1", "甲")
     create_user("u2", "乙")

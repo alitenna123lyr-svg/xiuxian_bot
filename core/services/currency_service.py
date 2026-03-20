@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from core.database.connection import db_transaction, get_user_by_id
+from core.database.migrations import reserve_request, save_response
 from core.game.currency import (
     CURRENCY_DEFINITIONS,
     DACHENG_MIN_RANK,
@@ -42,6 +43,18 @@ def _is_unlocked_currency(rank: int, currency_id: str) -> bool:
     return int(rank or 0) >= int(ZHENXIAN_MIN_RANK)
 
 
+def _mask_wallet_for_rank(rank: int, wallet: Dict[str, Any]) -> Dict[str, int]:
+    masked: Dict[str, int] = {}
+    for row in CURRENCY_DEFINITIONS:
+        cid = str(row["id"])
+        if not _is_known_currency(rank, cid):
+            continue
+        unlocked = _is_unlocked_currency(rank, cid)
+        amount_visible = unlocked or not _is_immortal_currency(cid)
+        masked[cid] = int(wallet.get(cid, 0) or 0) if amount_visible else 0
+    return masked
+
+
 def get_currency_overview(user_id: str) -> Tuple[Dict[str, Any], int]:
     user = get_user_by_id(user_id)
     if not user:
@@ -74,7 +87,7 @@ def get_currency_overview(user_id: str) -> Tuple[Dict[str, Any], int]:
     return {
         "success": True,
         "rank": rank,
-        "wallet": wallet,
+        "wallet": _mask_wallet_for_rank(rank, wallet),
         "tiers": tiers,
         "rules": {
             "exchange_rate": EXCHANGE_RATE,
@@ -92,22 +105,39 @@ def exchange_currency(
     from_currency: str,
     amount: int,
     to_currency: str | None = None,
+    request_id: Optional[str] = None,
 ) -> Tuple[Dict[str, Any], int]:
+    if request_id:
+        status, cached = reserve_request(request_id, user_id=user_id, action="currency_exchange")
+        if status == "cached" and cached:
+            return cached, 200
+        if status == "in_progress":
+            return {
+                "success": False,
+                "code": "REQUEST_IN_PROGRESS",
+                "message": "请求处理中，请稍后重试",
+            }, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if request_id:
+            save_response(request_id, user_id, "currency_exchange", resp)
+        return resp, http_status
+
     user = get_user_by_id(user_id)
     if not user:
-        return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
+        return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404)
 
     try:
         amount_int = int(amount)
     except (TypeError, ValueError):
-        return {"success": False, "code": "INVALID_AMOUNT", "message": "兑换数量必须是整数"}, 400
+        return _dedup_return({"success": False, "code": "INVALID_AMOUNT", "message": "兑换数量必须是整数"}, 400)
     if amount_int <= 0:
-        return {"success": False, "code": "INVALID_AMOUNT", "message": "兑换数量必须大于 0"}, 400
+        return _dedup_return({"success": False, "code": "INVALID_AMOUNT", "message": "兑换数量必须大于 0"}, 400)
 
     src = normalize_currency_id(from_currency)
     dst = normalize_currency_id(to_currency) if to_currency is not None else None
     if not src:
-        return {"success": False, "code": "INVALID_CURRENCY", "message": "源货币无效"}, 400
+        return _dedup_return({"success": False, "code": "INVALID_CURRENCY", "message": "源货币无效"}, 400)
 
     if dst is None:
         # backward compatibility
@@ -116,38 +146,38 @@ def exchange_currency(
         elif src == "spirit_mid":
             dst = prev_tier_currency(src)
         else:
-            return {"success": False, "code": "MISSING_TO", "message": "该兑换路径请指定目标货币"}, 400
+            return _dedup_return({"success": False, "code": "MISSING_TO", "message": "该兑换路径请指定目标货币"}, 400)
     if not dst:
-        return {"success": False, "code": "INVALID_CURRENCY", "message": "目标货币无效"}, 400
+        return _dedup_return({"success": False, "code": "INVALID_CURRENCY", "message": "目标货币无效"}, 400)
 
     if not is_adjacent_exchange(src, dst):
-        return {"success": False, "code": "INVALID_PATH", "message": "仅支持同体系相邻档位兑换"}, 400
+        return _dedup_return({"success": False, "code": "INVALID_PATH", "message": "仅支持同体系相邻档位兑换"}, 400)
 
     rank = int(user.get("rank", 1) or 1)
     if not _is_known_currency(rank, src) or not _is_known_currency(rank, dst):
-        return {"success": False, "code": "UNKNOWN", "message": "当前境界尚未知晓该货币"}, 400
+        return _dedup_return({"success": False, "code": "UNKNOWN", "message": "当前境界尚未知晓该货币"}, 400)
     if not _is_unlocked_currency(rank, src) or not _is_unlocked_currency(rank, dst):
-        return {"success": False, "code": "LOCKED", "message": "仙石体系需飞升仙界后开启"}, 400
+        return _dedup_return({"success": False, "code": "LOCKED", "message": "仙石体系需飞升仙界后开启"}, 400)
     if not can_hold_currency(rank, src) or not can_hold_currency(rank, dst):
-        return {"success": False, "code": "RANK_LIMIT", "message": "当前境界不可持有该货币"}, 400
+        return _dedup_return({"success": False, "code": "RANK_LIMIT", "message": "当前境界不可持有该货币"}, 400)
     if not can_gain_currency(rank, dst):
-        return {"success": False, "code": "RANK_LIMIT", "message": "当前境界不可获得目标货币"}, 400
+        return _dedup_return({"success": False, "code": "RANK_LIMIT", "message": "当前境界不可获得目标货币"}, 400)
 
     spend_src, gain_dst = calc_exchange_amounts(src, dst, amount_int)
     if spend_src <= 0 or gain_dst <= 0:
-        return {
+        return _dedup_return({
             "success": False,
             "code": "TOO_SMALL",
             "message": f"兑换数量不足，当前比例为 1:{EXCHANGE_RATE}",
-        }, 400
+        }, 400)
 
     src_field = to_db_field(src)
     dst_field = to_db_field(dst)
     if not src_field or not dst_field:
-        return {"success": False, "code": "UNAVAILABLE", "message": "兑换字段配置缺失"}, 400
+        return _dedup_return({"success": False, "code": "UNAVAILABLE", "message": "兑换字段配置缺失"}, 400)
 
     if int(user.get(src_field, 0) or 0) < spend_src:
-        return {"success": False, "code": "INSUFFICIENT", "message": f"{currency_label(src)}不足"}, 400
+        return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"{currency_label(src)}不足"}, 400)
 
     with db_transaction() as cur:
         cur.execute(
@@ -156,7 +186,7 @@ def exchange_currency(
             (spend_src, gain_dst, user_id, spend_src),
         )
         if cur.rowcount == 0:
-            return {"success": False, "code": "INSUFFICIENT", "message": f"{currency_label(src)}不足"}, 400
+            return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"{currency_label(src)}不足"}, 400)
 
     latest = get_user_by_id(user_id) or user
     wallet = wallet_from_user(latest)
@@ -171,9 +201,10 @@ def exchange_currency(
             "input_amount": amount_int,
             "spent": spend_src,
             "gained": gain_dst,
+            "request_id": request_id,
         },
     )
-    return {
+    return _dedup_return({
         "success": True,
         "message": f"兑换成功：{spend_src} {currency_label(src)} -> {gain_dst} {currency_label(dst)}",
         "from_currency": src,
@@ -181,5 +212,5 @@ def exchange_currency(
         "input_amount": amount_int,
         "spent": spend_src,
         "gained": gain_dst,
-        "wallet": wallet,
-    }, 200
+        "wallet": _mask_wallet_for_rank(rank, wallet),
+    }, 200)

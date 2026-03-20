@@ -6,6 +6,7 @@ import random
 import time
 import math
 import json
+import datetime
 from typing import Any, Dict, List, Tuple
 
 from core.database.connection import (
@@ -76,7 +77,11 @@ def _event_period_key(now_ts: int, period: str) -> str:
     if period == "day":
         return f"day:{local_day_key(now_ts)}"
     if period == "week":
-        return f"week:{local_day_key(now_ts) // 7}"
+        ts = int(now_ts or time.time())
+        local_tz = datetime.timezone(datetime.timedelta(hours=8))
+        local_dt = datetime.datetime.fromtimestamp(ts, tz=local_tz)
+        iso = local_dt.isocalendar()
+        return f"week:{int(iso.year)}-{int(iso.week):02d}"
     return "event:all"
 
 
@@ -371,18 +376,103 @@ def claim_event_reward(user_id: str, event_id: str) -> Tuple[Dict[str, Any], int
     }, 200
 
 
-def _ensure_boss_state(cur):
+def _ensure_boss_state(cur, *, for_update: bool = False):
     boss = _world_boss()
-    cur.execute("SELECT * FROM world_boss_state WHERE boss_id = %s", (boss["id"],))
+    lock_clause = " FOR UPDATE" if for_update else ""
+    cur.execute(f"SELECT * FROM world_boss_state WHERE boss_id = %s{lock_clause}", (boss["id"],))
     row = cur.fetchone()
     if row:
+        # Heal legacy/corrupted rows and keep runtime state aligned with config changes.
+        row_data = dict(row)
+        cfg_max_hp = int(boss.get("max_hp", 1) or 1)
+        max_hp = int(row_data.get("max_hp", 0) or 0)
+        hp = int(row_data.get("hp", 0) or 0)
+        if max_hp <= 0:
+            fixed_max_hp = cfg_max_hp
+            fixed_hp = fixed_max_hp if hp <= 0 else min(max(0, hp), fixed_max_hp)
+            cur.execute(
+                "UPDATE world_boss_state SET hp = %s, max_hp = %s WHERE boss_id = %s",
+                (fixed_hp, fixed_max_hp, boss["id"]),
+            )
+            cur.execute(f"SELECT * FROM world_boss_state WHERE boss_id = %s{lock_clause}", (boss["id"],))
+            return cur.fetchone()
+        if max_hp != cfg_max_hp:
+            fixed_hp = 0 if hp <= 0 else min(max(0, hp), cfg_max_hp)
+            cur.execute(
+                "UPDATE world_boss_state SET hp = %s, max_hp = %s WHERE boss_id = %s",
+                (fixed_hp, cfg_max_hp, boss["id"]),
+            )
+            cur.execute(f"SELECT * FROM world_boss_state WHERE boss_id = %s{lock_clause}", (boss["id"],))
+            return cur.fetchone()
         return row
     cur.execute(
-        "INSERT INTO world_boss_state (boss_id, hp, max_hp, last_reset, last_defeated) VALUES (%s, %s, %s, %s, 0)",
+        """INSERT INTO world_boss_state (boss_id, hp, max_hp, last_reset, last_defeated)
+           VALUES (%s, %s, %s, %s, 0)
+           ON CONFLICT (boss_id) DO NOTHING""",
         (boss["id"], boss["max_hp"], boss["max_hp"], int(time.time())),
     )
-    cur.execute("SELECT * FROM world_boss_state WHERE boss_id = %s", (boss["id"],))
+    cur.execute(f"SELECT * FROM world_boss_state WHERE boss_id = %s{lock_clause}", (boss["id"],))
     return cur.fetchone()
+
+
+def _table_columns(cur, table_name: str) -> set[str]:
+    cur.execute(
+        """
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = %s
+        """,
+        (table_name,),
+    )
+    rows = cur.fetchall() or []
+    names: set[str] = set()
+    for row in rows:
+        if isinstance(row, dict):
+            name = row.get("column_name")
+        elif isinstance(row, (list, tuple)):
+            name = row[0] if row else None
+        else:
+            try:
+                name = row["column_name"]
+            except Exception:
+                name = None
+        if name:
+            names.add(str(name))
+    return names
+
+
+def _ensure_unique_index(cur, *, table: str, index_name: str, columns_sql: str) -> None:
+    cur.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS {index_name} ON {table} ({columns_sql})")
+
+
+def _cleanup_worldboss_duplicates(cur) -> None:
+    # Clear invalid legacy rows first so unique indexes can be applied safely.
+    cur.execute("DELETE FROM world_boss_state WHERE boss_id IS NULL OR boss_id = ''")
+    cur.execute("DELETE FROM world_boss_attacks WHERE user_id IS NULL OR user_id = ''")
+
+    # Keep the newest row (max id) per key, remove stale duplicates from legacy schemas.
+    cur.execute(
+        """
+        DELETE FROM world_boss_state
+        WHERE boss_id IS NOT NULL AND boss_id <> ''
+          AND id NOT IN (
+              SELECT MAX(id) FROM world_boss_state
+              WHERE boss_id IS NOT NULL AND boss_id <> ''
+              GROUP BY boss_id
+          )
+        """
+    )
+    cur.execute(
+        """
+        DELETE FROM world_boss_attacks
+        WHERE user_id IS NOT NULL AND user_id <> ''
+          AND id NOT IN (
+              SELECT MAX(id) FROM world_boss_attacks
+              WHERE user_id IS NOT NULL AND user_id <> ''
+              GROUP BY user_id
+          )
+        """
+    )
 
 
 def _ensure_worldboss_tables(cur) -> None:
@@ -409,6 +499,40 @@ def _ensure_worldboss_tables(cur) -> None:
         )
         """
     )
+    # Backward compatibility for legacy schemas: old tables may miss columns.
+    state_cols = _table_columns(cur, "world_boss_state")
+    for col, ddl in [
+        ("boss_id", "TEXT"),
+        ("hp", "INTEGER DEFAULT 0"),
+        ("max_hp", "INTEGER DEFAULT 0"),
+        ("last_reset", "INTEGER DEFAULT 0"),
+        ("last_defeated", "INTEGER DEFAULT 0"),
+    ]:
+        if col not in state_cols:
+            cur.execute(f"ALTER TABLE world_boss_state ADD COLUMN {col} {ddl}")
+
+    attack_cols = _table_columns(cur, "world_boss_attacks")
+    for col, ddl in [
+        ("user_id", "TEXT"),
+        ("last_attack_day", "INTEGER DEFAULT 0"),
+        ("attacks_today", "INTEGER DEFAULT 0"),
+    ]:
+        if col not in attack_cols:
+            cur.execute(f"ALTER TABLE world_boss_attacks ADD COLUMN {col} {ddl}")
+
+    _cleanup_worldboss_duplicates(cur)
+    _ensure_unique_index(
+        cur,
+        table="world_boss_state",
+        index_name="ux_world_boss_state_boss_id",
+        columns_sql="boss_id",
+    )
+    _ensure_unique_index(
+        cur,
+        table="world_boss_attacks",
+        index_name="ux_world_boss_attacks_user_id",
+        columns_sql="user_id",
+    )
 
 
 def get_world_boss_status() -> Dict[str, Any]:
@@ -417,7 +541,7 @@ def get_world_boss_status() -> Dict[str, Any]:
     day_start = midnight_timestamp()
     with db_transaction() as cur:
         _ensure_worldboss_tables(cur)
-        row = _ensure_boss_state(cur)
+        row = _ensure_boss_state(cur, for_update=True)
         if row is None:
             return {"success": False, "message": "Boss not found"}
         row_data = dict(row)
@@ -429,7 +553,7 @@ def get_world_boss_status() -> Dict[str, Any]:
                 "UPDATE world_boss_state SET hp = %s, last_reset = %s WHERE boss_id = %s",
                 (snapshot.hp, snapshot.last_reset, boss_cfg["id"]),
             )
-            row = _ensure_boss_state(cur)
+            row = _ensure_boss_state(cur, for_update=True)
             row_data = dict(row) if row is not None else {}
             snapshot = WorldBossSnapshot.from_row(row_data, now_ts=now, day_start_ts=day_start)
             fsm = WorldBossFSM(snapshot)
@@ -456,21 +580,30 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
     now = int(time.time())
     stamina_user = refresh_user_stamina(user_id, now=now)
     event_point_grants: List[Dict[str, Any]] = []
+    attacks_used_today = 0
     with db_transaction() as cur:
         _ensure_worldboss_tables(cur)
         _ensure_event_point_tables(cur)
         day = local_day_key(now)
         cur.execute(
-            "SELECT last_attack_day, attacks_today FROM world_boss_attacks WHERE user_id = %s",
+            """
+            INSERT INTO world_boss_attacks (user_id, last_attack_day, attacks_today)
+            VALUES (%s, %s, 0)
+            ON CONFLICT (user_id) DO NOTHING
+            """,
+            (user_id, day),
+        )
+        cur.execute(
+            "SELECT last_attack_day, attacks_today FROM world_boss_attacks WHERE user_id = %s FOR UPDATE",
             (user_id,),
         )
         attack_row = cur.fetchone()
-        attacks_today = 0
-        if attack_row:
-            last_day = int(attack_row["last_attack_day"] or 0)
-            attacks_today = int(attack_row["attacks_today"] or 0)
-            if last_day != day:
-                attacks_today = 0
+        if not attack_row:
+            return {"success": False, "code": "CONFLICT", "message": "攻击记录锁定失败，请重试"}, 409
+        last_day = int(attack_row["last_attack_day"] or 0)
+        attacks_today = int(attack_row["attacks_today"] or 0)
+        if last_day != day:
+            attacks_today = 0
         if attacks_today >= BOSS_DAILY_LIMIT:
             log_event(
                 "world_boss_attack",
@@ -481,7 +614,7 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
             )
             return {"success": False, "code": "LIMIT", "message": "今日攻击次数已用完"}, 400
 
-        row = _ensure_boss_state(cur)
+        row = _ensure_boss_state(cur, for_update=True)
         snapshot = WorldBossSnapshot.from_row(row, now_ts=now, day_start_ts=midnight_timestamp())
         fsm = WorldBossFSM(snapshot)
         if fsm.should_daily_reset():
@@ -490,7 +623,7 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
                 "UPDATE world_boss_state SET hp = %s, last_reset = %s WHERE boss_id = %s",
                 (snapshot.hp, snapshot.last_reset, boss_cfg["id"]),
             )
-            row = _ensure_boss_state(cur)
+            row = _ensure_boss_state(cur, for_update=True)
             snapshot = WorldBossSnapshot.from_row(row, now_ts=now, day_start_ts=midnight_timestamp())
             fsm = WorldBossFSM(snapshot)
 
@@ -576,17 +709,11 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
                 (now, boss_cfg["id"]),
             )
 
-        # update per-user attack count
-        if attack_row:
-            cur.execute(
-                "UPDATE world_boss_attacks SET last_attack_day = %s, attacks_today = %s WHERE user_id = %s",
-                (day, attacks_today + 1, user_id),
-            )
-        else:
-            cur.execute(
-                "INSERT INTO world_boss_attacks (user_id, last_attack_day, attacks_today) VALUES (%s, %s, %s)",
-                (user_id, day, 1),
-            )
+        attacks_used_today = attacks_today + 1
+        cur.execute(
+            "UPDATE world_boss_attacks SET last_attack_day = %s, attacks_today = %s WHERE user_id = %s",
+            (day, attacks_used_today, user_id),
+        )
         event_point_grants = _apply_action_points(
             cur,
             user_id,
@@ -620,7 +747,7 @@ def attack_world_boss(user_id: str) -> Tuple[Dict[str, Any], int]:
         "boss_hp": new_hp,
         "defeated": defeated,
         "rewards": rewards,
-        "attacks_left": max(0, BOSS_DAILY_LIMIT - (attacks_today + 1)),
+        "attacks_left": max(0, BOSS_DAILY_LIMIT - attacks_used_today),
         "event_points": event_point_grants,
     }, 200
 
@@ -629,7 +756,12 @@ def exchange_event_points(user_id: str, event_id: str, exchange_id: str, *, quan
     user = get_user_by_id(user_id)
     if not user:
         return {"success": False, "code": "NOT_FOUND", "message": "玩家不存在"}, 404
-    qty = max(1, int(quantity or 1))
+    try:
+        qty = int(quantity)
+    except (TypeError, ValueError):
+        return {"success": False, "code": "INVALID_PARAMS", "message": "兑换数量必须是整数且大于 0"}, 400
+    if qty <= 0:
+        return {"success": False, "code": "INVALID_PARAMS", "message": "兑换数量必须是整数且大于 0"}, 400
     active_map = {e["id"]: e for e in get_active_events()}
     event = active_map.get(event_id)
     if not event:
@@ -644,100 +776,162 @@ def exchange_event_points(user_id: str, event_id: str, exchange_id: str, *, quan
     period_key = _event_period_key(now, period)
     reward_spec = exchange.get("rewards", {}) or {}
     awarded_items: List[Dict[str, Any]] = []
+    total = 0
+    spent = 0
+    balance = 0
+    points_balance_for_error = 0
+    remaining_for_error = 0
 
-    with db_transaction() as cur:
-        _ensure_event_point_tables(cur)
-        cur.execute(
-            "SELECT points_total, points_spent FROM event_points WHERE user_id = %s AND event_id = %s",
-            (user_id, event_id),
-        )
-        row = cur.fetchone()
-        points_total = int((row["points_total"] if row else 0) or 0)
-        points_spent = int((row["points_spent"] if row else 0) or 0)
-        points_balance = max(0, points_total - points_spent)
-        if points_balance < total_cost:
+    try:
+        with db_transaction() as cur:
+            _ensure_event_point_tables(cur)
+            cur.execute(
+                """
+                INSERT INTO event_points(user_id, event_id, points_total, points_spent, updated_at)
+                VALUES(%s, %s, 0, 0, %s)
+                ON CONFLICT(user_id, event_id) DO NOTHING
+                """,
+                (user_id, event_id, now),
+            )
+            cur.execute(
+                "SELECT points_total, points_spent FROM event_points WHERE user_id = %s AND event_id = %s FOR UPDATE",
+                (user_id, event_id),
+            )
+            row = cur.fetchone()
+            points_total = int((row["points_total"] if row else 0) or 0)
+            points_spent = int((row["points_spent"] if row else 0) or 0)
+            points_balance = max(0, points_total - points_spent)
+            points_balance_for_error = points_balance
+            if points_balance < total_cost:
+                raise ValueError("INSUFFICIENT_POINTS")
+
+            limit = int(exchange.get("limit", 0) or 0)
+            cur.execute(
+                """
+                INSERT INTO event_exchange_claims(user_id, event_id, exchange_id, period_key, quantity)
+                VALUES(%s,%s,%s,%s,0)
+                ON CONFLICT(user_id, event_id, exchange_id, period_key) DO NOTHING
+                """,
+                (user_id, event_id, exchange_id, period_key),
+            )
+            cur.execute(
+                """
+                SELECT quantity FROM event_exchange_claims
+                WHERE user_id = %s AND event_id = %s AND exchange_id = %s AND period_key = %s
+                FOR UPDATE
+                """,
+                (user_id, event_id, exchange_id, period_key),
+            )
+            claim_row = cur.fetchone()
+            claimed = int((claim_row["quantity"] if claim_row else 0) or 0)
+            if limit > 0 and claimed + qty > limit:
+                remaining_for_error = max(0, limit - claimed)
+                raise ValueError("LIMIT")
+
+            cur.execute(
+                """
+                UPDATE event_points
+                SET points_spent = points_spent + %s, updated_at = %s
+                WHERE user_id = %s AND event_id = %s
+                  AND points_total - points_spent >= %s
+                """,
+                (total_cost, now, user_id, event_id, total_cost),
+            )
+            if int(cur.rowcount or 0) == 0:
+                cur.execute(
+                    "SELECT points_total, points_spent FROM event_points WHERE user_id = %s AND event_id = %s",
+                    (user_id, event_id),
+                )
+                latest_row = cur.fetchone()
+                latest_total = int((latest_row["points_total"] if latest_row else 0) or 0)
+                latest_spent = int((latest_row["points_spent"] if latest_row else 0) or 0)
+                points_balance_for_error = max(0, latest_total - latest_spent)
+                raise ValueError("INSUFFICIENT_POINTS")
+
+            if limit > 0:
+                cur.execute(
+                    """
+                    UPDATE event_exchange_claims
+                    SET quantity = quantity + %s
+                    WHERE user_id = %s AND event_id = %s AND exchange_id = %s AND period_key = %s
+                      AND quantity + %s <= %s
+                    """,
+                    (qty, user_id, event_id, exchange_id, period_key, qty, limit),
+                )
+            else:
+                cur.execute(
+                    """
+                    UPDATE event_exchange_claims
+                    SET quantity = quantity + %s
+                    WHERE user_id = %s AND event_id = %s AND exchange_id = %s AND period_key = %s
+                    """,
+                    (qty, user_id, event_id, exchange_id, period_key),
+                )
+            if int(cur.rowcount or 0) == 0:
+                cur.execute(
+                    """
+                    SELECT quantity FROM event_exchange_claims
+                    WHERE user_id = %s AND event_id = %s AND exchange_id = %s AND period_key = %s
+                    """,
+                    (user_id, event_id, exchange_id, period_key),
+                )
+                latest_claim = cur.fetchone()
+                latest_claimed = int((latest_claim["quantity"] if latest_claim else 0) or 0)
+                remaining_for_error = max(0, limit - latest_claimed) if limit > 0 else 0
+                raise ValueError("LIMIT")
+
+            cur.execute(
+                "INSERT INTO event_point_logs(user_id, event_id, delta_points, source, meta_json, created_at) VALUES(%s,%s,%s,%s,%s,%s)",
+                (
+                    user_id,
+                    event_id,
+                    -total_cost,
+                    "exchange",
+                    json.dumps({"exchange_id": exchange_id, "quantity": qty}, ensure_ascii=False),
+                    now,
+                ),
+            )
+            cur.execute(
+                "UPDATE users SET copper = copper + %s, exp = exp + %s, gold = gold + %s WHERE user_id = %s",
+                (
+                    int(reward_spec.get("copper", 0) or 0) * qty,
+                    int(reward_spec.get("exp", 0) or 0) * qty,
+                    int(reward_spec.get("gold", 0) or 0) * qty,
+                    user_id,
+                ),
+            )
+            for item in reward_spec.get("items", []) or []:
+                generated = _grant_generated_item(
+                    cur,
+                    user_id,
+                    item.get("item_id"),
+                    int(item.get("quantity", 1) or 1) * qty,
+                )
+                if generated:
+                    awarded_items.append({"item_id": generated.get("item_id"), "quantity": int(generated.get("quantity", 1) or 1)})
+            cur.execute(
+                "SELECT points_total, points_spent FROM event_points WHERE user_id = %s AND event_id = %s",
+                (user_id, event_id),
+            )
+            final_row = cur.fetchone()
+            total = int((final_row["points_total"] if final_row else 0) or 0)
+            spent = int((final_row["points_spent"] if final_row else 0) or 0)
+            balance = max(0, total - spent)
+    except ValueError as exc:
+        reason = str(exc)
+        if reason == "INSUFFICIENT_POINTS":
             return {
                 "success": False,
                 "code": "INSUFFICIENT_POINTS",
-                "message": f"积分不足，需要 {total_cost}，当前 {points_balance}",
-                "points_balance": points_balance,
+                "message": f"积分不足，需要 {total_cost}，当前 {points_balance_for_error}",
+                "points_balance": points_balance_for_error,
             }, 400
-
-        limit = int(exchange.get("limit", 0) or 0)
-        cur.execute(
-            """
-            SELECT quantity FROM event_exchange_claims
-            WHERE user_id = %s AND event_id = %s AND exchange_id = %s AND period_key = %s
-            """,
-            (user_id, event_id, exchange_id, period_key),
-        )
-        claim_row = cur.fetchone()
-        claimed = int((claim_row["quantity"] if claim_row else 0) or 0)
-        if limit > 0 and claimed + qty > limit:
-            return {
-                "success": False,
-                "code": "LIMIT",
-                "message": f"兑换次数不足，本周期剩余 {max(0, limit - claimed)} 次",
-                "remaining": max(0, limit - claimed),
-            }, 400
-
-        cur.execute(
-            """
-            INSERT INTO event_points(user_id, event_id, points_total, points_spent, updated_at)
-            VALUES(%s, %s, 0, %s, %s)
-            ON CONFLICT(user_id, event_id)
-            DO UPDATE SET
-                points_spent = event_points.points_spent + excluded.points_spent,
-                updated_at = excluded.updated_at
-            """,
-            (user_id, event_id, total_cost, now),
-        )
-        cur.execute(
-            "INSERT INTO event_point_logs(user_id, event_id, delta_points, source, meta_json, created_at) VALUES(%s,%s,%s,%s,%s,%s)",
-            (
-                user_id,
-                event_id,
-                -total_cost,
-                "exchange",
-                json.dumps({"exchange_id": exchange_id, "quantity": qty}, ensure_ascii=False),
-                now,
-            ),
-        )
-        cur.execute(
-            """
-            INSERT INTO event_exchange_claims(user_id, event_id, exchange_id, period_key, quantity)
-            VALUES(%s,%s,%s,%s,%s)
-            ON CONFLICT(user_id, event_id, exchange_id, period_key)
-            DO UPDATE SET quantity = event_exchange_claims.quantity + excluded.quantity
-            """,
-            (user_id, event_id, exchange_id, period_key, qty),
-        )
-        cur.execute(
-            "UPDATE users SET copper = copper + %s, exp = exp + %s, gold = gold + %s WHERE user_id = %s",
-            (
-                int(reward_spec.get("copper", 0) or 0) * qty,
-                int(reward_spec.get("exp", 0) or 0) * qty,
-                int(reward_spec.get("gold", 0) or 0) * qty,
-                user_id,
-            ),
-        )
-        for item in reward_spec.get("items", []) or []:
-            generated = _grant_generated_item(
-                cur,
-                user_id,
-                item.get("item_id"),
-                int(item.get("quantity", 1) or 1) * qty,
-            )
-            if generated:
-                awarded_items.append({"item_id": generated.get("item_id"), "quantity": int(generated.get("quantity", 1) or 1)})
-        cur.execute(
-            "SELECT points_total, points_spent FROM event_points WHERE user_id = %s AND event_id = %s",
-            (user_id, event_id),
-        )
-        final_row = cur.fetchone()
-        total = int((final_row["points_total"] if final_row else 0) or 0)
-        spent = int((final_row["points_spent"] if final_row else 0) or 0)
-        balance = max(0, total - spent)
+        return {
+            "success": False,
+            "code": "LIMIT",
+            "message": f"兑换次数不足，本周期剩余 {remaining_for_error} 次",
+            "remaining": remaining_for_error,
+        }, 400
 
     return {
         "success": True,

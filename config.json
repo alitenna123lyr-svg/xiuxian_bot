@@ -317,7 +317,7 @@
     "universal_uid_start": 1000000
   },
   "tokens": {
-    "telegram_token": "8768994748:AAGYTWpKT-1NDZldkjGlwYVr_bVR9_Uph_Q"
+    "telegram_token": ""
   },
   "battle": {
     "kernel_shadow": {
@@ -333,7 +333,7 @@
     "world_boss": {
       "id": "world_boss_1",
       "name": "赤炎妖王",
-      "max_hp": 100000,
+      "max_hp": 3000,
       "reward_copper": 1200,
       "reward_exp": 1200,
       "reward_gold": 2

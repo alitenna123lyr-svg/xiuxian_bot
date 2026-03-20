@@ -870,6 +870,9 @@ async def cultivate_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         status = await http_get(f"{SERVER_URL}/api/cultivate/status/{uid}", timeout=15)
+        if not status.get("success"):
+            await update.message.reply_text("❌ 修炼状态获取失败，请稍后重试")
+            return
         cultivating = status.get("state", False)
         
         if action == "stat":
@@ -976,46 +979,33 @@ async def hunt_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         monsters = get_available_monsters(user_rank)
         
         if len(context.args) > 0:
-            # 挑战特定怪物
+            # 统一到回合制入口，避免与按钮链路分叉。
             monster_id = context.args[0]
-            result = await http_post(
-                f"{SERVER_URL}/api/hunt",
-                json={"user_id": uid, "monster_id": monster_id, "request_id": _new_request_id(context)},
-                timeout=15,
+            monster = get_monster_by_id(monster_id)
+            if not monster:
+                await update.message.reply_text("❌ 怪物不存在，请检查怪物ID")
+                return
+            if int(monster.get("min_rank", 1) or 1) > int(user_rank or 1):
+                await update.message.reply_text(f"❌ 需要达到 {monster.get('min_rank')} 级才能挑战该怪物")
+                return
+            diff = "简单" if monster["min_rank"] <= user_rank - 2 else ("普通" if monster["min_rank"] <= user_rank else "困难")
+            text = (
+                f"👹 *准备挑战*: {monster.get('name')}\n"
+                f"难度: {diff}\n"
+                f"属性: HP {monster.get('hp')} / ATK {monster.get('attack')} / DEF {monster.get('defense')}\n\n"
+                "点击下方按钮进入回合战斗。"
             )
-            
-            if result["success"]:
-                if result["victory"]:
-                    text = f"""
-⚔️ *战斗胜利！*
-
-{result['message']}
-
-🎁 *奖励:*
-• 修为: +{result['rewards']['exp']:,}
-• 下品灵石: +{result['rewards']['copper']:,}
-{f"• 中品灵石: +{result['rewards']['gold']}" if result['rewards']['gold'] > 0 else ""}
-
-回合数: {result['rounds']}
-"""
-                else:
-                    text = f"""
-💀 *战斗失败*
-
-{result['message']}
-
-回去继续修炼，变强后再来挑战吧！
-"""
-                text += _format_post_battle_status(result.get("post_status"))
-                await _reply_with_owned_panel(
-                    update,
-                    context,
-                    text,
-                    parse_mode=ParseMode.MARKDOWN,
-                    reply_markup=get_main_menu_keyboard()
-                )
-            else:
-                await update.message.reply_text(f"❌ {result['message']}")
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(f"⚔️ 开始挑战 {monster.get('name')}", callback_data=f"hunt_{monster_id}")],
+                [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+            ])
+            await _reply_with_owned_panel(
+                update,
+                context,
+                text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=keyboard,
+            )
         else:
             # 显示怪物列表
             text = format_monster_list(user_rank)
@@ -1023,7 +1013,7 @@ async def hunt_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # 创建怪物按钮
             keyboard = []
-            for m in monsters[:8]:  # 最多显示8个
+            for m in monsters[:4]:  # 最多显示4个
                 keyboard.append([
                     InlineKeyboardButton(
                         f"{m['name']} (修为:{m['exp_reward']})", 
@@ -1075,9 +1065,30 @@ async def breakthrough_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=get_main_menu_keyboard()
             )
         else:
-            preview = _build_breakthrough_preview(user_data, strategy="steady")
-            notes = _build_breakthrough_strategy_notes(user_data)
-            text = f"""
+            trial = await _fetch_realm_trial(uid)
+            trial_blocked = bool(trial) and int(trial.get("completed", 0) or 0) != 1
+            if trial_blocked:
+                text = f"""
+🔥 *突破*
+
+{format_realm_progress(user_data)}
+
+⚠️ 修为已满足，但境界试炼尚未完成。
+
+{_format_realm_trial_text(trial)}
+
+完成试炼后即可突破。
+"""
+                keyboard = [
+                    [
+                        InlineKeyboardButton("⚔️ 去狩猎", callback_data="hunt"),
+                        InlineKeyboardButton("🗺️ 去秘境", callback_data="secret_realms"),
+                    ],
+                    [InlineKeyboardButton("❌ 返回", callback_data="main_menu")],
+                ]
+            else:
+                preview_block = await _build_breakthrough_preview_block(uid, user_data, strategy="steady")
+                text = f"""
 🔥 *突破*
 
 {format_realm_progress(user_data)}
@@ -1088,18 +1099,16 @@ async def breakthrough_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 请选择冲关策略：
 
-{preview}
-
-{notes}
+{preview_block}
 """
-            keyboard = [
-                [
-                    InlineKeyboardButton("🛡️ 稳妥突破", callback_data="breakthrough_steady"),
-                    InlineKeyboardButton("🌿 护脉突破", callback_data="breakthrough_protect"),
-                ],
-                [InlineKeyboardButton("⚡ 生死突破", callback_data="breakthrough_desperate")],
-                [InlineKeyboardButton("❌ 取消", callback_data="main_menu")],
-            ]
+                keyboard = [
+                    [
+                        InlineKeyboardButton("🛡️ 稳妥突破", callback_data="breakthrough_steady"),
+                        InlineKeyboardButton("🌿 护脉突破", callback_data="breakthrough_protect"),
+                    ],
+                    [InlineKeyboardButton("⚡ 生死突破", callback_data="breakthrough_desperate")],
+                    [InlineKeyboardButton("❌ 取消", callback_data="main_menu")],
+                ]
             await _reply_with_owned_panel(
                 update,
                 context,
@@ -1439,9 +1448,10 @@ async def _build_bounty_menu():
         text += "当前暂无公开悬赏。\n"
     else:
         for row in rows[:12]:
+            wanted_name = row.get("wanted_item_name") or _item_display_name(str(row.get("wanted_item_id") or ""))
             text += (
                 f"#{row.get('id')} ｜ {row.get('poster_name', row.get('poster_user_id', '未知'))}\n"
-                f"需求: {row.get('wanted_item_name', row.get('wanted_item_id'))} x{row.get('wanted_quantity', 0)}\n"
+                f"需求: {wanted_name} x{row.get('wanted_quantity', 0)}\n"
                 f"奖励: {row.get('reward_spirit_low', 0)} 下品灵石\n"
             )
             if row.get("description"):
@@ -1476,7 +1486,8 @@ async def _build_convert_menu(uid: str):
     if targets:
         text += "可转资源（每批基础下品灵石消耗）：\n"
         for row in targets[:12]:
-            text += f"• {row.get('name')} ({row.get('item_id')}) - {row.get('base_copper')} 下品灵石\n"
+            target_name = row.get("name") or _item_display_name(str(row.get("item_id") or ""))
+            text += f"• {target_name} - {row.get('base_copper')} 下品灵石\n"
         text += "\n"
         text += "请选择路线："
         keyboard = [
@@ -1538,7 +1549,8 @@ async def _build_convert_route(uid: str, route: str):
     for row in targets[:12]:
         catalyst = row.get("focused_catalyst")
         if route == "focused" and catalyst:
-            text += f"• {row.get('name')} - {row.get('base_copper')} 下品灵石/批（专精材料: {catalyst}）\n"
+            catalyst_name = _item_display_name(str(catalyst))
+            text += f"• {row.get('name')} - {row.get('base_copper')} 下品灵石/批（专精材料: {catalyst_name}）\n"
         else:
             text += f"• {row.get('name')} - {row.get('base_copper')} 下品灵石/批\n"
         keyboard.append([
@@ -1593,14 +1605,15 @@ async def _build_forge_menu(uid: str):
     if not st.get("success"):
         return st.get("message", "锻造信息获取失败"), [[InlineKeyboardButton("🔙 返回", callback_data="main_menu")]]
     catalog = await http_get(f"{SERVER_URL}/api/forge/catalog/{uid}", timeout=15)
+    material_item_name = st.get("material_item_name") or _item_display_name(str(st.get("material_item_id", "iron_ore") or "iron_ore"))
     text = (
         "🔨 *锻造/祭炼*\n\n"
         "铁矿石属于强化流核心材料，用来把日常下品灵石转成装备与强化机会。\n"
         "普通锻造：随机出当前阶段装备，适合补装和开图鉴。\n"
         "定向锻造：指定做已收录装备，适合追目标和刷更高品质同名装备，消耗更高。\n"
         "定向锻造要求图鉴里已经收录过该装备。\n\n"
-        f"普通锻造: {st.get('cost_copper',0)} 下品灵石 + {st.get('material_need',0)} 个 {st.get('material_item_id','iron_ore')}\n"
-        f"定向锻造: {st.get('cost_copper',0) * 2} 下品灵石 + {st.get('material_need',0) * 2} 个 {st.get('material_item_id','iron_ore')}\n\n"
+        f"普通锻造: {st.get('cost_copper',0)} 下品灵石 + {st.get('material_need',0)} 个 {material_item_name}\n"
+        f"定向锻造: {st.get('cost_copper',0) * 2} 下品灵石 + {st.get('material_need',0) * 2} 个 {material_item_name}\n\n"
     )
     keyboard = [[InlineKeyboardButton("🔨 普通锻造", callback_data="forge_do")]]
     catalog_items = catalog.get("items", []) if catalog.get("success") else []
@@ -1633,6 +1646,8 @@ async def _build_gacha_menu(uid: str | None = None):
         f"今日付费：剩余 {paid_remaining}/15 次\n"
         "规则：免费抽奖不耗精力；付费单抽消耗 1 中品灵石 + 1 精力；五连消耗 4 中品灵石 + 4 精力。\n\n"
     )
+    free_label = "免费1抽" if free_remaining > 0 else "免费已用尽"
+    free_callback = "gacha_free_limit" if free_remaining <= 0 else None
     keyboard = []
     if not banners:
         text += "暂无开放卡池。\n"
@@ -1643,8 +1658,9 @@ async def _build_gacha_menu(uid: str | None = None):
             single_price = int(b.get("price_single", 1) or 1)
             five_price = 4 if currency == "gold" else single_price * 4
             text += f"• {b.get('title')} (ID {b.get('banner_id')})\n  {b.get('description')}\n\n"
+            this_free_callback = free_callback or f"gacha_pull_{b.get('banner_id')}_1"
             keyboard.append([
-                InlineKeyboardButton("免费1抽", callback_data=f"gacha_pull_{b.get('banner_id')}_1"),
+                InlineKeyboardButton(free_label, callback_data=this_free_callback),
                 InlineKeyboardButton(f"付费1抽 {single_price}{currency_short}", callback_data=f"gacha_pull_{b.get('banner_id')}_paid1"),
             ])
             keyboard.append([
@@ -1675,11 +1691,11 @@ def _format_reward_text(rewards: dict) -> str:
         return ""
     parts = []
     if rewards.get("copper"):
-        parts.append(f"{rewards.get('copper')}铜")
+        parts.append(f"{rewards.get('copper')}下品灵石")
     if rewards.get("exp"):
         parts.append(f"{rewards.get('exp')}修为")
     if rewards.get("gold"):
-        parts.append(f"{rewards.get('gold')}金")
+        parts.append(f"{rewards.get('gold')}中品灵石")
     items = rewards.get("items") or []
     if items:
         item_parts = []
@@ -1886,8 +1902,19 @@ async def _load_shop_view(uid: str | None, *, rank: int = 1, category: str = "al
 
 
 def _item_display_name(item_id: str) -> str:
-    item = get_item_def(item_id)
-    return item["name"] if item else item_id
+    raw = str(item_id or "").strip()
+    aliases = {
+        "ironore": "iron_ore",
+        "iron-ore": "iron_ore",
+        "iron ore": "iron_ore",
+    }
+    normalized = aliases.get(raw.lower(), raw)
+    item = get_item_def(normalized)
+    if item:
+        return item["name"]
+    if raw.lower() in aliases:
+        return "铁矿石"
+    return normalized
 
 
 def _format_codex_monsters(rows: list[dict]) -> str:
@@ -1961,6 +1988,18 @@ def _battle_action_keyboard(prefix: str, session_id: str, skills: list[dict], *,
     return InlineKeyboardMarkup(keyboard)
 
 
+def _secret_choice_keyboard(session_id: str, choices: list[dict], *, back_callback: str):
+    keyboard = []
+    for choice in choices[:3]:
+        choice_id = str(choice.get("id") or "").strip()
+        label = str(choice.get("label") or choice_id).strip() or "执行选择"
+        if not choice_id:
+            continue
+        keyboard.append([InlineKeyboardButton(label, callback_data=f"sbc_{session_id}_{choice_id}")])
+    keyboard.append([InlineKeyboardButton("🔙 返回", callback_data=back_callback)])
+    return InlineKeyboardMarkup(keyboard)
+
+
 def _format_failure_reasons(reasons: list | None) -> str:
     reasons = reasons or []
     if not reasons:
@@ -2013,6 +2052,33 @@ async def _build_recovery_menu(uid: str, *, return_callback: str = "main_menu"):
     keyboard.append([InlineKeyboardButton("🎒 背包", callback_data="bag")])
     keyboard.append([InlineKeyboardButton("🔙 返回", callback_data=return_callback)])
     return text, keyboard
+
+
+async def _fetch_realm_trial(uid: str) -> dict | None:
+    try:
+        trial_resp = await http_get(f"{SERVER_URL}/api/realm-trial/{uid}", timeout=15)
+    except Exception:
+        return None
+    if not trial_resp.get("success"):
+        return None
+    return trial_resp.get("trial") or None
+
+
+def _format_realm_trial_text(trial: dict | None) -> str:
+    if not trial:
+        return "当前境界暂未配置试炼任务。"
+    hunt_target = max(0, int(trial.get("hunt_target", 0) or 0))
+    hunt_progress = max(0, int(trial.get("hunt_progress", 0) or 0))
+    secret_target = max(0, int(trial.get("secret_target", 0) or 0))
+    secret_progress = max(0, int(trial.get("secret_progress", 0) or 0))
+    lines = ["🧪 *境界试炼进度*"]
+    if hunt_target > 0:
+        lines.append(f"• 狩猎：{hunt_progress}/{hunt_target}（还差 {max(0, hunt_target - hunt_progress)}）")
+    if secret_target > 0:
+        lines.append(f"• 秘境：{secret_progress}/{secret_target}（还差 {max(0, secret_target - secret_progress)}）")
+    if len(lines) == 1:
+        lines.append("• 当前境界无额外试炼要求")
+    return "\n".join(lines)
 
 
 def _build_breakthrough_preview(user_data: dict, *, strategy: str = "normal") -> str:
@@ -2091,6 +2157,27 @@ def _build_breakthrough_strategy_notes(user_data: dict) -> str:
     )
 
 
+async def _build_breakthrough_preview_block(uid: str, user_data: dict, *, strategy: str = "steady") -> str:
+    """优先使用服务端预览，避免 Bot 本地规则与结算规则漂移。"""
+    try:
+        data = await http_get(
+            f"{SERVER_URL}/api/breakthrough/preview/{uid}",
+            params={"strategy": strategy},
+            timeout=15,
+        )
+        if data.get("success"):
+            preview = data.get("preview", {}) or {}
+            preview_text = str(preview.get("preview_text", "") or "").strip()
+            notes = str(preview.get("strategy_notes", "") or "").strip()
+            blocks = [b for b in (preview_text, notes) if b]
+            if blocks:
+                return "\n\n".join(blocks)
+    except Exception:
+        pass
+    # fallback: local rendering
+    return f"{_build_breakthrough_preview(user_data, strategy=strategy)}\n\n{_build_breakthrough_strategy_notes(user_data)}"
+
+
 async def _build_events_menu(uid: str | None = None):
     if uid:
         data = await http_get(f"{SERVER_URL}/api/events/status/{uid}", timeout=15)
@@ -2143,6 +2230,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """处理按钮回调"""
     query = update.callback_query
     user_id = str(query.from_user.id)
+    callback_request_id = f"tgcb:{query.id}"
 
     async def _safe_answer(text=None, show_alert=False):
         try:
@@ -2271,8 +2359,16 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             to_name = result.get("to_username", "你")
             from_name = result.get("from_username", "道友")
-            acceptor_text = "🗣️ 论道成功！\n" + _build_chat_reward_text(from_name, result.get("to_stamina_gain", 0), result.get("exp_gain", 0))
-            initiator_text = "🗣️ 论道成功！\n" + _build_chat_reward_text(to_name, result.get("from_stamina_gain", 0), result.get("exp_gain", 0))
+            acceptor_text = "🗣️ 论道成功！\n" + _build_chat_reward_text(
+                from_name,
+                result.get("to_stamina_gain", 0),
+                result.get("to_exp_gain", result.get("exp_gain", 0)),
+            )
+            initiator_text = "🗣️ 论道成功！\n" + _build_chat_reward_text(
+                to_name,
+                result.get("from_stamina_gain", 0),
+                result.get("from_exp_gain", result.get("exp_gain", 0)),
+            )
 
             await _safe_edit("✅ 已接受论道邀请", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]))
             try:
@@ -2490,6 +2586,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     keyboard.append([InlineKeyboardButton("🏛️ 创建宗门", callback_data="sect_create_prompt")])
                 keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
                 await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+            else:
+                await _safe_edit("❌ 未找到账号，请先注册或稍后重试", reply_markup=get_main_menu_keyboard())
         except Exception as e:
             logger.error(f"sect menu error: {e}")
             await _safe_edit("❌ 宗门面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
@@ -2548,9 +2646,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if r.get("success"):
                 uid = r["user_id"]
                 from_currency = "copper" if direction == "up" else "gold"
+                request_id = _new_request_id(context)
                 result = await http_post(
                     f"{SERVER_URL}/api/currency/exchange",
-                    json={"user_id": uid, "from_currency": from_currency, "amount": amount},
+                    json={"user_id": uid, "from_currency": from_currency, "amount": amount, "request_id": request_id},
                     timeout=15,
                 )
                 msg = f"{'✅' if result.get('success') else '❌'} {result.get('message', '兑换失败')}"
@@ -2663,7 +2762,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     catalyst = result.get("catalyst") or {}
                     catalyst_text = ""
                     if catalyst and catalyst.get("item_id"):
-                        catalyst_text = f"\n专精材料: {catalyst.get('used', 0)} x {catalyst.get('item_id')}"
+                        catalyst_text = (
+                            f"\n专精材料: {catalyst.get('used', 0)} x "
+                            f"{_item_display_name(str(catalyst.get('item_id') or ''))}"
+                        )
                     text = (
                         f"✅ {result.get('message', result.get('route_name', '转化完成'))}\n"
                         f"目标: {result.get('target_name')} x{result.get('output_quantity', 0)}\n"
@@ -2753,6 +2855,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _safe_edit("❌ 抽卡面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
         return
 
+    if data == "gacha_free_limit":
+        try:
+            await query.answer("今日免费抽奖次数已用尽", show_alert=False)
+        except Exception:
+            pass
+        return
+
     if data.startswith("gacha_pull_"):
         parts = data.split("_")
         if len(parts) >= 4:
@@ -2770,15 +2879,23 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 uid = r["user_id"]
                 force_paid = draw_mode == "paid1"
                 count = 5 if draw_mode == "5" else 1
+                request_id = _new_request_id(context)
                 result = await http_post(
                     f"{SERVER_URL}/api/gacha/pull",
-                    json={"user_id": uid, "banner_id": int(banner_id), "count": int(count), "force_paid": force_paid},
+                    json={
+                        "user_id": uid,
+                        "banner_id": int(banner_id),
+                        "count": int(count),
+                        "force_paid": force_paid,
+                        "request_id": request_id,
+                    },
                     timeout=15,
                 )
                 if result.get("success"):
                     text = "🎲 *抽奖结果*\n\n"
                     for it in result.get("results", [])[:10]:
-                        text += f"• [{it.get('rarity')}] {it.get('item_name', it.get('item_id'))}\n"
+                        name = it.get("item_name") or _item_display_name(str(it.get("item_id") or ""))
+                        text += f"• [{it.get('rarity')}] {name}\n"
                     if result.get("pull_mode") == "free":
                         text += "\n本次为免费抽奖。"
                     else:
@@ -2887,7 +3004,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             if r.get("success"):
                 uid = r["user_id"]
-                if await _stop_if_cultivating(uid, "攻击世界BOSS"):
+                if await _stop_if_cultivating(uid, "领取活动奖励"):
                     return
                 result = await http_post(
                     f"{SERVER_URL}/api/events/claim",
@@ -3172,6 +3289,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if r.get("success"):
                 uid = r["user_id"]
                 status = await http_get(f"{SERVER_URL}/api/cultivate/status/{uid}", timeout=15)
+                if not status.get("success"):
+                    await _safe_edit(
+                        "❌ 修炼状态获取失败，请稍后重试",
+                        reply_markup=InlineKeyboardMarkup([
+                            [InlineKeyboardButton("🧘 修炼面板", callback_data="cultivate")],
+                            [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+                        ]),
+                    )
+                    return
                 current = status.get("current_gain", 0)
                 keyboard = [[InlineKeyboardButton("⏹️ 结束修炼", callback_data="cultivate_end")]]
                 text = f"🧘 已获得 {current:,} 修为"
@@ -3254,7 +3380,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     text = "👹 *选择要挑战的怪物:*\n\n"
                     keyboard = []
-                    for m in monsters[:8]:
+                    for m in monsters[:4]:
                         diff = "简单" if m["min_rank"] <= user_rank - 2 else ("普通" if m["min_rank"] <= user_rank else "困难")
                         text += f"▸ *{m['name']}* [{diff}]"
                         if m.get("element"):
@@ -3338,6 +3464,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "session_id": session_id,
                         "action": action,
                         "skill_id": selected_skill,
+                        "request_id": callback_request_id,
                     },
                     timeout=15,
                 )
@@ -3450,10 +3577,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 uid = r["user_id"]
                 if await _stop_if_cultivating(uid, "锻造"):
                     return
-                res = await http_post(f"{SERVER_URL}/api/forge", json={"user_id": uid}, timeout=15)
+                request_id = _new_request_id(context)
+                res = await http_post(
+                    f"{SERVER_URL}/api/forge",
+                    json={"user_id": uid, "request_id": request_id},
+                    timeout=15,
+                )
                 if res.get("success"):
                     rw = res.get("reward") or {}
-                    name = rw.get("item_name") or rw.get("name") or rw.get("item_id") or "未知奖励"
+                    name = rw.get("item_name") or rw.get("name") or _item_display_name(str(rw.get("item_id") or "")) or "未知奖励"
                     qty = rw.get("quantity", 1)
                     text = f"✅ 锻造成功！\n\n获得: {name} x{qty}"
                 else:
@@ -3487,7 +3619,12 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 uid = r["user_id"]
                 if await _stop_if_cultivating(uid, "定向锻造"):
                     return
-                res = await http_post(f"{SERVER_URL}/api/forge/targeted", json={"user_id": uid, "item_id": item_id}, timeout=15)
+                request_id = _new_request_id(context)
+                res = await http_post(
+                    f"{SERVER_URL}/api/forge/targeted",
+                    json={"user_id": uid, "item_id": item_id, "request_id": request_id},
+                    timeout=15,
+                )
                 prefix = f"🎯 {res.get('message', '定向锻造失败')}"
                 text2, keyboard = await _build_forge_menu(uid)
                 return await _safe_edit(prefix + "\n\n" + text2, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
@@ -3518,21 +3655,36 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     can_break = can_breakthrough(user_data.get("exp", 0), user_data.get("rank", 1))
                     progress = format_realm_progress(user_data)
                     if can_break:
-                        preview = _build_breakthrough_preview(user_data, strategy="steady")
-                        notes = _build_breakthrough_strategy_notes(user_data)
-                        text = (
-                            f"🔥 *突破*\n\n{progress}\n\n✨ 可以突破！\n"
-                            f"请选择冲关策略：\n\n{preview}\n\n"
-                            f"{notes}"
-                        )
-                        keyboard = [
-                            [
-                                InlineKeyboardButton("🛡️ 稳妥突破", callback_data="breakthrough_steady"),
-                                InlineKeyboardButton("🌿 护脉突破", callback_data="breakthrough_protect"),
-                            ],
-                            [InlineKeyboardButton("⚡ 生死突破", callback_data="breakthrough_desperate")],
-                            [InlineKeyboardButton("🔙 返回", callback_data="main_menu")],
-                        ]
+                        trial = await _fetch_realm_trial(uid)
+                        trial_blocked = bool(trial) and int(trial.get("completed", 0) or 0) != 1
+                        if trial_blocked:
+                            text = (
+                                f"🔥 *突破*\n\n{progress}\n\n"
+                                "⚠️ 修为已满足，但境界试炼尚未完成。\n\n"
+                                f"{_format_realm_trial_text(trial)}\n\n"
+                                "完成试炼后即可突破。"
+                            )
+                            keyboard = [
+                                [
+                                    InlineKeyboardButton("⚔️ 去狩猎", callback_data="hunt"),
+                                    InlineKeyboardButton("🗺️ 去秘境", callback_data="secret_realms"),
+                                ],
+                                [InlineKeyboardButton("🔙 返回", callback_data="main_menu")],
+                            ]
+                        else:
+                            preview_block = await _build_breakthrough_preview_block(uid, user_data, strategy="steady")
+                            text = (
+                                f"🔥 *突破*\n\n{progress}\n\n✨ 可以突破！\n"
+                                f"请选择冲关策略：\n\n{preview_block}"
+                            )
+                            keyboard = [
+                                [
+                                    InlineKeyboardButton("🛡️ 稳妥突破", callback_data="breakthrough_steady"),
+                                    InlineKeyboardButton("🌿 护脉突破", callback_data="breakthrough_protect"),
+                                ],
+                                [InlineKeyboardButton("⚡ 生死突破", callback_data="breakthrough_desperate")],
+                                [InlineKeyboardButton("🔙 返回", callback_data="main_menu")],
+                            ]
                     else:
                         text = f"🔥 *突破*\n\n{progress}\n\n修为不足，继续修炼吧！"
                         keyboard = [[InlineKeyboardButton("🔙 返回", callback_data="main_menu")]]
@@ -3588,21 +3740,29 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         f"建议: {result.get('next_goal', '继续稳固境界，准备下一阶段修行。')}"
                     )
                 else:
-                    exp_lost = result.get("exp_lost", 0)
-                    weak = result.get("weak_seconds", 0)
-                    text = (
-                        f"💥 *突破失败*\n\n"
-                        f"{result.get('event_title', '这次冲关未能成功')}\n"
-                        f"{result.get('event_flavor', '')}\n\n"
-                        f"{result.get('message', '')}"
-                    )
-                    if exp_lost:
-                        text += f"\n损失修为: {exp_lost:,}"
-                    if weak:
-                        text += f"\n虚弱状态: {weak // 60} 分钟"
-                    if result.get("strategy_cost_text"):
-                        text += f"\n{result.get('strategy_cost_text')}"
-                    text += f"\n建议: {result.get('next_goal', '先恢复状态，再准备下一次冲关。')}"
+                    if result.get("code") == "REALM_TRIAL":
+                        text = (
+                            "⛔ *暂时无法突破*\n\n"
+                            f"{result.get('message', '需完成当前境界试炼后方可突破')}\n\n"
+                            f"{_format_realm_trial_text(result.get('trial') or {})}\n\n"
+                            "完成试炼后再来冲关。"
+                        )
+                    else:
+                        exp_lost = result.get("exp_lost", 0)
+                        weak = result.get("weak_seconds", 0)
+                        text = (
+                            f"💥 *突破失败*\n\n"
+                            f"{result.get('event_title', '这次冲关未能成功')}\n"
+                            f"{result.get('event_flavor', '')}\n\n"
+                            f"{result.get('message', '')}"
+                        )
+                        if exp_lost:
+                            text += f"\n损失修为: {exp_lost:,}"
+                        if weak:
+                            text += f"\n虚弱状态: {weak // 60} 分钟"
+                        if result.get("strategy_cost_text"):
+                            text += f"\n{result.get('strategy_cost_text')}"
+                        text += f"\n建议: {result.get('next_goal', '先恢复状态，再准备下一次冲关。')}"
                 await _safe_edit(
                     text,
                     parse_mode=ParseMode.MARKDOWN,
@@ -4170,7 +4330,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     icon = "✅" if result.get("enhance_success", True) else "⚠️"
                     text = f"{icon} {result['message']}\n"
                     text += f"消耗: {result.get('cost', 0)} 下品灵石\n"
-                    text += f"材料: {result.get('material', {}).get('used', 0)} x {result.get('material', {}).get('item_id', '')}\n"
+                    material_item_name = _item_display_name(str((result.get("material", {}) or {}).get("item_id", "") or ""))
+                    text += f"材料: {result.get('material', {}).get('used', 0)} x {material_item_name}\n"
                     if bonus_parts:
                         text += f"属性提升: {', '.join(bonus_parts)}"
                     if focus_parts:
@@ -4270,6 +4431,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                     keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
                     await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+                else:
+                    await _safe_edit("❌ 任务面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
+            else:
+                await _safe_edit("❌ 未找到账号，请先注册或稍后重试", reply_markup=get_main_menu_keyboard())
         except Exception as e:
             logger.error(f"quests callback error: {e}")
             await _safe_edit("❌ 任务面板加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
@@ -4290,6 +4455,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]
                 await _safe_edit(f"{icon} {msg}", reply_markup=InlineKeyboardMarkup(keyboard))
+            else:
+                await _safe_edit("❌ 未找到账号，请先注册或稍后重试", reply_markup=get_main_menu_keyboard())
         except Exception as e:
             logger.error(f"quest claim callback error: {e}")
             await _safe_edit("❌ 任务奖励领取失败，请稍后重试", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📜 任务列表", callback_data="quests")], [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]))
@@ -4407,10 +4574,36 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return
                 result = await http_post(
                     f"{SERVER_URL}/api/secret-realms/turn/start",
-                    json={"user_id": uid, "realm_id": realm_id, "path": path},
+                    json={"user_id": uid, "realm_id": realm_id, "path": path, "interactive": True},
                     timeout=15,
                 )
                 if result.get("success"):
+                    if result.get("needs_choice"):
+                        realm_name = result.get("realm", {}).get("name", "秘境")
+                        path_name = {
+                            "safe": "稳妥探索",
+                            "risky": "冒险探索",
+                            "loot": "寻宝路线",
+                            "normal": "常规探索",
+                        }.get(result.get("path", path), "常规探索")
+                        encounter = result.get("encounter") or {}
+                        encounter_name = encounter.get("label") if isinstance(encounter, dict) else str(encounter or "事件")
+                        text = f"🗺️ *{realm_name} · 事件抉择*\n路线: {path_name}\n遭遇: {encounter_name}\n\n请选择处理方式：\n"
+                        for choice in (result.get("choices") or [])[:3]:
+                            text += f"• {choice.get('label', '选项')}"
+                            if choice.get("note"):
+                                text += f"：{choice.get('note')}"
+                            text += "\n"
+                        await _safe_edit(
+                            text,
+                            parse_mode=ParseMode.MARKDOWN,
+                            reply_markup=_secret_choice_keyboard(
+                                result.get("session_id"),
+                                result.get("choices", []),
+                                back_callback="secret_realms",
+                            ),
+                        )
+                        return
                     if result.get("needs_battle"):
                         realm_name = result.get("realm", {}).get("name", "秘境")
                         path_name = {
@@ -4524,6 +4717,123 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         return
 
+    if data.startswith("sbc_"):
+        parts = data.split("_", 2)
+        if len(parts) < 3:
+            return
+        session_id = parts[1]
+        choice_id = parts[2]
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": user_id},
+                timeout=15,
+            )
+            if r.get("success"):
+                uid = r["user_id"]
+                result = await http_post(
+                    f"{SERVER_URL}/api/secret-realms/turn/action",
+                    json={
+                        "user_id": uid,
+                        "session_id": session_id,
+                        "action": "choice",
+                        "choice": choice_id,
+                        "request_id": callback_request_id,
+                    },
+                    timeout=15,
+                )
+                if result.get("success"):
+                    if result.get("needs_choice"):
+                        realm_name = result.get("realm", {}).get("name", "秘境")
+                        path_name = {
+                            "safe": "稳妥探索",
+                            "risky": "冒险探索",
+                            "loot": "寻宝路线",
+                            "normal": "常规探索",
+                        }.get(result.get("path", "normal"), "常规探索")
+                        encounter = result.get("encounter") or {}
+                        encounter_name = encounter.get("label") if isinstance(encounter, dict) else str(encounter or "事件")
+                        text = f"🗺️ *{realm_name} · 事件抉择*\n路线: {path_name}\n遭遇: {encounter_name}\n\n请选择处理方式：\n"
+                        for choice in (result.get("choices") or [])[:3]:
+                            text += f"• {choice.get('label', '选项')}"
+                            if choice.get("note"):
+                                text += f"：{choice.get('note')}"
+                            text += "\n"
+                        await _safe_edit(
+                            text,
+                            parse_mode=ParseMode.MARKDOWN,
+                            reply_markup=_secret_choice_keyboard(
+                                result.get("session_id"),
+                                result.get("choices", []),
+                                back_callback="secret_realms",
+                            ),
+                        )
+                        return
+                    if result.get("needs_battle"):
+                        realm_name = result.get("realm", {}).get("name", "秘境")
+                        path_name = {
+                            "safe": "稳妥探索",
+                            "risky": "冒险探索",
+                            "loot": "寻宝路线",
+                            "normal": "常规探索",
+                        }.get(result.get("path", "normal"), "常规探索")
+                        encounter = result.get("encounter") or {}
+                        encounter_name = encounter.get("label") if isinstance(encounter, dict) else encounter
+                        subtitle = f"路线: {path_name}"
+                        if encounter_name:
+                            subtitle += f" ｜ 遭遇: {encounter_name}"
+                        text = _battle_state_text(
+                            f"🗺️ *{realm_name} · 遭遇战*",
+                            result,
+                            subtitle=subtitle,
+                        )
+                        await _safe_edit(
+                            text,
+                            parse_mode=ParseMode.MARKDOWN,
+                            reply_markup=_battle_action_keyboard("sbt", result.get("session_id"), result.get("active_skills", []), back_callback="secret_realms"),
+                        )
+                        return
+                    rewards = result.get("rewards", {})
+                    drops = rewards.get("drops") or []
+                    text = f"🗺️ *事件处理完成*\n\n📜 {result.get('event', '本次事件已结算')}\n\n🎁 *探索收获:*\n"
+                    text += f"• 修为: +{rewards.get('exp', 0):,}\n"
+                    text += f"• 下品灵石: +{rewards.get('copper', 0):,}\n"
+                    if rewards.get("gold"):
+                        text += f"• 中品灵石: +{rewards['gold']}\n"
+                    for drop in drops[:4]:
+                        text += f"• 掉落: {drop.get('item_name', '未知物品')}"
+                        if drop.get("quantity", 1) > 1:
+                            text += f" x{drop['quantity']}"
+                        text += "\n"
+                    text += _format_post_battle_status(result.get("post_status"))
+                    attempts_left = int(result.get("attempts_left", 0) or 0)
+                    realm_id = result.get("realm", {}).get("id")
+                    keyboard = []
+                    if attempts_left > 0 and realm_id:
+                        keyboard.append([
+                            InlineKeyboardButton("🛡️ 稳妥", callback_data=f"secret_realm_explore_{realm_id}_safe"),
+                            InlineKeyboardButton("⚔️ 冒险", callback_data=f"secret_realm_explore_{realm_id}_risky"),
+                            InlineKeyboardButton("💰 寻宝", callback_data=f"secret_realm_explore_{realm_id}_loot"),
+                        ])
+                    keyboard.append([InlineKeyboardButton("🗺️ 秘境列表", callback_data="secret_realms")])
+                    keyboard.append([InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")])
+                    await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+                else:
+                    await _safe_edit(
+                        f"❌ {result.get('message', '事件处理失败')}",
+                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🗺️ 秘境列表", callback_data="secret_realms")], [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]),
+                    )
+        except Exception as e:
+            logger.error(f"secret realm choice error: {e}")
+            await _safe_edit(
+                "❌ 事件处理失败，请稍后重试",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🗺️ 秘境列表", callback_data="secret_realms")],
+                    [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+                ]),
+            )
+        return
+
     if data.startswith("sbt_"):
         parts = data.split("_")
         if len(parts) < 3:
@@ -4544,10 +4854,42 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 uid = r["user_id"]
                 result = await http_post(
                     f"{SERVER_URL}/api/secret-realms/turn/action",
-                    json={"user_id": uid, "session_id": session_id, "action": action, "skill_id": selected_skill},
+                    json={
+                        "user_id": uid,
+                        "session_id": session_id,
+                        "action": action,
+                        "skill_id": selected_skill,
+                        "request_id": callback_request_id,
+                    },
                     timeout=15,
                 )
                 if result.get("success"):
+                    if result.get("needs_choice"):
+                        realm_name = result.get("realm", {}).get("name", "秘境")
+                        path_name = {
+                            "safe": "稳妥探索",
+                            "risky": "冒险探索",
+                            "loot": "寻宝路线",
+                            "normal": "常规探索",
+                        }.get(result.get("path", "normal"), "常规探索")
+                        encounter = result.get("encounter") or {}
+                        encounter_name = encounter.get("label") if isinstance(encounter, dict) else str(encounter or "事件")
+                        text = f"🗺️ *{realm_name} · 事件抉择*\n路线: {path_name}\n遭遇: {encounter_name}\n\n请选择处理方式：\n"
+                        for choice in (result.get("choices") or [])[:3]:
+                            text += f"• {choice.get('label', '选项')}"
+                            if choice.get("note"):
+                                text += f"：{choice.get('note')}"
+                            text += "\n"
+                        await _safe_edit(
+                            text,
+                            parse_mode=ParseMode.MARKDOWN,
+                            reply_markup=_secret_choice_keyboard(
+                                result.get("session_id"),
+                                result.get("choices", []),
+                                back_callback="secret_realms",
+                            ),
+                        )
+                        return
                     if result.get("finished") is False:
                         realm_name = result.get("realm", {}).get("name", "秘境")
                         path_name = {
@@ -5316,7 +5658,13 @@ async def currency_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             result = await http_post(
                 f"{SERVER_URL}/api/currency/exchange",
-                json={"user_id": uid, "from_currency": from_currency, "to_currency": to_currency, "amount": amount},
+                json={
+                    "user_id": uid,
+                    "from_currency": from_currency,
+                    "to_currency": to_currency,
+                    "amount": amount,
+                    "request_id": _new_request_id(context),
+                },
                 timeout=15,
             )
             await update.message.reply_text(("✅ " if result.get("success") else "❌ ") + result.get("message", "兑换失败"))
@@ -5339,7 +5687,12 @@ async def currency_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             result = await http_post(
                 f"{SERVER_URL}/api/currency/exchange",
-                json={"user_id": uid, "from_currency": from_currency, "amount": amount},
+                json={
+                    "user_id": uid,
+                    "from_currency": from_currency,
+                    "amount": amount,
+                    "request_id": _new_request_id(context),
+                },
                 timeout=15,
             )
             if result.get("success"):
@@ -5425,7 +5778,10 @@ async def convert_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 catalyst = result.get("catalyst") or {}
                 catalyst_text = ""
                 if catalyst and catalyst.get("item_id"):
-                    catalyst_text = f"\n专精材料: {catalyst.get('used', 0)} x {catalyst.get('item_id')}"
+                    catalyst_text = (
+                        f"\n专精材料: {catalyst.get('used', 0)} x "
+                        f"{_item_display_name(str(catalyst.get('item_id') or ''))}"
+                    )
                 text = (
                     f"✅ {result.get('message', result.get('route_name', '转化完成'))}\n"
                     f"目标: {result.get('target_name')} x{result.get('output_quantity', 0)}\n"
@@ -5465,16 +5821,23 @@ async def gacha_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
             count = 5 if draw_arg in ("5", "five") else 1
             result = await http_post(
                 f"{SERVER_URL}/api/gacha/pull",
-                json={"user_id": uid, "banner_id": banner_id, "count": count, "force_paid": force_paid},
+                json={
+                    "user_id": uid,
+                    "banner_id": banner_id,
+                    "count": count,
+                    "force_paid": force_paid,
+                    "request_id": _new_request_id(context),
+                },
                 timeout=15,
             )
             if result.get("success"):
                 text = "🎲 *抽奖结果*\n\n"
                 for it in result.get("results", [])[:10]:
-                    line = f"• [{it.get('rarity')}] {it.get('item_name', it.get('item_id'))}"
+                    item_name = it.get("item_name") or _item_display_name(str(it.get("item_id") or ""))
+                    line = f"• [{it.get('rarity')}] {item_name}"
                     if it.get("duplicate"):
                         comp = it.get("compensation") or {}
-                        comp_name = comp.get("item_name") or comp.get("item_id")
+                        comp_name = comp.get("item_name") or _item_display_name(str(comp.get("item_id") or ""))
                         comp_qty = int(comp.get("quantity", 0) or 0)
                         if comp_name and comp_qty > 0:
                             line += f"（重复转化：{comp_name} x{comp_qty}）"
@@ -5696,8 +6059,9 @@ async def bounty_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             lines = ["📜 悬赏会"]
             for row in (data.get("bounties") or [])[:15]:
+                wanted_name = row.get("wanted_item_name") or _item_display_name(str(row.get("wanted_item_id") or ""))
                 lines.append(
-                    f"#{row.get('id')} {row.get('wanted_item_name', row.get('wanted_item_id'))} x{row.get('wanted_quantity')} "
+                    f"#{row.get('id')} {wanted_name} x{row.get('wanted_quantity')} "
                     f"=> {row.get('reward_spirit_low')} 下品灵石 ({row.get('status')})"
                 )
             await update.message.reply_text("\n".join(lines))

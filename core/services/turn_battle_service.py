@@ -8,6 +8,7 @@ import time
 import json
 import threading
 import copy
+import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
 from core.config import config
@@ -23,6 +24,7 @@ from core.database.connection import (
     fetch_all,
     ensure_battle_session_table,
 )
+from core.database.migrations import reserve_request, save_response
 from core.game.combat import get_monster_by_id, create_combatant_from_user, create_combatant_from_monster
 from core.game.combat_kernel import (
     apply_counter_bonus,
@@ -58,6 +60,7 @@ from core.utils.number import format_stamina_value
 
 logger = logging.getLogger("core.turn_battle")
 _BATTLE_SESSIONS: dict[str, dict[str, Any]] = {}
+_BATTLE_SESSIONS_LOCK = threading.RLock()
 _SESSION_LOCKS: dict[str, threading.Lock] = {}
 _SESSION_LOCKS_LOCK = threading.Lock()
 
@@ -106,12 +109,12 @@ def _cleanup_expired_sessions(now_ts: Optional[int] = None) -> int:
     ttl_seconds = _session_ttl_seconds()
     expire_before = now - ttl_seconds
     stale_ids = []
-    for sid, sess in list(_BATTLE_SESSIONS.items()):
+    for sid, sess in _session_items_snapshot():
         last_active = int(sess.get("last_active_at", sess.get("started_at", 0)) or 0)
         if last_active <= expire_before:
             stale_ids.append(sid)
     for sid in stale_ids:
-        sess = _BATTLE_SESSIONS.pop(sid, None)
+        sess = _session_pop(sid)
         if sess:
             _compensate_expired_secret_session(sess, now)
         _delete_session(sid)
@@ -143,7 +146,57 @@ def _cleanup_expired_sessions(now_ts: Optional[int] = None) -> int:
 
 
 def _session_id() -> str:
-    return f"B{int(time.time() * 1000) % 100000000}{random.randint(10, 99)}"
+    return f"B{uuid.uuid4().hex}"
+
+
+def _session_items_snapshot() -> List[Tuple[str, Dict[str, Any]]]:
+    with _BATTLE_SESSIONS_LOCK:
+        return list(_BATTLE_SESSIONS.items())
+
+
+def _session_values_snapshot() -> List[Dict[str, Any]]:
+    with _BATTLE_SESSIONS_LOCK:
+        return list(_BATTLE_SESSIONS.values())
+
+
+def _session_get(session_id: str) -> Optional[Dict[str, Any]]:
+    with _BATTLE_SESSIONS_LOCK:
+        return _BATTLE_SESSIONS.get(session_id)
+
+
+def _session_put(session: Dict[str, Any]) -> None:
+    sid = str(session.get("id") or "")
+    if not sid:
+        return
+    with _BATTLE_SESSIONS_LOCK:
+        _BATTLE_SESSIONS[sid] = session
+
+
+def _session_pop(session_id: str) -> Optional[Dict[str, Any]]:
+    with _BATTLE_SESSIONS_LOCK:
+        return _BATTLE_SESSIONS.pop(session_id, None)
+
+
+def _session_exists(session_id: str) -> bool:
+    with _BATTLE_SESSIONS_LOCK:
+        return session_id in _BATTLE_SESSIONS
+
+
+def _session_exists_in_store(session_id: str) -> bool:
+    ensure_battle_session_table()
+    row = fetch_one("SELECT 1 AS c FROM battle_sessions WHERE session_id = ? LIMIT 1", (session_id,))
+    return bool(row)
+
+
+def _allocate_session_id(max_attempts: int = 6) -> str:
+    for _ in range(max(1, int(max_attempts or 6))):
+        sid = _session_id()
+        if _session_exists(sid):
+            continue
+        if _session_exists_in_store(sid):
+            continue
+        return sid
+    raise RuntimeError("unable to allocate unique battle session id")
 
 
 def _get_session_lock(session_id: str) -> threading.Lock:
@@ -208,7 +261,7 @@ def _find_active_session_for_user(user_id: str) -> Optional[Dict[str, Any]]:
     now = int(time.time())
     ttl = _session_ttl_seconds()
     expire_before = now - ttl
-    for sess in _BATTLE_SESSIONS.values():
+    for sess in _session_values_snapshot():
         if sess.get("user_id") != user_id:
             continue
         last_active = int(sess.get("last_active_at", sess.get("started_at", 0)) or 0)
@@ -223,7 +276,7 @@ def _find_active_session_for_user(user_id: str) -> Optional[Dict[str, Any]]:
         return None
     session = _load_session(row.get("session_id"))
     if session:
-        _BATTLE_SESSIONS[session["id"]] = session
+        _session_put(session)
     return session
 
 
@@ -455,7 +508,7 @@ def _maybe_apply_enrage(target: Dict[str, Any], logs: List[str]) -> None:
 
 
 def _kernel_shadow_enabled() -> bool:
-    return bool(config.get_nested("battle", "kernel_shadow", "enabled", default=True))
+    return bool(config.get_nested("battle", "kernel_shadow", "enabled", default=False))
 
 
 def _kernel_shadow_threshold_pct() -> float:
@@ -513,6 +566,7 @@ def _run_round(session: Dict[str, Any], action: str, skill_id: Optional[str] = N
     enemy = session["enemy"]
     session["last_active_at"] = int(time.time())
     selected_skill = None
+    invalid_skill_requested = False
     if action == "skill" and skill_id:
         candidate = next((s for s in session.get("active_skills", []) if s.get("id") == skill_id), None)
         if candidate:
@@ -529,9 +583,13 @@ def _run_round(session: Dict[str, Any], action: str, skill_id: Optional[str] = N
                 }
             player["mp"] = max(0, int(player.get("mp", 0) or 0) - mp_cost)
             selected_skill = candidate
+        else:
+            invalid_skill_requested = True
 
     session["round"] = int(session.get("round", 0) or 0) + 1
     round_logs = [f"第 {session['round']} 回合"]
+    if invalid_skill_requested:
+        round_logs.append("⚠️ 技能无效，已降级为普通攻击。")
     if session["round"] == 1:
         elite_names = (enemy.get("elite_affix_names") or session.get("elite_affix_names")) if enemy else None
         if elite_names:
@@ -748,7 +806,7 @@ def _build_secret_battle_session(
         "danger_scale": float(encounter.get("danger_scale", 1.0) or 1.0),
         "kernel_shadow": {"enabled": _kernel_shadow_enabled(), "alerts": 0},
     }
-    sid = session_id or _session_id()
+    sid = session_id or _allocate_session_id()
     session = {
         "id": sid,
         "kind": "secret",
@@ -805,7 +863,8 @@ def _battle_failure_reasons(session: Dict[str, Any]) -> List[str]:
 
     if original_hp <= max(1, int(max_hp * 0.55)):
         reasons.append("开战时血量偏低，没能扛住后续回合。")
-    if session.get("element_relation") == "被克(-25%)":
+    relation_text = str(session.get("element_relation") or "")
+    if relation_text.startswith("被克"):
         reasons.append("你被怪物五行克制，输出被明显压低。")
     if enemy_damage >= max_hp or int(enemy.get("attack", 0) or 0) >= int(player.get("defense", 0) or 0) * 2:
         reasons.append("敌方伤害过高，你的防御和血量不够稳。")
@@ -899,8 +958,12 @@ def start_hunt_session(user_id: str, monster_id: str, *, now: Optional[int] = No
         "kernel_shadow": {"enabled": _kernel_shadow_enabled(), "alerts": 0},
     }
 
-    session_id = _session_id()
-    _BATTLE_SESSIONS[session_id] = {
+    try:
+        session_id = _allocate_session_id()
+    except RuntimeError:
+        logger.error("failed_to_allocate_hunt_session_id user_id=%s", user_id)
+        return {"success": False, "message": "战斗会话创建失败，请稍后重试"}, 500
+    session_obj = {
         "id": session_id,
         "kind": "hunt",
         "user_id": user_id,
@@ -923,7 +986,8 @@ def start_hunt_session(user_id: str, monster_id: str, *, now: Optional[int] = No
         "started_at": now,
         "last_active_at": now,
     }
-    _persist_session(_BATTLE_SESSIONS[session_id])
+    _session_put(session_obj)
+    _persist_session(session_obj)
     return {
         "success": True,
         "session_id": session_id,
@@ -956,7 +1020,7 @@ def _finalize_hunt(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
             )
         hcfg = config.get_nested("balance", "hunt", default={}) or {}
         rank = int(user.get("rank", 1) or 1)
-        base_rw = hunt_rewards(rank, hcfg)
+        base_rw = hunt_rewards(rank, hcfg, monster=monster)
         mult = fatigue_multiplier(int(session.get("hunt_index", 1) or 1), hcfg)
         exp_mult = exp_fatigue_multiplier(int(session.get("hunt_index", 1) or 1), hcfg)
         rewards["exp"] = int(base_rw["exp"] * exp_mult)
@@ -1041,29 +1105,57 @@ def _finalize_hunt(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
     return payload
 
 
-def action_hunt_session(user_id: str, session_id: str, *, action: str, skill_id: Optional[str] = None) -> Tuple[Dict[str, Any], int]:
+def action_hunt_session(
+    user_id: str,
+    session_id: str,
+    *,
+    action: str,
+    skill_id: Optional[str] = None,
+    request_id: Optional[str] = None,
+) -> Tuple[Dict[str, Any], int]:
     _cleanup_expired_sessions()
+    dedup_action = "hunt_turn_action"
+    dedup_request_id = str(request_id or "").strip()
+    if dedup_request_id:
+        dedup_status, cached = reserve_request(
+            dedup_request_id,
+            user_id=user_id,
+            action=dedup_action,
+            stale_after_seconds=20,
+        )
+        if dedup_status == "cached":
+            if cached is not None:
+                return cached, 200
+            return {"success": False, "message": "请求结果不可用，请重试"}, 409
+        if dedup_status == "in_progress":
+            return {"success": False, "message": "请求处理中，请勿重复点击"}, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if dedup_request_id:
+            save_response(dedup_request_id, user_id, dedup_action, resp)
+        return resp, http_status
+
     lock = _get_session_lock(session_id)
     if not lock.acquire(blocking=False):
-        return {"success": False, "message": "上一回合仍在处理，请稍后重试"}, 409
+        return _dedup_return({"success": False, "message": "上一回合仍在处理，请稍后重试"}, 409)
     try:
-        session = _BATTLE_SESSIONS.get(session_id)
+        session = _session_get(session_id)
         if not session:
             session = _load_session(session_id)
             if session:
-                _BATTLE_SESSIONS[session_id] = session
+                _session_put(session)
         if not session or session.get("kind") != "hunt" or session.get("user_id") != user_id:
-            return {"success": False, "message": "战斗已失效，请重新开始狩猎"}, 404
+            return _dedup_return({"success": False, "message": "战斗已失效，请重新开始狩猎"}, 404)
         round_result = _run_round(session, action, skill_id)
         if round_result["finished"]:
             resp = _finalize_hunt(session, bool(round_result["victory"]))
             resp["round_log"] = round_result["round_log"]
             resp["session_id"] = session_id
-            _BATTLE_SESSIONS.pop(session_id, None)
+            _session_pop(session_id)
             _delete_session(session_id)
-            return resp, 200
+            return _dedup_return(resp, 200)
         _persist_session(session)
-        return {
+        return _dedup_return({
             "success": True,
             "finished": False,
             "session_id": session_id,
@@ -1074,7 +1166,7 @@ def action_hunt_session(user_id: str, session_id: str, *, action: str, skill_id:
             "active_skills": [_skill_summary(skill) for skill in session.get("active_skills", [])],
             "element_relation": session.get("element_relation"),
             "combat_modifiers": session.get("combat_modifiers"),
-        }, 200
+        }, 200)
     finally:
         lock.release()
 
@@ -1150,7 +1242,11 @@ def start_secret_realm_session(
     user = get_user_by_id(user_id) or user
     if not encounter.get("monster_id"):
         if interactive and encounter.get("type") in ("trap", "treasure_event"):
-            session_id = _session_id()
+            try:
+                session_id = _allocate_session_id()
+            except RuntimeError:
+                logger.error("failed_to_allocate_secret_event_session_id user_id=%s", user_id)
+                return {"success": False, "message": "秘境会话创建失败，请稍后重试"}, 500
             combat_modifiers = {
                 "element_relation": None,
                 "elite_affixes": [],
@@ -1158,7 +1254,7 @@ def start_secret_realm_session(
                 "path": path,
                 "danger_scale": float(encounter.get("danger_scale", 1.0) or 1.0),
             }
-            _BATTLE_SESSIONS[session_id] = {
+            session_obj = {
                 "id": session_id,
                 "kind": "secret_event",
                 "user_id": user_id,
@@ -1170,7 +1266,8 @@ def start_secret_realm_session(
                 "started_at": now,
                 "last_active_at": now,
             }
-            _persist_session(_BATTLE_SESSIONS[session_id])
+            _session_put(session_obj)
+            _persist_session(session_obj)
             return {
                 "success": True,
                 "needs_choice": True,
@@ -1201,7 +1298,7 @@ def start_secret_realm_session(
     )
     if not session:
         return response, status
-    _BATTLE_SESSIONS[session["id"]] = session
+    _session_put(session)
     _persist_session(session)
     return response, status
 
@@ -1369,7 +1466,7 @@ def _resolve_secret_event_choice(session: Dict[str, Any], choice: Optional[str])
             )
             if not session_obj:
                 return response, status
-            _BATTLE_SESSIONS[session_obj["id"]] = session_obj
+            _session_put(session_obj)
             _persist_session(session_obj)
             return response, status
         # endure (default)
@@ -1397,7 +1494,7 @@ def _resolve_secret_event_choice(session: Dict[str, Any], choice: Optional[str])
             )
             if not session_obj:
                 return response, status
-            _BATTLE_SESSIONS[session_obj["id"]] = session_obj
+            _session_put(session_obj)
             _persist_session(session_obj)
             return response, status
         if choice == "leave":
@@ -1516,40 +1613,62 @@ def action_secret_session(
     action: str,
     skill_id: Optional[str] = None,
     choice: Optional[str] = None,
+    request_id: Optional[str] = None,
 ) -> Tuple[Dict[str, Any], int]:
     _cleanup_expired_sessions()
+    dedup_action = "secret_turn_action"
+    dedup_request_id = str(request_id or "").strip()
+    if dedup_request_id:
+        dedup_status, cached = reserve_request(
+            dedup_request_id,
+            user_id=user_id,
+            action=dedup_action,
+            stale_after_seconds=20,
+        )
+        if dedup_status == "cached":
+            if cached is not None:
+                return cached, 200
+            return {"success": False, "message": "请求结果不可用，请重试"}, 409
+        if dedup_status == "in_progress":
+            return {"success": False, "message": "请求处理中，请勿重复点击"}, 409
+
+    def _dedup_return(resp: Dict[str, Any], http_status: int) -> Tuple[Dict[str, Any], int]:
+        if dedup_request_id:
+            save_response(dedup_request_id, user_id, dedup_action, resp)
+        return resp, http_status
+
     lock = _get_session_lock(session_id)
     if not lock.acquire(blocking=False):
-        return {"success": False, "message": "上一回合仍在处理，请稍后重试"}, 409
+        return _dedup_return({"success": False, "message": "上一回合仍在处理，请稍后重试"}, 409)
     try:
-        session = _BATTLE_SESSIONS.get(session_id)
+        session = _session_get(session_id)
         if not session:
             session = _load_session(session_id)
             if session:
-                _BATTLE_SESSIONS[session_id] = session
+                _session_put(session)
         if not session or session.get("user_id") != user_id:
-            return {"success": False, "message": "战斗已失效，请重新进入秘境"}, 404
+            return _dedup_return({"success": False, "message": "战斗已失效，请重新进入秘境"}, 404)
         if session.get("kind") == "secret_event":
             if action not in ("choice", "event"):
-                return {"success": False, "message": "需要先选择事件处理方式"}, 400
+                return _dedup_return({"success": False, "message": "需要先选择事件处理方式"}, 400)
             resp, status = _resolve_secret_event_choice(session, choice)
             if resp.get("needs_battle"):
-                return resp, status
-            _BATTLE_SESSIONS.pop(session_id, None)
+                return _dedup_return(resp, status)
+            _session_pop(session_id)
             _delete_session(session_id)
-            return resp, status
+            return _dedup_return(resp, status)
         if session.get("kind") != "secret":
-            return {"success": False, "message": "战斗已失效，请重新进入秘境"}, 404
+            return _dedup_return({"success": False, "message": "战斗已失效，请重新进入秘境"}, 404)
         round_result = _run_round(session, action, skill_id)
         if round_result["finished"]:
             resp = _finalize_secret(session, bool(round_result["victory"]))
             resp["round_log"] = round_result["round_log"]
             resp["session_id"] = session_id
-            _BATTLE_SESSIONS.pop(session_id, None)
+            _session_pop(session_id)
             _delete_session(session_id)
-            return resp, 200
+            return _dedup_return(resp, 200)
         _persist_session(session)
-        return {
+        return _dedup_return({
             "success": True,
             "finished": False,
             "session_id": session_id,
@@ -1564,6 +1683,6 @@ def action_secret_session(
             "active_skills": [_skill_summary(skill) for skill in session.get("active_skills", [])],
             "element_relation": session.get("element_relation"),
             "combat_modifiers": session.get("combat_modifiers"),
-        }, 200
+        }, 200)
     finally:
         lock.release()

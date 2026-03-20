@@ -70,6 +70,42 @@ def _clone_dict(items: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     return {k: dict(v) for k, v in items.items()}
 
 
+def _validate_route(route_name: str, row: Dict[str, Any]) -> Dict[str, Any]:
+    cfg = dict(row or {})
+    cost_mult = float(cfg.get("cost_mult", 1.0) or 0.0)
+    success_rate = float(cfg.get("success_rate", 1.0) or 0.0)
+    fail_output_mult = float(cfg.get("fail_output_mult", 1.0) or 0.0)
+    if cost_mult <= 0:
+        raise ValueError(f"resource_conversion.routes.{route_name}.cost_mult 必须大于 0")
+    if success_rate < 0 or success_rate > 1:
+        raise ValueError(f"resource_conversion.routes.{route_name}.success_rate 必须在 [0,1] 范围内")
+    if fail_output_mult < 0:
+        raise ValueError(f"resource_conversion.routes.{route_name}.fail_output_mult 不能小于 0")
+    cfg["cost_mult"] = cost_mult
+    cfg["success_rate"] = success_rate
+    cfg["fail_output_mult"] = fail_output_mult
+    cfg["output_mult"] = float(cfg.get("output_mult", 1.0) or 1.0)
+    cfg["requires_catalyst"] = bool(cfg.get("requires_catalyst", False))
+    return cfg
+
+
+def _validate_target(row: Dict[str, Any]) -> Dict[str, Any]:
+    target = dict(row or {})
+    item_id = str(target.get("item_id") or "").strip()
+    if not item_id:
+        raise ValueError("resource_conversion.targets[].item_id 不能为空")
+    min_rank = int(target.get("min_rank", 1) or 1)
+    base_copper = int(target.get("base_copper", 0) or 0)
+    if min_rank < 1:
+        raise ValueError(f"resource_conversion.targets[{item_id}].min_rank 必须大于等于 1")
+    if base_copper <= 0:
+        raise ValueError(f"resource_conversion.targets[{item_id}].base_copper 必须大于 0")
+    target["item_id"] = item_id
+    target["min_rank"] = min_rank
+    target["base_copper"] = base_copper
+    return target
+
+
 def get_resource_conversion_config() -> Dict[str, Any]:
     cfg = config.get_nested("balance", "resource_conversion", default={}) or {}
     routes = cfg.get("routes") or DEFAULT_ROUTES
@@ -79,10 +115,16 @@ def get_resource_conversion_config() -> Dict[str, Any]:
     if disabled:
         targets = [row for row in targets if row.get("item_id") not in disabled]
     max_batch = int(cfg.get("max_batch", 20))
+    if max_batch < 1:
+        raise ValueError("resource_conversion.max_batch 必须大于等于 1")
     catalyst_per_batch = int(cfg.get("focused_catalyst_per_batch", 1))
+    if catalyst_per_batch < 1:
+        raise ValueError("resource_conversion.focused_catalyst_per_batch 必须大于等于 1")
+    normalized_routes = {str(k): _validate_route(str(k), v) for k, v in _clone_dict(routes).items()}
+    normalized_targets = [_validate_target(row) for row in _clone_list(targets)]
     return {
-        "routes": _clone_dict(routes),
-        "targets": _clone_list(targets),
+        "routes": normalized_routes,
+        "targets": normalized_targets,
         "focused_catalyst": dict(catalysts),
         "max_batch": max_batch,
         "focused_catalyst_per_batch": catalyst_per_batch,

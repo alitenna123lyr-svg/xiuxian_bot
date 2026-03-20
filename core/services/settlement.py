@@ -6,6 +6,7 @@ Each function returns (response_dict, http_status).
 
 from __future__ import annotations
 
+import logging
 import time
 import random
 from typing import Any, Dict, Tuple, Optional
@@ -96,6 +97,7 @@ def _enhance_pct_for_level(level: int) -> float:
 
 
 APP_CONFIG = config.raw
+logger = logging.getLogger("Settlement")
 
 
 def _element_relation_label(user: Dict[str, Any], monster: Optional[Dict[str, Any]]) -> Optional[str]:
@@ -256,9 +258,9 @@ def settle_hunt(
         active_skill_id=active_skill_id,
     )
 
-    # REVIEW_balance: compute hunt rewards by rank (override monster table values)
+    # REVIEW_balance: rank baseline + monster exp floor (stronger monsters can reward more)
     if result.get("victory"):
-        base_rw = hunt_rewards(rank, hcfg)
+        base_rw = hunt_rewards(rank, hcfg, monster=result.get("monster"))
         hunts_today = int((user or {}).get("hunts_today", 1) or 1)
         mult = fatigue_multiplier(hunts_today, hcfg)
         exp_mult = exp_fatigue_multiplier(hunts_today, hcfg)
@@ -344,7 +346,23 @@ def settle_hunt(
         try:
             increment_realm_trial(user_id, int(user.get("rank", 1) or 1), "hunt", 1)
         except Exception:
-            pass
+            logger.error(
+                "realm_trial_increment_failed user_id=%s rank=%s kind=hunt",
+                user_id,
+                int(user.get("rank", 1) or 1),
+                exc_info=True,
+            )
+            try:
+                log_event(
+                    "realm_trial_increment",
+                    user_id=user_id,
+                    success=False,
+                    rank=int(user.get("rank", 1) or 1),
+                    reason="EXCEPTION",
+                    meta={"kind": "hunt"},
+                )
+            except Exception:
+                pass
         try:
             story_update = track_story_action(user_id, "hunt_victory")
         except Exception:
@@ -761,7 +779,23 @@ def settle_secret_realm_explore(
             if overall_victory:
                 increment_realm_trial(user_id, int(user.get("rank", 1) or 1), "secret", 1)
         except Exception:
-            pass
+            logger.error(
+                "realm_trial_increment_failed user_id=%s rank=%s kind=secret multi_step=true",
+                user_id,
+                int(user.get("rank", 1) or 1),
+                exc_info=True,
+            )
+            try:
+                log_event(
+                    "realm_trial_increment",
+                    user_id=user_id,
+                    success=False,
+                    rank=int(user.get("rank", 1) or 1),
+                    reason="EXCEPTION",
+                    meta={"kind": "secret", "multi_step": True},
+                )
+            except Exception:
+                pass
         story_update: List[Dict[str, Any]] = []
         if overall_victory:
             try:
@@ -977,7 +1011,23 @@ def settle_secret_realm_explore(
         if battle_result.get("victory", True):
             increment_realm_trial(user_id, int(user.get("rank", 1) or 1), "secret", 1)
     except Exception:
-        pass
+        logger.error(
+            "realm_trial_increment_failed user_id=%s rank=%s kind=secret multi_step=false",
+            user_id,
+            int(user.get("rank", 1) or 1),
+            exc_info=True,
+        )
+        try:
+            log_event(
+                "realm_trial_increment",
+                user_id=user_id,
+                success=False,
+                rank=int(user.get("rank", 1) or 1),
+                reason="EXCEPTION",
+                meta={"kind": "secret", "multi_step": False},
+            )
+        except Exception:
+            pass
     story_update: List[Dict[str, Any]] = []
     if battle_result.get("victory", True):
         try:

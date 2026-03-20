@@ -93,12 +93,24 @@ def _deduct_material(cur, user_id: str, item_id: str, quantity: int) -> None:
     for row in rows:
         if remaining <= 0:
             break
-        have = int(row["quantity"])
+        have = int(row["quantity"] or 0)
+        if have <= 0:
+            continue
         if have <= remaining:
-            cur.execute("DELETE FROM items WHERE id = ?", (row["id"],))
+            cur.execute(
+                "DELETE FROM items WHERE id = ? AND user_id = ? AND item_id = ? AND item_type = 'material' AND quantity = ?",
+                (row["id"], user_id, item_id, have),
+            )
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INSUFFICIENT_MATERIAL")
             remaining -= have
         else:
-            cur.execute("UPDATE items SET quantity = quantity - ? WHERE id = ?", (remaining, row["id"]))
+            cur.execute(
+                "UPDATE items SET quantity = quantity - ? WHERE id = ? AND user_id = ? AND item_id = ? AND item_type = 'material' AND quantity >= ?",
+                (remaining, row["id"], user_id, item_id, remaining),
+            )
+            if int(cur.rowcount or 0) == 0:
+                raise ValueError("INSUFFICIENT_MATERIAL")
             remaining = 0
     if remaining > 0:
         raise ValueError("INSUFFICIENT_MATERIAL")
@@ -311,7 +323,7 @@ def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) ->
     log_event(
         "alchemy_brew",
         user_id=user_id,
-        success=True,
+        success=success,
         request_id=request_id,
         rank=rank,
         meta={"recipe_id": recipe_id, "brew_success": success},
@@ -324,7 +336,7 @@ def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) ->
         delta_stamina=-1,
         item_id=recipe.get("product_item_id"),
         qty=int(recipe.get("product_qty", 1) or 1) if success else 0,
-        success=True,
+        success=success,
         request_id=request_id,
         rank=rank,
         meta={"brew_success": success},

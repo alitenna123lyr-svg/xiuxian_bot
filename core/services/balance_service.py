@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 def _piecewise_growth_for_level(level: int, growth: float, rank_curve: Any) -> float:
@@ -56,14 +56,25 @@ def hunt_base_exp(rank: int, base: float = 20.0, growth: float = 1.25, rank_curv
     return max(1, int(round(exp)))
 
 
-def hunt_rewards(rank: int, cfg: Dict[str, Any]) -> Dict[str, int]:
+def hunt_rewards(rank: int, cfg: Dict[str, Any], monster: Optional[Dict[str, Any]] = None) -> Dict[str, int]:
     base = float(cfg.get("base_exp", 20))
     growth = float(cfg.get("growth", 1.25))
     rank_curve = cfg.get("rank_growth_segments")
     copper_ratio = float(cfg.get("copper_ratio", 0.6))
     copper_rand = float(cfg.get("copper_rand", 0.2))
 
-    exp = hunt_base_exp(rank, base=base, growth=growth, rank_curve=rank_curve)
+    rank_exp = hunt_base_exp(rank, base=base, growth=growth, rank_curve=rank_curve)
+    # Keep rank progression as baseline, but allow stronger monsters to yield
+    # higher rewards than weaker ones when monster exp is configured.
+    exp = int(rank_exp)
+    if isinstance(monster, dict):
+        try:
+            monster_exp = int(monster.get("exp_reward", 0) or 0)
+        except (TypeError, ValueError):
+            monster_exp = 0
+        if monster_exp > 0:
+            exp = max(exp, monster_exp)
+
     copper_mean = exp * copper_ratio
     # ± rand
     low = int(round(copper_mean * (1 - copper_rand)))
