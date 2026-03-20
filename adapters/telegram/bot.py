@@ -426,7 +426,17 @@ def _set_pending_action(
 
 
 def _clear_pending_action(context: ContextTypes.DEFAULT_TYPE) -> None:
-    for key in ("pending_action", "pending_prompt_id", "pending_chat_id", "pending_user_id", "pending_element"):
+    for key in (
+        "pending_action",
+        "pending_prompt_id",
+        "pending_chat_id",
+        "pending_user_id",
+        "pending_element",
+        "pending_shop_buy_currency",
+        "pending_shop_buy_item_id",
+        "pending_shop_buy_item_name",
+        "pending_shop_buy_category",
+    ):
         context.user_data.pop(key, None)
 
 
@@ -629,6 +639,81 @@ async def text_message_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         except Exception as exc:
             logger.error(f"chat request text error: {exc}")
             await message.reply_text("❌ 服务器错误，请稍后重试", reply_markup=get_main_menu_keyboard())
+        return
+
+    if _matches_pending_action(update, context, "shop_buy_qty"):
+        message = update.message
+        if message is None:
+            return
+        text = (message.text or "").strip()
+        category = str(context.user_data.get("pending_shop_buy_category", "all") or "all").strip().lower()
+        if category not in ("all", "pill", "material", "special"):
+            category = "all"
+        back_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🏪 返回商店", callback_data=f"shop_{category}")],
+            [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+        ])
+        if text in ("/cancel", "取消"):
+            _clear_pending_action(context)
+            await message.reply_text("已取消购买。", reply_markup=back_keyboard)
+            return
+
+        qty_text = text.split()[0] if text else ""
+        try:
+            quantity = int(qty_text)
+        except (TypeError, ValueError):
+            prompt = await message.reply_text(
+                "请输入有效数量（1-999），输入“取消”可终止购买。",
+                reply_markup=ForceReply(selective=True),
+            )
+            _set_pending_action(context, action="shop_buy_qty", prompt_message=prompt, user_id=message.from_user.id)
+            return
+
+        if quantity <= 0 or quantity > 999:
+            prompt = await message.reply_text(
+                "购买数量范围为 1-999，请重新输入。",
+                reply_markup=ForceReply(selective=True),
+            )
+            _set_pending_action(context, action="shop_buy_qty", prompt_message=prompt, user_id=message.from_user.id)
+            return
+
+        currency = str(context.user_data.get("pending_shop_buy_currency", "") or "").strip().lower()
+        item_id = str(context.user_data.get("pending_shop_buy_item_id", "") or "").strip()
+        item_name = str(context.user_data.get("pending_shop_buy_item_name", "") or "").strip() or _item_display_name(item_id)
+        if currency not in ("copper", "gold") or not item_id:
+            _clear_pending_action(context)
+            await message.reply_text("❌ 购买状态已失效，请重新打开商店。", reply_markup=back_keyboard)
+            return
+
+        _clear_pending_action(context)
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": str(update.effective_user.id)},
+                timeout=15,
+            )
+            if not r.get("success"):
+                await message.reply_text("❌ 未找到账号，请先注册", reply_markup=get_main_menu_keyboard())
+                return
+            uid = r["user_id"]
+            result = await http_post(
+                f"{SERVER_URL}/api/shop/buy",
+                json={"user_id": uid, "item_id": item_id, "quantity": quantity, "currency": currency},
+                timeout=15,
+            )
+            if result.get("success"):
+                await message.reply_text(
+                    f"✅ 已购买 {item_name} x{quantity}\n{result.get('message', '')}".strip(),
+                    reply_markup=back_keyboard,
+                )
+            else:
+                await message.reply_text(
+                    f"❌ {result.get('message', '购买失败')}",
+                    reply_markup=back_keyboard,
+                )
+        except Exception as exc:
+            logger.error(f"shop buy qty text error: {exc}")
+            await message.reply_text("❌ 服务器错误，请稍后重试", reply_markup=back_keyboard)
         return
 
     message = update.message
@@ -1884,7 +1969,12 @@ async def _build_achievements_menu(uid: str):
     keyboard = []
     for ach in achievements[:10]:
         status = "✅" if ach.get("claimed") else ("🎁" if ach.get("completed") else "⬜")
+        reward_text = _format_reward_text(ach.get("rewards") or {})
         text += f"{status} {ach.get('name')} ({ach.get('progress')}/{ach.get('goal')})\n"
+        if ach.get("desc"):
+            text += f"  {ach.get('desc')}\n"
+        if reward_text:
+            text += f"  奖励: {reward_text}\n"
         if ach.get("completed") and not ach.get("claimed"):
             keyboard.append([InlineKeyboardButton(f"领取#{ach.get('id')}", callback_data=f"ach_claim_{ach.get('id')}")])
     keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
@@ -1991,6 +2081,146 @@ def _equipment_affix_text(item: dict) -> str:
     if lh > 0:
         parts.append(f"残血护盾{int(lh * 100)}%")
     return " / ".join(parts)
+
+
+_EQUIPMENT_ITEM_TYPES = {"weapon", "armor", "accessory"}
+_BAG_ITEMS_PER_PAGE = 8
+_EQUIP_ITEMS_PER_PAGE = 6
+
+
+def _parse_positive_int(value, *, default: int = 1) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return parsed if parsed > 0 else default
+
+
+def _is_equipment_inventory_item(item: dict) -> bool:
+    item_type = str(item.get("item_type") or "").strip().lower()
+    return item_type in _EQUIPMENT_ITEM_TYPES
+
+
+def _split_inventory_items(items: list[dict]) -> tuple[list[dict], list[dict]]:
+    equipment_items: list[dict] = []
+    stackable_map: dict[tuple[str, str, str], dict] = {}
+
+    for raw_item in items or []:
+        item = dict(raw_item or {})
+        if _is_equipment_inventory_item(item):
+            equipment_items.append(item)
+            continue
+
+        item_id = str(item.get("item_id") or "")
+        item_name = str(item.get("item_name") or item_id or "未知物品")
+        item_type = str(item.get("item_type") or "")
+        quantity = _parse_positive_int(item.get("quantity", 1), default=1)
+        key = (item_id, item_name, item_type)
+
+        if key not in stackable_map:
+            item["item_name"] = item_name
+            item["quantity"] = quantity
+            stackable_map[key] = item
+            continue
+
+        stackable_map[key]["quantity"] = int(stackable_map[key].get("quantity", 0) or 0) + quantity
+
+    return equipment_items, list(stackable_map.values())
+
+
+def _build_bag_panel(items: list[dict], *, page: int = 0) -> tuple[str, list[list[InlineKeyboardButton]]]:
+    equipment_items, stackable_items = _split_inventory_items(items)
+    keyboard: list[list[InlineKeyboardButton]] = []
+
+    total_pages = max(1, (len(stackable_items) + _BAG_ITEMS_PER_PAGE - 1) // _BAG_ITEMS_PER_PAGE)
+    page = max(0, min(page, total_pages - 1))
+    page_items = stackable_items[page * _BAG_ITEMS_PER_PAGE : (page + 1) * _BAG_ITEMS_PER_PAGE]
+
+    text = (
+        f"🎒 *我的背包* (第{page + 1}/{total_pages}页)\n"
+        f"物品种类: {len(stackable_items)} | 装备数量: {len(equipment_items)}\n\n"
+    )
+
+    if not stackable_items:
+        text += "当前没有可堆叠物品。\n请点击“装备背包”查看并操作装备。"
+    else:
+        for item in page_items:
+            item_name = str(item.get("item_name") or "未知物品")
+            quantity = _parse_positive_int(item.get("quantity", 1), default=1)
+            usage = _item_usage_desc(str(item.get("item_id") or ""))
+            text += f"  {item_name} x{quantity}\n"
+            if usage:
+                text += f"    用途: {usage}\n"
+            if item.get("item_type") == "pill" and item.get("item_id"):
+                keyboard.append([InlineKeyboardButton(f"使用 {item_name}", callback_data=f"use_{item['item_id']}")])
+
+    nav: list[InlineKeyboardButton] = []
+    if page > 0:
+        nav.append(InlineKeyboardButton("⬅️ 上一页", callback_data=f"bag_{page - 1}"))
+    if page < total_pages - 1:
+        nav.append(InlineKeyboardButton("➡️ 下一页", callback_data=f"bag_{page + 1}"))
+    if nav:
+        keyboard.append(nav)
+
+    keyboard.append([InlineKeyboardButton(f"👕 装备背包 ({len(equipment_items)})", callback_data="equipbag_0")])
+    keyboard.append([InlineKeyboardButton("👕 已装备", callback_data="equipped_view")])
+    keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
+    return text, keyboard
+
+
+def _build_equipment_bag_panel(items: list[dict], *, page: int = 0) -> tuple[str, list[list[InlineKeyboardButton]]]:
+    equipment_items, _ = _split_inventory_items(items)
+    keyboard: list[list[InlineKeyboardButton]] = []
+
+    total_pages = max(1, (len(equipment_items) + _EQUIP_ITEMS_PER_PAGE - 1) // _EQUIP_ITEMS_PER_PAGE)
+    page = max(0, min(page, total_pages - 1))
+    page_items = equipment_items[page * _EQUIP_ITEMS_PER_PAGE : (page + 1) * _EQUIP_ITEMS_PER_PAGE]
+
+    text = f"👕 *装备背包* (第{page + 1}/{total_pages}页)\n装备数量: {len(equipment_items)}\n\n"
+    if not equipment_items:
+        text += "当前没有装备。\n可通过狩猎、锻造等玩法获取装备。"
+    else:
+        for item in page_items:
+            item_name = str(item.get("item_name") or "未知装备")
+            enhance_level = _parse_positive_int(item.get("enhance_level", 0), default=0)
+            quality = item.get("quality_name") or item.get("quality")
+            quality_text = f" [{quality}]" if quality else ""
+            text += f"  {item_name}{quality_text} +{enhance_level}\n"
+
+            bonuses = []
+            if item.get("attack_bonus"):
+                bonuses.append(f"攻+{item['attack_bonus']}")
+            if item.get("defense_bonus"):
+                bonuses.append(f"防+{item['defense_bonus']}")
+            if item.get("hp_bonus"):
+                bonuses.append(f"HP+{item['hp_bonus']}")
+            if item.get("mp_bonus"):
+                bonuses.append(f"MP+{item['mp_bonus']}")
+            if bonuses:
+                text += f"    属性: {', '.join(bonuses)}\n"
+
+            affix_text = _equipment_affix_text(item)
+            if affix_text:
+                text += f"    词条: {affix_text}\n"
+
+            row_btns = [InlineKeyboardButton(f"装备 {item_name}", callback_data=f"equip_{item['id']}")]
+            if enhance_level < 10:
+                row_btns.append(InlineKeyboardButton("强化", callback_data=f"enhance_{item['id']}"))
+            row_btns.append(InlineKeyboardButton("分解", callback_data=f"decompose_{item['id']}"))
+            keyboard.append(row_btns)
+
+    nav: list[InlineKeyboardButton] = []
+    if page > 0:
+        nav.append(InlineKeyboardButton("⬅️ 上一页", callback_data=f"equipbag_{page - 1}"))
+    if page < total_pages - 1:
+        nav.append(InlineKeyboardButton("➡️ 下一页", callback_data=f"equipbag_{page + 1}"))
+    if nav:
+        keyboard.append(nav)
+
+    keyboard.append([InlineKeyboardButton("🎒 物品背包", callback_data="bag")])
+    keyboard.append([InlineKeyboardButton("👕 已装备", callback_data="equipped_view")])
+    keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
+    return text, keyboard
 
 
 def _format_shop_intro(*, rank: int = 1) -> str:
@@ -3247,7 +3477,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     json={"user_id": uid, "achievement_id": ach_id},
                     timeout=15,
                 )
-                text = "✅ 领取成功" if result.get("success") else f"❌ {result.get('message', '失败')}"
+                if result.get("success"):
+                    text = f"✅ {result.get('message', '领取成功')}"
+                    reward_text = _format_reward_text(result.get("rewards") or {})
+                    if reward_text:
+                        text += f"\n奖励: {reward_text}"
+                else:
+                    text = f"❌ {result.get('message', '失败')}"
                 text2, keyboard = await _build_achievements_menu(uid)
                 await query.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
                 await _safe_edit(text2, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
@@ -4141,6 +4377,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 category = shop_parts[1]
             elif len(shop_parts) >= 3 and shop_parts[2] in ("all", "pill", "material", "special"):
                 category = shop_parts[2]
+        context.user_data["shop_category"] = category
         try:
             stat_r = await http_get(
                 f"{SERVER_URL}/api/user/lookup",
@@ -4174,34 +4411,27 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("buy_"):
         parts = data.split("_")
         if len(parts) >= 3:
-            currency = parts[1]
-            item_id = "_".join(parts[2:])
+            currency = str(parts[1] or "").strip().lower()
+            item_id = "_".join(parts[2:]).strip()
+            if currency not in ("copper", "gold") or not item_id:
+                await _safe_edit("❌ 商品参数错误，请重新打开商店", reply_markup=get_main_menu_keyboard())
+                return
+            context.user_data["pending_shop_buy_currency"] = currency
+            context.user_data["pending_shop_buy_item_id"] = item_id
+            context.user_data["pending_shop_buy_item_name"] = _item_display_name(item_id)
+            category = str(context.user_data.get("shop_category", "all") or "all").strip().lower()
+            if category not in ("all", "pill", "material", "special"):
+                category = "all"
+            context.user_data["pending_shop_buy_category"] = category
             try:
-                r = await http_get(
-                    f"{SERVER_URL}/api/user/lookup",
-                    params={"platform": "telegram", "platform_id": user_id},
-                    timeout=15,
+                prompt = await query.message.reply_text(
+                    f"🛒 购买 {_item_display_name(item_id)}\n请输入购买数量（1-999），输入“取消”可终止购买。",
+                    reply_markup=ForceReply(selective=True),
                 )
-                if r.get("success"):
-                    uid = r["user_id"]
-                    result = await http_post(
-                        f"{SERVER_URL}/api/shop/buy",
-                        json={"user_id": uid, "item_id": item_id, "quantity": 1, "currency": currency},
-                        timeout=15,
-                    )
-                    if result.get("success"):
-                        await _safe_edit(
-                            f"✅ {result.get('message', '购买成功！')}",
-                            reply_markup=get_main_menu_keyboard()
-                        )
-                    else:
-                        await _safe_edit(
-                            f"❌ {result.get('message', '购买失败')}",
-                            reply_markup=get_main_menu_keyboard()
-                        )
+                _set_pending_action(context, action="shop_buy_qty", prompt_message=prompt, user_id=user_id)
             except Exception as e:
-                logger.error(f"buy callback error: {e}")
-                await _safe_edit("❌ 购买失败，请稍后重试", reply_markup=get_main_menu_keyboard())
+                logger.error(f"buy qty prompt callback error: {e}")
+                await _safe_edit("❌ 无法发起购买输入，请稍后重试", reply_markup=get_main_menu_keyboard())
         return
     
     # 背包（带分页）
@@ -4221,68 +4451,39 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if r.get("success"):
                 uid = r["user_id"]
                 result = await http_get(f"{SERVER_URL}/api/items/{uid}", timeout=15)
-                stat_r = await http_get(f"{SERVER_URL}/api/stat/{uid}", timeout=15)
                 if result.get("success"):
                     items = result.get("items", [])
-                    if not items:
-                        await _safe_edit(
-                            "🎒 背包空空如也~",
-                            reply_markup=get_main_menu_keyboard()
-                        )
-                        return
-
-                    ITEMS_PER_PAGE = 8
-                    total_pages = max(1, (len(items) + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
-                    page = max(0, min(page, total_pages - 1))
-                    page_items = items[page * ITEMS_PER_PAGE : (page + 1) * ITEMS_PER_PAGE]
-
-                    text = f"🎒 *我的背包* (第{page + 1}/{total_pages}页)\n\n"
-                    keyboard = []
-
-                    for i in page_items:
-                        itype = i.get("item_type", "")
-                        if itype in ("weapon", "armor", "accessory"):
-                            enhance = i.get("enhance_level", 0) or 0
-                            bonuses = []
-                            if i.get("attack_bonus"):
-                                bonuses.append(f"攻+{i['attack_bonus']}")
-                            if i.get("defense_bonus"):
-                                bonuses.append(f"防+{i['defense_bonus']}")
-                            if i.get("hp_bonus"):
-                                bonuses.append(f"HP+{i['hp_bonus']}")
-                            bonus_str = f" ({', '.join(bonuses)})" if bonuses else ""
-                            text += f"  {i['item_name']}{bonus_str}\n"
-                            affix_text = _equipment_affix_text(i)
-                            if affix_text:
-                                text += f"    词条: {affix_text}\n"
-                            row_btns = [InlineKeyboardButton(f"装备 {i['item_name']}", callback_data=f"equip_{i['id']}")]
-                            if enhance < 10:
-                                row_btns.append(InlineKeyboardButton(f"强化", callback_data=f"enhance_{i['id']}"))
-                            row_btns.append(InlineKeyboardButton("分解", callback_data=f"decompose_{i['id']}"))
-                            keyboard.append(row_btns)
-                        elif itype == "pill":
-                            text += f"  {i['item_name']} x{i.get('quantity', 1)}\n"
-                            keyboard.append([InlineKeyboardButton(
-                                f"使用 {i['item_name']}", callback_data=f"use_{i['item_id']}"
-                            )])
-                        else:
-                            text += f"  {i['item_name']} x{i.get('quantity', 1)}\n"
-
-                    # Pagination buttons
-                    nav = []
-                    if page > 0:
-                        nav.append(InlineKeyboardButton("⬅️ 上一页", callback_data=f"bag_{page - 1}"))
-                    if page < total_pages - 1:
-                        nav.append(InlineKeyboardButton("➡️ 下一页", callback_data=f"bag_{page + 1}"))
-                    if nav:
-                        keyboard.append(nav)
-
-                    keyboard.append([InlineKeyboardButton("👕 已装备", callback_data="equipped_view")])
-                    keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
+                    text, keyboard = _build_bag_panel(items, page=page)
                     await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
         except Exception as e:
             logger.error(f"bag callback error: {e}")
             await _safe_edit("❌ 背包面板出错，请重试", reply_markup=get_main_menu_keyboard())
+        return
+
+    # 装备背包（单独分页）
+    if data.startswith("equipbag"):
+        page = 0
+        if data.startswith("equipbag_"):
+            try:
+                page = int(data[len("equipbag_"):])
+            except ValueError:
+                page = 0
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": user_id},
+                timeout=15,
+            )
+            if r.get("success"):
+                uid = r["user_id"]
+                result = await http_get(f"{SERVER_URL}/api/items/{uid}", timeout=15)
+                if result.get("success"):
+                    items = result.get("items", [])
+                    text, keyboard = _build_equipment_bag_panel(items, page=page)
+                    await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
+        except Exception as e:
+            logger.error(f"equipbag callback error: {e}")
+            await _safe_edit("❌ 装备背包加载失败，请稍后重试", reply_markup=get_main_menu_keyboard())
         return
 
     # 装备物品（从背包）
@@ -4296,7 +4497,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = result.get("message", "已处理")
                 icon = "✅" if result.get("success") else "❌"
                 keyboard = [
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]
                 await _safe_edit(f"{icon} {msg}", reply_markup=InlineKeyboardMarkup(keyboard))
@@ -4305,7 +4507,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _safe_edit(
                 "❌ 装备失败，请稍后重试",
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]),
             )
@@ -4321,7 +4524,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = result.get("message", "已处理")
                 icon = "♻️" if result.get("success") else "❌"
                 keyboard = [
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]
                 await _safe_edit(f"{icon} {msg}", reply_markup=InlineKeyboardMarkup(keyboard))
@@ -4330,7 +4534,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _safe_edit(
                 "❌ 分解失败，请稍后重试",
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]),
             )
@@ -4408,7 +4613,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     else:
                         text += f"{label}: _空_\n"
 
-                keyboard.append([InlineKeyboardButton("🎒 背包", callback_data="bag")])
+                keyboard.append([InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")])
+                keyboard.append([InlineKeyboardButton("🎒 物品背包", callback_data="bag")])
                 keyboard.append([InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")])
                 await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
         except Exception as e:
@@ -4416,7 +4622,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _safe_edit(
                 "❌ 已装备面板加载失败，请稍后重试",
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]),
             )
@@ -4594,7 +4801,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _safe_edit(
                 "❌ 强化参数错误",
                 reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]),
             )
@@ -4643,13 +4850,21 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     text = f"❌ {result.get('message', '强化失败')}"
                 keyboard = [
-                    [InlineKeyboardButton("🎒 背包", callback_data="bag")],
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
                     [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
                 ]
                 await _safe_edit(text, reply_markup=InlineKeyboardMarkup(keyboard))
         except Exception as e:
             logger.error(f"enhance callback error: {e}")
-            await _safe_edit("❌ 强化失败，请稍后重试", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🎒 背包", callback_data="bag")], [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]))
+            await _safe_edit(
+                "❌ 强化失败，请稍后重试",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("👕 装备背包", callback_data="equipbag_0")],
+                    [InlineKeyboardButton("🎒 物品背包", callback_data="bag")],
+                    [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+                ]),
+            )
         return
 
     if data.startswith("enhance_"):
@@ -4683,7 +4898,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🛡️ 保守强化", callback_data=f"enhance_do_{item_db_id}_steady")],
             [InlineKeyboardButton("⚡ 冲击强化", callback_data=f"enhance_do_{item_db_id}_risky")],
             [InlineKeyboardButton("🪨 材料专精强化", callback_data=f"enhance_do_{item_db_id}_focused")],
-            [InlineKeyboardButton("🎒 返回背包", callback_data="bag")],
+            [InlineKeyboardButton("👕 返回装备背包", callback_data="equipbag_0")],
         ]
         await _safe_edit(text, parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup(keyboard))
         return
@@ -5351,6 +5566,7 @@ async def shop_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         first = (context.args[0] or "").strip().lower()
         if first in ("all", "pill", "material", "special"):
             category = first
+    context.user_data["shop_category"] = category
     
     try:
         status_r = await http_get(f"{SERVER_URL}/api/stat/{context.user_data['uid']}", timeout=15)
@@ -5384,60 +5600,7 @@ async def bag_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if data.get("success"):
             items = data.get("items", [])
-
-            if not items:
-                await update.message.reply_text(
-                    "🎒 背包空空如也~",
-                    reply_markup=get_main_menu_keyboard()
-                )
-                return
-
-            ITEMS_PER_PAGE = 8
-            total_pages = max(1, (len(items) + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
-            page_items = items[:ITEMS_PER_PAGE]
-
-            text = f"🎒 *我的背包* (第1/{total_pages}页)\n\n"
-            keyboard = []
-
-            for i in page_items:
-                itype = i.get("item_type", "")
-                if itype in ("weapon", "armor", "accessory"):
-                    bonuses = []
-                    if i.get("attack_bonus"):
-                        bonuses.append(f"攻+{i['attack_bonus']}")
-                    if i.get("defense_bonus"):
-                        bonuses.append(f"防+{i['defense_bonus']}")
-                    if i.get("hp_bonus"):
-                        bonuses.append(f"HP+{i['hp_bonus']}")
-                    bonus_str = f" ({', '.join(bonuses)})" if bonuses else ""
-                    text += f"  {i['item_name']}{bonus_str}\n"
-                    affix_text = _equipment_affix_text(i)
-                    if affix_text:
-                        text += f"    词条: {affix_text}\n"
-                    row_btns = [InlineKeyboardButton(f"装备 {i['item_name']}", callback_data=f"equip_{i['id']}")]
-                    enhance = i.get("enhance_level", 0) or 0
-                    if enhance < 10:
-                        row_btns.append(InlineKeyboardButton(f"强化", callback_data=f"enhance_{i['id']}"))
-                    row_btns.append(InlineKeyboardButton("分解", callback_data=f"decompose_{i['id']}"))
-                    keyboard.append(row_btns)
-                elif itype == "pill":
-                    usage = _item_usage_desc(i.get("item_id"))
-                    text += f"  {i['item_name']} x{i.get('quantity', 1)}\n"
-                    if usage:
-                        text += f"    用途: {usage}\n"
-                    keyboard.append([InlineKeyboardButton(
-                        f"使用 {i['item_name']}", callback_data=f"use_{i['item_id']}"
-                    )])
-                else:
-                    usage = _item_usage_desc(i.get("item_id"))
-                    text += f"  {i['item_name']} x{i.get('quantity', 1)}\n"
-                    if usage:
-                        text += f"    用途: {usage}\n"
-
-            if total_pages > 1:
-                keyboard.append([InlineKeyboardButton("➡️ 下一页", callback_data="bag_1")])
-            keyboard.append([InlineKeyboardButton("👕 已装备", callback_data="equipped_view")])
-            keyboard.append([InlineKeyboardButton("🔙 返回", callback_data="main_menu")])
+            text, keyboard = _build_bag_panel(items, page=0)
 
             await _reply_with_owned_panel(
                 update,

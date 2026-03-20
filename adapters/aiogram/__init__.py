@@ -1,0 +1,2 @@
+"""aiogram adapter package."""
+
