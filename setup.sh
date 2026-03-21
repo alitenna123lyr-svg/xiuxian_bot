@@ -33,6 +33,7 @@ warn() { echo -e "  ${YELLOW}!${NC} $1"; }
 fail() { echo -e "  ${RED}✗${NC} $1"; exit 1; }
 
 APT_UPDATED=0
+NGINX_CHANGED=0
 
 require_root() {
     if [ "${EUID}" -ne 0 ]; then
@@ -95,6 +96,49 @@ install_go_version() {
     ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
     export PATH="/usr/local/go/bin:/usr/local/bin:${PATH}"
     hash -r
+}
+
+extract_deploy_web_dir() {
+    local deploy_web_dir
+    deploy_web_dir="$(awk -F= '
+        /^WEB_DIR=/ {
+            gsub(/"/, "", $2);
+            print $2;
+            exit
+        }
+    ' "${DEPLOY_SCRIPT}" || true)"
+    if [ -n "${deploy_web_dir}" ]; then
+        printf '%s' "${deploy_web_dir}"
+    else
+        printf '%s' "/var/www/xiuxian-web"
+    fi
+}
+
+sync_nginx_root_file() {
+    local conf="$1"
+    local target_root="$2"
+    [ -f "${conf}" ] || return 0
+
+    local current_root
+    current_root="$(awk '
+        $1 == "root" {
+            gsub(";", "", $2);
+            print $2;
+            exit
+        }
+    ' "${conf}" || true)"
+    [ -n "${current_root}" ] || return 0
+
+    if [ "${current_root}" = "${target_root}" ]; then
+        return 0
+    fi
+
+    if [ "${current_root}" = "${target_root}/dist" ] || { [ ! -d "${current_root}" ] && [ -d "${target_root}" ]; }; then
+        cp "${conf}" "${conf}.bak-$(date +%Y%m%d-%H%M%S)-setup-sync"
+        sed -i "0,/^[[:space:]]*root[[:space:]]\\+.*;/{s#^[[:space:]]*root[[:space:]]\\+.*;#    root ${target_root};#}" "${conf}"
+        ok "同步 Nginx root: ${conf} (${current_root} -> ${target_root})"
+        NGINX_CHANGED=1
+    fi
 }
 
 echo ""
@@ -210,6 +254,19 @@ echo "[2] 调用 xiuxian-web/deploy.sh ${ACTION} ..."
 chmod +x "${DEPLOY_SCRIPT}"
 bash "${DEPLOY_SCRIPT}" "${ACTION}"
 ok "deploy.sh 执行完成"
+echo ""
+
+DEPLOY_WEB_DIR="$(extract_deploy_web_dir)"
+echo "[3] 同步 Nginx root 路径 (${DEPLOY_WEB_DIR}) ..."
+sync_nginx_root_file "/etc/nginx/sites-available/xiuxian" "${DEPLOY_WEB_DIR}"
+sync_nginx_root_file "/etc/nginx/sites-available/default" "${DEPLOY_WEB_DIR}"
+if [ "${NGINX_CHANGED}" -eq 1 ]; then
+    nginx -t
+    systemctl reload nginx
+    ok "Nginx 已按部署目录同步并重载"
+else
+    ok "Nginx root 路径已是最新"
+fi
 echo ""
 
 echo "══════════════════════════════════════"

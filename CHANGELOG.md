@@ -1,10 +1,18 @@
 # 项目变更日志（Changelog）
 
-- 最后更新：2026-03-21 18:26 (UTC+8)
-- 本轮修复完成时间：2026-03-21 18:26 (UTC+8)
+- 最后更新：2026-03-21 19:12 (UTC+8)
+- 本轮修复完成时间：2026-03-21 19:12 (UTC+8)
 - 维护规则：新记录写在最前；每条记录必须包含“记录时间、影响范围、修改摘要”。
 
 ## 2026-03-21
+
+### [34] MiniApp 404 修复（Nginx root 与部署目录自动同步）
+- 记录时间：2026-03-21 19:12 (UTC+8)
+- 影响范围：`setup.sh`、`/etc/nginx/sites-available/xiuxian`、`/etc/nginx/sites-available/default`。
+- 修改摘要：
+  - 修复线上 Nginx `root` 指向 `/var/www/xiuxian-web/dist` 但实际部署到 `/var/www/xiuxian-web` 导致首页 404 的问题。
+  - `setup.sh` 新增 root 同步步骤：读取 `xiuxian-web/deploy.sh` 的 `WEB_DIR`，自动对齐 Nginx 站点路径并重载。
+  - 追加备份逻辑，调整 Nginx 配置前自动生成带时间戳的备份文件。
 
 ### [33] setup 一键部署改为调用 xiuxian-web build/deploy 链路
 - 记录时间：2026-03-21 18:26 (UTC+8)
