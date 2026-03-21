@@ -2781,12 +2781,45 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     dao_n = float(status.get("dao_ni", 0) or 0)
                     dao_y = float(status.get("dao_yan", 0) or 0)
                     try:
-                        from core.game.maps import format_world_map
+                        from core.game.maps import format_world_map, get_adjacent_maps, get_area_actions
                         map_text = format_world_map(current_map, rank, dao_h, dao_n, dao_y)
                     except Exception as me:
                         logger.error(f"format_world_map error: {me}")
                         map_text = f"🗺️ 当前位置：{current_map}\n（地图渲染失败）"
-                    keyboard = [[InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]
+
+                    # 构建移动按钮：显示相邻可前往的区域
+                    keyboard = []
+                    try:
+                        from core.game.maps import get_adjacent_maps, check_travel_requirements
+                        adj = get_adjacent_maps(current_map)
+                        for a in adj:
+                            can_enter, _ = check_travel_requirements(a["id"], rank, dao_h, dao_n, dao_y)
+                            if can_enter:
+                                keyboard.append([InlineKeyboardButton(
+                                    f"→ {a['name']}",
+                                    callback_data=f"travel_to_{a['id']}"
+                                )])
+                    except Exception as ae:
+                        logger.error(f"adjacent maps error: {ae}")
+
+                    # 当前区域可执行操作
+                    try:
+                        actions = get_area_actions(current_map)
+                        action_row = []
+                        for act in actions[:4]:  # 最多显示4个操作按钮
+                            action_row.append(InlineKeyboardButton(
+                                act["label"],
+                                callback_data=f"area_action_{act['action']}"
+                            ))
+                        if action_row:
+                            # 分两行显示
+                            keyboard.insert(0, action_row[:2])
+                            if len(action_row) > 2:
+                                keyboard.insert(1, action_row[2:])
+                    except Exception:
+                        pass
+
+                    keyboard.append([InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")])
                     try:
                         await _safe_edit(map_text, reply_markup=InlineKeyboardMarkup(keyboard))
                     except Exception:
@@ -2801,6 +2834,70 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     [[InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]))
             except Exception:
                 await query.message.reply_text("❌ 地图加载失败，请稍后重试")
+        return
+
+    # 区域移动
+    if data.startswith("travel_to_"):
+        to_map_id = data[len("travel_to_"):]
+        try:
+            r = await http_get(
+                f"{SERVER_URL}/api/user/lookup",
+                params={"platform": "telegram", "platform_id": user_id},
+                timeout=15,
+            )
+            if not r.get("success"):
+                await _safe_edit("❌ 请先注册角色")
+                return
+            uid = r["user_id"]
+            travel_r = await http_post(
+                f"{SERVER_URL}/api/travel",
+                json={"user_id": uid, "to_map": to_map_id},
+                timeout=15,
+            )
+            if travel_r.get("success"):
+                to_name = travel_r.get("to_name", to_map_id)
+                to_desc = travel_r.get("to_desc", "")
+                stamina_cost = travel_r.get("stamina_cost", 1)
+                first_visit = travel_r.get("first_visit", False)
+                first_visit_text = travel_r.get("first_visit_text") or ""
+
+                text = f"🚶 你启程前往 *{to_name}*……\n\n"
+                text += f"_{to_desc}_\n\n"
+                text += f"⚡ 消耗精力：{stamina_cost}\n"
+
+                if first_visit and first_visit_text:
+                    text += f"\n📍 *首次到达*\n{first_visit_text}\n"
+
+                # 到达后显示该区域可执行操作
+                actions = travel_r.get("actions") or []
+                keyboard = []
+                action_row = []
+                for act in actions[:4]:
+                    action_row.append(InlineKeyboardButton(
+                        act["label"],
+                        callback_data=f"area_action_{act['action']}"
+                    ))
+                if action_row:
+                    keyboard.append(action_row[:2])
+                    if len(action_row) > 2:
+                        keyboard.append(action_row[2:])
+
+                keyboard.append([InlineKeyboardButton("🗺️ 查看地图", callback_data="world_map")])
+                keyboard.append([InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")])
+
+                await _safe_edit(text, parse_mode=ParseMode.MARKDOWN,
+                                 reply_markup=InlineKeyboardMarkup(keyboard))
+            else:
+                msg = travel_r.get("message", "移动失败")
+                keyboard = [
+                    [InlineKeyboardButton("🗺️ 返回地图", callback_data="world_map")],
+                    [InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")],
+                ]
+                await _safe_edit(f"❌ {msg}", reply_markup=InlineKeyboardMarkup(keyboard))
+        except Exception as e:
+            logger.error(f"travel error: {e}")
+            await _safe_edit("❌ 移动失败，请稍后重试", reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton("🔙 主菜单", callback_data="main_menu")]]))
         return
 
     # PVP 菜单

@@ -870,3 +870,182 @@ def format_world_map(current_map_id: str, realm_id: int,
                 lines.append(f"  🔒 {a['name']}（需{format_realm_display(a['min_realm'])}）")
 
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# 区域移动系统
+# ---------------------------------------------------------------------------
+
+# 区域类型 → 可执行操作
+_AREA_ACTIONS = {
+    "city":     ["explore", "shop", "npc_talk", "quest", "sect_recruit"],
+    "market":   ["shop", "auction", "npc_talk", "trade"],
+    "forest":   ["explore", "hunt", "gather_herb"],
+    "mountain": ["explore", "hunt", "cultivate_bonus", "gather_ore"],
+    "lake":     ["explore", "hunt", "cultivate_bonus", "fish"],
+    "mine":     ["explore", "gather_ore", "hunt"],
+    "swamp":    ["explore", "hunt", "gather_herb"],
+    "sect":     ["cultivate_bonus", "sect_daily", "npc_talk", "quest", "skill_learn"],
+    "ruin":     ["explore", "hunt", "treasure_hunt"],
+    "sea":      ["explore", "hunt", "treasure_hunt"],
+    "secret":   ["explore", "hunt", "treasure_hunt", "boss"],
+    "domain":   ["explore", "hunt", "cultivate_bonus"],
+}
+
+# 每个操作的显示名称
+_ACTION_LABELS = {
+    "explore":        "🗺️ 探索",
+    "shop":           "🏪 商铺",
+    "auction":        "🏛️ 万宝楼",
+    "npc_talk":       "💬 交谈",
+    "quest":          "📋 任务",
+    "sect_recruit":   "🏛️ 宗门招聘",
+    "trade":          "🤝 交易",
+    "hunt":           "⚔️ 历练",
+    "gather_herb":    "🌿 采药",
+    "gather_ore":     "⛏️ 采矿",
+    "fish":           "🎣 钓鱼",
+    "cultivate_bonus":"🧘 灵地修炼",
+    "sect_daily":     "📅 宗门领取",
+    "skill_learn":    "📜 研读秘籍",
+    "treasure_hunt":  "💎 寻宝",
+    "boss":           "👹 挑战Boss",
+}
+
+
+def get_area_type(map_id: str) -> str:
+    """推断区域类型（用于确定可执行操作）"""
+    m = MAPS.get(map_id)
+    if not m:
+        return "forest"
+    name = m.get("name", "")
+    mid = m.get("id", "")
+
+    if "city" in mid or "城" in name:
+        return "city"
+    if "market" in mid or "坊市" in name:
+        return "market"
+    if "forest" in mid or "林" in name or "密林" in name:
+        return "forest"
+    if "mountain" in mid or "山" in name or "峰" in name:
+        return "mountain"
+    if "lake" in mid or "湖" in name or "泽" in name:
+        return "lake"
+    if "mine" in mid or "矿" in name:
+        return "mine"
+    if "swamp" in mid or "沼" in name:
+        return "swamp"
+    if "sect" in mid or "宗" in name or "阁" in name or "门" in name or "谷" in name:
+        return "sect"
+    if "ruin" in mid or "废墟" in name or "遗迹" in name or "ruins" in mid:
+        return "ruin"
+    if "sea" in mid or "海" in name:
+        return "sea"
+    if "secret" in mid or "秘境" in name:
+        return "secret"
+    if "domain" in mid or "域" in name:
+        return "domain"
+
+    return "forest"
+
+
+def get_area_actions(map_id: str) -> List[Dict[str, str]]:
+    """返回当前区域可执行的操作列表
+
+    Returns:
+        [{"action": "explore", "label": "🗺️ 探索"}, ...]
+    """
+    area_type = get_area_type(map_id)
+    actions = _AREA_ACTIONS.get(area_type, ["explore"])
+    return [{"action": a, "label": _ACTION_LABELS.get(a, a)} for a in actions]
+
+
+def calc_travel_cost(from_id: str, to_id: str) -> Dict[str, Any]:
+    """计算从一个地图到另一个地图的移动消耗
+
+    Returns:
+        {"can_travel": bool, "reason": str,
+         "stamina_cost": int, "time_desc": str}
+    """
+    from_map = MAPS.get(from_id)
+    to_map = MAPS.get(to_id)
+
+    if not from_map or not to_map:
+        return {"can_travel": False, "reason": "地图不存在", "stamina_cost": 0, "time_desc": ""}
+
+    # 必须相邻才能移动
+    adj_ids = [a for a in from_map.get("adjacent", [])]
+    if to_id not in adj_ids:
+        return {"can_travel": False, "reason": "目的地与当前位置不相邻，无法直接前往",
+                "stamina_cost": 0, "time_desc": ""}
+
+    # 同世界层级内移动
+    if from_map["world_tier"] == to_map["world_tier"]:
+        stamina = 1
+        time_desc = "约半日路程"
+    else:
+        # 跨世界层级移动（升界/降界），消耗更大
+        tier_diff = abs(from_map["world_tier"] - to_map["world_tier"])
+        stamina = 2 + tier_diff * 2
+        time_desc = f"需跨越界限，约{tier_diff}日路程"
+
+    return {
+        "can_travel": True,
+        "reason": "",
+        "stamina_cost": stamina,
+        "time_desc": time_desc,
+        "to_name": to_map["name"],
+        "to_desc": to_map.get("desc", ""),
+    }
+
+
+def check_travel_requirements(to_id: str, realm_id: int,
+                               dao_heng: float = 0, dao_ni: float = 0,
+                               dao_yan: float = 0) -> tuple:
+    """检查玩家是否满足目标地图的进入条件
+
+    Returns:
+        (can_enter: bool, reason: str)
+    """
+    to_map = MAPS.get(to_id)
+    if not to_map:
+        return False, "目的地不存在"
+
+    if realm_id < to_map["min_realm"]:
+        from core.game.realms import format_realm_display
+        return False, f"境界不足，需达到{format_realm_display(to_map['min_realm'])}"
+
+    cond = to_map.get("unlock_condition")
+    if cond:
+        if realm_id < cond.get("min_realm", 0):
+            from core.game.realms import format_realm_display
+            return False, f"境界不足，需达到{format_realm_display(cond['min_realm'])}"
+        if dao_ni < cond.get("dao_ni_pct", 0):
+            return False, f"逆道亲和不足，需达到{cond['dao_ni_pct']}%"
+        if dao_yan < cond.get("dao_yan_pct", 0):
+            return False, f"衍道亲和不足，需达到{cond['dao_yan_pct']}%"
+        if dao_heng < cond.get("dao_heng_pct", 0):
+            return False, f"恒道亲和不足，需达到{cond['dao_heng_pct']}%"
+
+    return True, ""
+
+
+# 首次到达区域时的介绍文案
+_FIRST_VISIT_TEXTS = {
+    "canglan_city": "苍澜城，边陲小城，你修仙之路的起点。城中散修云集，坊市热闹，是新手历练的好去处。",
+    "east_forest": "踏入东郊灵林，林中灵气比城内浓郁了些许。远处传来灵兽的低鸣，你握紧了手中的法器。",
+    "south_market": "南市坊市人声鼎沸，各式灵材丹药法器琳琅满目。你第一次见到这么多修士聚集的地方。",
+    "north_mountain": "北望灵山巍峨耸立，山顶云雾缭绕，灵气充沛。据说山中有前辈遗留的修炼洞府。",
+    "fallen_star_lake": "落星湖畔，湖水清澈见底，据说此湖因一颗坠落的星辰而成。湖底偶尔闪烁着奇异的光芒。",
+    "luoxia_valley": "落霞谷中灵气如雾，晚霞时分整个山谷都被染成金红色。这里是苍澜洲最好的修炼之地之一。",
+    "canglan_mines": "苍澜矿脉深入地底，矿道中隐约可见灵矿的微光。这里产出的灵石虽品质一般，但对新手足够了。",
+    "misty_swamp": "迷雾沼泽阴气弥漫，脚下的泥泞让你每一步都走得小心翼翼。传说沼泽深处有罕见的灵药。",
+    "tianyuan_sect_city": "天元宗城巍峨壮观，比苍澜城大了数十倍。这里是天元大陆的修仙中心，各大宗门在此都有分堂。",
+    "sword_peak": "万剑峰上剑气纵横，数百把无主飞剑在空中翱翔。天剑门的威压从山巅倾泻而下。",
+    "pill_pavilion": "丹鼎阁周围弥漫着各种丹药的香气，有的清新提神，有的浓郁呛人。这里是天下丹师的圣地。",
+}
+
+
+def get_first_visit_text(map_id: str) -> Optional[str]:
+    """获取首次到达某区域的介绍文案"""
+    return _FIRST_VISIT_TEXTS.get(map_id)

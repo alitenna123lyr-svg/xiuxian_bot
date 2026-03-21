@@ -24,9 +24,10 @@ def register_blueprints(app: Flask) -> None:
     from core.routes.currency import currency_bp
     from core.routes.bounty import bounty_bp
     from core.routes.audit import audit_bp
+    from core.routes.travel import travel_bp
 
     for bp in (health_bp, user_bp, cultivation_bp, combat_bp,
                equipment_bp, skills_bp, shop_bp, quests_bp, misc_bp,
                pvp_bp, sect_bp, alchemy_bp, achievements_bp, events_bp, convert_bp, social_bp, story_bp,
-               currency_bp, bounty_bp, audit_bp):
+               currency_bp, bounty_bp, audit_bp, travel_bp):
         app.register_blueprint(bp)

@@ -7,6 +7,7 @@ import os
 import sys
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.strategy import FSMStrategy
 from aiogram.fsm.storage.memory import MemoryStorage
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -34,7 +35,7 @@ async def main() -> None:
         raise RuntimeError("Missing TELEGRAM_BOT_TOKEN/XXBOT_TELEGRAM_TOKEN")
 
     bot = Bot(token=token)
-    dispatcher = Dispatcher(storage=MemoryStorage())
+    dispatcher = Dispatcher(storage=MemoryStorage(), fsm_strategy=FSMStrategy.USER_IN_CHAT)
     dispatcher.include_router(legacy_router)
 
     logger.info("aiogram adapter starting (full_fsm_coverage)")

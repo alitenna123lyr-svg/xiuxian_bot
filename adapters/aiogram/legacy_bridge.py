@@ -76,6 +76,7 @@ class _CompatMessage:
         *,
         chat_id: int | None = None,
         message_id: int | None = None,
+        message_thread_id: int | None = None,
         chat: Any | None = None,
         from_user: Any | None = None,
         text: str | None = None,
@@ -86,6 +87,7 @@ class _CompatMessage:
             self.chat = message.chat
             self.chat_id = int(message.chat.id)
             self.message_id = int(message.message_id)
+            self.message_thread_id = int(getattr(message, "message_thread_id", 0) or 0)
             self.from_user = message.from_user
             self.text = message.text
             return
@@ -94,11 +96,14 @@ class _CompatMessage:
         fallback_chat_id = int(getattr(chat, "id", 0) or 0) if chat is not None else 0
         self.chat_id = int(chat_id or fallback_chat_id)
         self.message_id = int(message_id or 0)
+        self.message_thread_id = int(message_thread_id or 0)
         self.from_user = from_user
         self.text = text
 
     async def reply_text(self, text: str, **kwargs):
         payload = _normalize_message_kwargs(kwargs)
+        if self.message_thread_id > 0 and "message_thread_id" not in payload:
+            payload["message_thread_id"] = self.message_thread_id
         sent = await self._bot.send_message(chat_id=self.chat_id, text=text, **payload)
         return _CompatMessage(self._bot, sent)
 
@@ -116,11 +121,13 @@ class _CompatCallbackQuery:
             fallback_chat = getattr(query.message, "chat", None)
             fallback_chat_id = int(getattr(fallback_chat, "id", 0) or 0)
             fallback_mid = int(getattr(query.message, "message_id", 0) or 0)
+            fallback_thread_id = int(getattr(query.message, "message_thread_id", 0) or 0)
             self.message = _CompatMessage(
                 bot,
                 None,
                 chat_id=fallback_chat_id,
                 message_id=fallback_mid,
+                message_thread_id=fallback_thread_id,
                 chat=fallback_chat,
                 from_user=query.from_user,
                 text=None,
@@ -263,6 +270,20 @@ def _normalize_message_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
         out["reply_markup"] = reply_markup
     if "disable_web_page_preview" in kwargs:
         out["disable_web_page_preview"] = bool(kwargs.get("disable_web_page_preview"))
+    reply_to_message_id = kwargs.get("reply_to_message_id")
+    if reply_to_message_id is not None:
+        try:
+            out["reply_to_message_id"] = int(reply_to_message_id)
+        except (TypeError, ValueError):
+            pass
+    message_thread_id = kwargs.get("message_thread_id")
+    if message_thread_id is not None:
+        try:
+            out["message_thread_id"] = int(message_thread_id)
+        except (TypeError, ValueError):
+            pass
+    if "allow_sending_without_reply" in kwargs:
+        out["allow_sending_without_reply"] = bool(kwargs.get("allow_sending_without_reply"))
     return out
 
 
