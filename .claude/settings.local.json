@@ -18,7 +18,10 @@
       "Bash(D:/temp_build/XiuXianBot/.venv/Scripts/python.exe:*)",
       "Bash(export:*)",
       "Bash(mv:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(pnpm:*)",
+      "Bash(ls -la dist/assets/*.js)",
+      "Bash(npx vite:*)"
     ]
   }
 }
