@@ -56,6 +56,15 @@ const player = usePlayerStore()
           <span class="quick__icon">📜</span><span>仙卷剧情</span>
         </router-link>
       </div>
+
+      <div class="quick" style="margin-top:var(--space-sm)">
+        <router-link to="/map" class="quick__btn">
+          <span class="quick__icon">🗺️</span><span>大地图</span>
+        </router-link>
+        <router-link to="/more" class="quick__btn">
+          <span class="quick__icon">☯</span><span>更多</span>
+        </router-link>
+      </div>
     </template>
 
     <div v-else class="home__empty">气机紊乱，请刷新重试</div>

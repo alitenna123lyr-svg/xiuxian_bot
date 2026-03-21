@@ -8,6 +8,7 @@ const router = createRouter({
     { path: '/story', component: () => import('@/views/Story.vue') },
     { path: '/bag', component: () => import('@/views/Bag.vue') },
     { path: '/more', component: () => import('@/views/More.vue') },
+    { path: '/map', component: () => import('@/views/WorldMap.vue') },
   ],
 })
 

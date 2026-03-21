@@ -21,7 +21,14 @@
       "Bash(git:*)",
       "Bash(pnpm:*)",
       "Bash(ls -la dist/assets/*.js)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(go version:*)",
+      "Bash(mkdir -p D:/temp_build/xiuxian-gateway)",
+      "Read(//d/temp_build/**)",
+      "Bash(go mod init xiuxian-gateway)",
+      "Bash(go get:*)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go get:*)",
+      "Bash(GOPROXY=https://goproxy.cn,direct go build:*)"
     ]
   }
 }

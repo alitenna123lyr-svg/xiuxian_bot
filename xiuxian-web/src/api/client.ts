@@ -94,3 +94,37 @@ export function storyRead(userId: string, chapterId: string, count = 5) {
 export function storyReread(userId: string, chapterId: string) {
   return post('/api/story/reread', { user_id: userId, chapter_id: chapterId })
 }
+
+// ── Map / Travel ────────────────────────────────
+
+export function travelTo(userId: string, toMap: string) {
+  return post('/api/travel', { user_id: userId, to_map: toMap })
+}
+
+export function getAreaActions(mapId: string) {
+  return get(`/api/area/actions/${mapId}`)
+}
+
+// ── Signin ──────────────────────────────────────
+
+export function signin(userId: string) {
+  return post('/api/signin', { user_id: userId })
+}
+
+export function getSigninStatus(userId: string) {
+  return get(`/api/signin/${userId}`)
+}
+
+// ── Items / Bag ─────────────────────────────────
+
+export function getItems(userId: string) {
+  return get(`/api/items/${userId}`)
+}
+
+export function equipItem(userId: string, itemInstanceId: string, slot: string) {
+  return post('/api/equip', { user_id: userId, item_instance_id: itemInstanceId, slot })
+}
+
+export function useItem(userId: string, itemInstanceId: string) {
+  return post('/api/item/use', { user_id: userId, item_instance_id: itemInstanceId })
+}
