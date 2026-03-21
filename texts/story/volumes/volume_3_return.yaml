@@ -1,0 +1,598 @@
+# 卷三：苍澜归途（元婴初期 → 元婴圆满）
+# 完整20章，覆盖苍澜洲回归 + 血煞宗之战 + 元婴突破
+# 核心线：保卫苍澜 + 柳清竹身世 + 元婴突破
+
+volume_3:
+  title: "卷三：苍澜归途"
+  realm_range: [14, 17]
+  main_npcs: [mc_shen_wuji, xiao_han_cang, chu_qianshang, liu_qingzhu, blood_sect_master, elder_chen_sect, villager_shi_bo, herb_ling_er, hunter_zhangda, dan_master_chen]
+
+  chapters:
+
+    ch01_return:
+      title: "第一章：归乡"
+      trigger: {type: "first_visit", map: "canglan_city_v2"}
+      map: canglan_city_v2
+      scenes:
+        - type: narration
+          text: |
+            苍澜城变了。
+
+            你离开时，这里虽然贫瘠但充满生机。
+            现在，城中灵气稀薄得令人窒息。
+            灵田枯萎，坊市萧条，街上的修士面色灰败。
+
+            血煞宗的灵脉抽取阵法已经运行了一个月，
+            苍澜洲的地脉灵气正在以肉眼可见的速度消失。
+
+    ch02_old_friends:
+      title: "第二章：故人"
+      trigger: {type: "quest_start", quest: "canglan_rescue"}
+      map: canglan_city_v2
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                石伯老了很多。他的修为本就不高，灵气枯竭对他的影响最大。
+            - speaker: 石伯
+              text: "你回来了……好啊，好啊……"
+            - speaker: null
+              text: 他的声音沙哑，眼眶有些泛红。
+            - speaker: 石伯
+              text: "矿脉关了。没有灵气，挖出来的也是废石。大伙都快活不下去了。"
+            - speaker: null
+              text: |
+                药灵儿还在坚持采药，但灵草大面积枯死，她能找到的越来越少。
+                张大带着猎户们组建了巡逻队，防止灵兽因饥饿攻击城池。
+                陈丹师把仅剩的丹药全部分给了伤病者，自己面黄肌瘦。
+
+                你离开时他们帮助了你。现在，该你回报他们了。
+            - speaker: 沈无极
+              text: "阵眼有三个。分布在东郊灵林深处、迷雾沼泽中心和北山地底。"
+            - speaker: 沈无极
+              text: "每个阵眼都有血煞宗的修士看守。至少……元婴级别的。"
+
+    ch03_first_array:
+      title: "第三章：灵林阵眼"
+      trigger: {type: "quest_progress", quest: "canglan_rescue", step: 1}
+      map: east_forest_v2
+      scenes:
+        - type: narration
+          text: |
+            东郊灵林，曾经充满生机的林子如今一片枯黄。
+
+            灵林深处，一个巨大的血红色阵法在地面旋转，
+            像一张张开的巨口，将地脉灵气源源不断地吞噬。
+
+            阵法旁边站着一个红袍修士，元婴初期，
+            面容阴鸷，手持一把血色长刀。
+        - type: dialogue
+          lines:
+            - speaker: 血煞弟子
+              text: "天元宗的人？哈，你们管得也太宽了吧？"
+            - speaker: null
+              text: |
+                战斗一触即发。
+
+                你发现对方的战斗风格极其残暴——
+                每一刀都带着吸血效果，伤到你就能恢复自身。
+
+                但你的根基比他扎实得多。
+                你用防守消耗了他大半灵力，
+                然后在他刀势最弱的一瞬间，一剑穿胸。
+            - speaker: null
+              text: |
+                第一个阵眼被你破坏了。
+                灵林中的灵气微微恢复了一些——虽然远远不够。
+
+                还剩两个。
+
+    ch04_swamp_array:
+      title: "第四章：沼泽伏击"
+      trigger: {type: "quest_progress", quest: "canglan_rescue", step: 2}
+      map: misty_swamp_v2
+      scenes:
+        - type: narration
+          text: |
+            迷雾沼泽中的第二个阵眼更加隐蔽。
+            你和沈无极分头行动——他去北山，你来沼泽。
+
+            韩苍跟着你。两人在毒雾中摸索了半天，终于找到了阵眼位置。
+
+            但等着你们的，不止一个人。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                三个血煞宗修士。
+                一个元婴初期，两个金丹圆满。
+
+                你和韩苍对视一眼，无声地分配了对手。
+            - speaker: 韩苍
+              text: "两个金丹的交给我。师弟你对付那个元婴的。"
+            - speaker: null
+              text: |
+                韩苍的战斗方式简单粗暴但极其有效——
+                他那堪比妖兽的肉身硬度，让两个金丹修士的攻击如隔靴搔痒。
+
+                你这边的元婴修士比灵林那个更强，
+                但他犯了一个致命的错误：他小看了你。
+
+                你佯装不敌，引他追击到沼泽深处，
+                然后引爆了你提前布下的陷阱阵法。
+
+                第二个阵眼，破。
+
+    ch05_north_mountain_trap:
+      title: "第五章：北山血战"
+      trigger: {type: "quest_progress", quest: "canglan_rescue", step: 3}
+      map: north_mountain_v2
+      scenes:
+        - type: narration
+          text: |
+            第三个阵眼在北山地底。也是最危险的一个。
+
+            因为守在这里的，是血煞宗的一位长老——
+            元婴圆满。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你和沈无极在北山入口会合。
+                他的脸色不太好——三道并修的反噬似乎又加重了。
+            - speaker: 沈无极
+              text: "元婴圆满……说实话，我们两个加起来也不一定打得过。"
+            - speaker: 沈无极
+              text: "但必须打。阵法完全启动的话，苍澜洲的灵脉会彻底断绝。"
+            - speaker: null
+              text: |
+                北山地底深处，血色阵法的光芒如心脏般脉动。
+                一个白发红袍的老者盘坐在阵中央，缓缓睁开了眼。
+            - speaker: 血煞长老
+              text: "两个金丹期的小辈……就想破我的大阵？"
+            - speaker: 血煞长老
+              text: "不自量力。"
+            - speaker: null
+              text: |
+                这是你经历过的最艰难的战斗。
+
+                血煞长老每一招都带着毁天灭地的威压，
+                你和沈无极配合默契，但依然被打得节节败退。
+
+                就在你以为要败的时候——
+
+                一道剑光从天而降，直劈血煞长老！
+            - speaker: 楚千殇
+              text: "……我路过。"
+            - speaker: null
+              text: |
+                楚千殇。天剑门。
+                她没有解释为什么会出现在这里。
+                但她的剑，替你们争取了翻盘的机会。
+
+                三人联手，终于将血煞长老逼退。
+                第三个阵眼被破坏，苍澜洲的灵脉保住了。
+
+    ch06_aftermath:
+      title: "第六章：善后"
+      trigger: {type: "quest_complete", quest: "canglan_rescue"}
+      map: canglan_city_v2
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                灵脉恢复需要时间，但至少不会再恶化了。
+
+                苍澜城的人们开始重建。
+                石伯重新开了矿，药灵儿在枯萎的灵田里播下新种。
+                张大的巡逻队改编成了民兵，负责日常防卫。
+            - speaker: 药灵儿
+              text: "谢谢你回来！呜呜……我还以为你去了大宗门就不会回来了……"
+            - speaker: 张大
+              text: "小兄弟……不，该叫大修士了。你做到了。"
+            - speaker: 陈丹师
+              text: "嗯。不错。"
+            - speaker: null
+              text: 这是陈丹师说过的最高赞美。
+
+    ch07_qingzhu_truth:
+      title: "第七章：清竹之秘"
+      trigger: {type: "realm_reach", realm: 15, tags: ["柳清竹初遇"]}
+      map: fallen_star_lake
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                苍澜洲事件结束后的一天，
+                柳清竹突然出现在落星湖畔。
+
+                她的神色比以往任何时候都严肃。
+            - speaker: 柳清竹
+              text: "我欠你一个真相。"
+            - speaker: 柳清竹
+              text: "我不是散修。我是……太清宗的叛逃者。"
+            - speaker: null
+              text: 你沉默地听着。
+            - speaker: 柳清竹
+              text: "太清宗发现了我的灵根属性——太阴灵根，可以被用来祭炼某种禁忌法器。"
+            - speaker: 柳清竹
+              text: "我拒绝了。然后我逃了。他们一直在追我。"
+            - speaker: 柳清竹
+              text: "那天在乱星海，不是偶然。我是被追到那里的。"
+            - speaker: null
+              text: |
+                你终于理解了她眼中那种复杂的情绪——
+                不只是感谢，还有愧疚。
+                她怕连累你。
+            - speaker: 柳清竹
+              text: "现在你知道了。如果你不想再和我有任何牵扯，我理解。"
+        - type: choice
+          choices:
+            - label: "我不在意你的过去"
+              result: |
+                你看着她的眼睛，语气平静但坚定：
+                "你救了你自己的命。这没有任何错。"
+                柳清竹的眼眶泛红，但她忍住了。
+                柳清竹："……谢谢你。"
+              tags: ["清竹信任"]
+            - label: "这件事我需要了解更多"
+              result: |
+                你没有急着表态，而是追问了太清宗和那件禁忌法器的细节。
+                柳清竹如实相告——那法器名为「太阴锁魂镜」，
+                一旦炼成，可以控制万人心智。
+                你意识到这件事牵涉的层面远超想象。
+              tags: ["太阴镜线索"]
+
+    ch08_yuanying_prep:
+      title: "第八章：元婴之路"
+      trigger: {type: "realm_reach", realm: 16}
+      map: star_fall_sea
+      scenes:
+        - type: narration
+          text: |
+            金丹巅峰。丹田中的金丹已经出现了碎裂的征兆。
+
+            你按照陈长老的指引，来到星陨之海寻找元婴结晶。
+
+            这片海域中，陨石散发着各种属性的灵力，
+            其中品质最高的，就是元婴结晶的原材料。
+
+    ch09_star_trial:
+      title: "第九章：星辰试炼"
+      trigger: {type: "explore_count", map: "star_fall_sea", count: 5}
+      map: star_fall_sea
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                星陨之海深处，你找到了一块巨大的陨石。
+                陨石内部蕴含着充沛的星辰之力——正是元婴结晶的核心。
+
+                但要取出它，你必须通过陨石设下的试炼。
+            - speaker: null
+              text: |
+                试炼分三关：
+                心关——面对你内心最深处的恐惧。
+                力关——在纯粹的力量对抗中胜出。
+                道关——回答一个关于你修行之道的问题。
+
+                心关中，你看到了自己最害怕的场景：
+                所有你在乎的人——沈无极、韩苍、药灵儿——
+                一个个倒在你面前，而你无力阻止。
+
+                你咬牙走过了心关。
+
+                力关中，你面对了一个与你实力完全相同的影子。
+                旗鼓相当的战斗持续了整整一天，
+                最终你凭借更坚韧的意志力胜出。
+
+                道关的问题很简单：「你为何修行？」
+            - speaker: null
+              text: |
+                你想了很久。
+
+                不是为了长生。不是为了权力。
+                是为了保护。
+                保护苍澜洲的故人，保护并肩而行的朋友，
+                保护那些无法保护自己的人。
+
+                陨石裂开，元婴结晶安静地躺在你手中。
+      rewards:
+        items: [{id: "yuanying_crystal", qty: 1}]
+
+    ch10_yuanying_breakthrough:
+      title: "第十章：元婴"
+      trigger: {type: "breakthrough_success", from_stage: "jindan"}
+      map: luoxia_valley
+      scenes:
+        - type: narration
+          text: |
+            落霞谷，你的洞府。
+
+            你盘坐在最深处的密室中，
+            元婴结晶悬浮在丹田上方，与金丹共鸣。
+
+            金丹开始碎裂——不是破碎，而是蜕变。
+            碎片在结晶的引导下重新凝聚，
+            化为一个拳头大小的微缩人形。
+
+            元婴。
+
+            它缓缓睁开了眼睛——和你一模一样的眼睛。
+            然后它盘坐在丹田深处，开始呼吸。
+
+            每一次呼吸，天地灵气都如洪流般涌入你的身体。
+            你的实力在这一刻发生了质变。
+
+            从今天起，你是元婴修士了。
+            在整个天元大陆，这已经是真正的强者行列。
+
+    ch11_canglan_rebuilt:
+      title: "第十一章：重建"
+      trigger: {type: "realm_reach", realm: 15, tags: ["苍澜危机"]}
+      map: canglan_city_v2
+      scenes:
+        - type: narration
+          text: |
+            苍澜洲的灵脉在你破坏阵法后逐渐恢复。
+
+            你用元婴期的修为在关键节点布下了辅助阵法，
+            加速灵气回流。半年后，苍澜洲的灵气浓度恢复到了以前的七成。
+
+            更重要的是，你将在宗门学到的知识传授给了苍澜城的修士们——
+            更高效的功法、更完善的修炼体系、更先进的阵法。
+
+            苍澜洲不再是那个被遗忘的偏远小城了。
+
+    ch12_blood_sect_revenge:
+      title: "第十二章：血煞来袭"
+      trigger: {type: "realm_reach", realm: 16, tags: ["血煞宗暗线"]}
+      map: canglan_city_v2
+      scenes:
+        - type: narration
+          text: |
+            你的举动激怒了血煞宗。
+
+            一天深夜，苍澜城上空突然出现了三道血色遁光。
+            三个元婴修士，气息凶戾，直奔苍澜城而来。
+        - type: dialogue
+          lines:
+            - speaker: 血煞宗修士
+              text: "破坏我们大阵的人就在这座城里。"
+            - speaker: 血煞宗修士
+              text: "交出来，饶你全城不死。"
+            - speaker: null
+              text: |
+                你站上城墙。
+
+                三个元婴修士，你一个人。
+                韩苍和沈无极不在——他们各自有任务。
+
+                但你不能退。你身后是整个苍澜城。
+            - speaker: null
+              text: |
+                战斗惊天动地。
+                一对三，你被打得遍体鳞伤。
+
+                但你守住了。
+                你在城墙上布下的防御阵法发挥了巨大作用，
+                将三个元婴修士的攻击分散消解。
+
+                战斗持续到天明，血煞宗修士的灵力先耗尽了——
+                他们没料到一个刚突破的元婴修士能撑这么久。
+
+                他们撤退了。但你知道这不是结束。
+
+    ch13_alliance:
+      title: "第十三章：结盟"
+      trigger: {type: "reputation_reach", value: 500}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "血煞宗的行为已经引起了正道联盟的注意。"
+            - speaker: 陈长老
+              text: "各宗门正在商议联合对策。你作为苍澜洲事件的亲历者，需要出席。"
+            - speaker: null
+              text: |
+                正道联盟大会上，你见到了各大宗门的代表。
+                太清宗、天剑门、丹鼎阁、星辰阁……
+                每一个名字都如雷贯耳。
+
+                你将苍澜洲的情况如实禀报。
+                大会决定对血煞宗展开联合制裁。
+
+                但你从一些长老的眼神中读到了别的东西——
+                他们并不都是为了正义。
+                有些人看重的是血煞宗倒下后空出的地盘和资源。
+
+                修仙界的政治，远比妖兽和邪修更复杂。
+
+    ch14_chu_qianshang_past:
+      title: "第十四章：殇剑"
+      trigger: {type: "realm_reach", realm: 16, tags: ["楚千殇初遇"]}
+      map: sword_peak
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                联盟大会后，你在万剑峰再次见到楚千殇。
+                她站在悬崖边上，手中的剑插在地上，没有出鞘。
+            - speaker: 楚千殇
+              text: "你想知道我为什么帮你吗？"
+            - speaker: null
+              text: 你等着她说下去。
+            - speaker: 楚千殇
+              text: "我的父母死在血煞宗手里。我七岁那年。"
+            - speaker: 楚千殇
+              text: "从那天起，我就在练剑。每一天，每一刻。"
+            - speaker: 楚千殇
+              text: "我的剑是为了复仇而生。但……"
+            - speaker: null
+              text: 她抬头看着天空，眼中有一种你从未见过的脆弱。
+            - speaker: 楚千殇
+              text: "复仇之后呢？剑还有什么意义？"
+            - speaker: 楚千殇
+              text: "你在苍澜城城墙上独战三名元婴修士的事，我听说了。你的剑不是为了复仇。"
+            - speaker: 楚千殇
+              text: "为了保护而拔剑……也许比为了杀人而拔剑更强。"
+      rewards:
+        tags: ["楚千殇心事"]
+
+    ch15_wuji_crisis:
+      title: "第十五章：三道之劫"
+      trigger: {type: "realm_reach", realm: 17, tags: ["鸿蒙珠秘密"]}
+      map: any
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                沈无极出事了。
+
+                三道并修的反噬在元婴期彻底爆发——
+                恒、逆、衍三种灵力在他体内剧烈冲突，
+                元婴出现了裂痕。
+
+                你赶到时，他已经陷入了半昏迷状态。
+                鸿蒙珠在他胸口疯狂闪烁，似乎在努力维持平衡。
+            - speaker: 沈无极
+              text: "……别管我……这是我自己的选择……"
+            - speaker: null
+              text: |
+                你没有听他的话。
+                你将自己的灵力渡入他体内，帮助他压制三道冲突。
+
+                这对你自己也有巨大的风险——
+                但你不可能看着你最好的朋友死在面前。
+
+                经过一天一夜的努力，沈无极的元婴裂痕被暂时稳住了。
+                但这不是根治——只是延缓。
+            - speaker: 沈无极
+              text: "……谢谢。我欠你一条命。"
+            - speaker: 沈无极
+              text: "鸿蒙珠……它告诉我，要彻底解决三道冲突，需要找到鸿蒙之源。"
+            - speaker: 沈无极
+              text: "据说在天元大陆最深处的秘境——混沌禁地。"
+      rewards:
+        tags: ["三道危机", "混沌禁地线索"]
+
+    ch16_xuankong_mountain:
+      title: "第十六章：悬空山"
+      trigger: {type: "first_visit", map: "xuankong_mountain"}
+      map: xuankong_mountain
+      scenes:
+        - type: narration
+          text: |
+            悬空山。天元大陆中央的奇景。
+
+            整座山脉悬浮在万丈高空，被无数灵力链条锁在天穹之上。
+            传说这是上古大能斗法时从地面掀起的。
+
+            正道联盟选择在这里召开最终军事会议，
+            商讨对血煞宗的总攻计划。
+
+    ch17_final_battle_prep:
+      title: "第十七章：战前"
+      trigger: {type: "quest_start", quest: "blood_sect_war"}
+      map: xuankong_mountain
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "血煞宗的总坛在黑风谷。化神期的宗主坐镇。"
+            - speaker: 陈长老
+              text: "我们的化神修士会对付他们的化神。你们元婴修士负责扫清外围。"
+            - speaker: null
+              text: |
+                你被分配到了突击队。成员有你、韩苍、楚千殇，
+                还有几个来自各宗门的元婴精英。
+
+                目标：突破血煞宗外围防线，摧毁他们的防护大阵。
+
+    ch18_blood_sect_war:
+      title: "第十八章：黑风谷之战"
+      trigger: {type: "battle", battle_id: "blood_sect_final"}
+      map: blood_sect_hq
+      scenes:
+        - type: narration
+          text: |
+            黑风谷。
+
+            天空被染成血红色，杀气冲天。
+            数百名修士在空中交战，法术碰撞的轰鸣声震耳欲聋。
+
+            这是你第一次参加大规模宗门战争。
+            战场不是一对一的切磋，而是混乱、残酷、不讲道理的生死搏杀。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你带领突击队冲破了三道防线，
+                韩苍在前面扛伤害，你在后面指挥，
+                楚千殇的剑光横扫一切阻碍。
+
+                防护大阵被摧毁的那一刻，
+                正道联盟的化神修士趁势攻入——
+
+                血煞宗覆灭了。
+
+                但你没有感到喜悦。
+                战场上倒下的不只有血煞宗的人。
+                你认识的一个元婴修士，在混战中被流矢击中，当场陨落。
+
+                修仙界的战争没有赢家。只有活下来的人和死去的人。
+
+    ch19_war_aftermath:
+      title: "第十九章：战后"
+      trigger: {type: "quest_complete", quest: "blood_sect_war"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "你在这次战争中表现出色。宗门决定提升你为内门首席。"
+            - speaker: null
+              text: |
+                内门首席——仅次于长老的地位。
+                但你心中没有太多喜悦。
+
+                战争带走了太多人。
+                你需要变得更强，强到不再需要通过战争来解决问题。
+            - speaker: 沈无极
+              text: "血煞宗只是开始。这次战争暴露了一个更大的问题——"
+            - speaker: 沈无极
+              text: "正道和邪道之间的矛盾越来越深。下一场战争，规模会更大。"
+            - speaker: 沈无极
+              text: "我们需要更强的力量。不是为了打仗——是为了在战争来临前阻止它。"
+
+    ch20_volume3_end:
+      title: "第二十章：新的征途"
+      trigger: {type: "realm_reach", realm: 17, tags: ["血煞宗暗线"]}
+      map: any
+      scenes:
+        - type: narration
+          text: |
+            血煞宗覆灭了，但更大的阴影正在浮现。
+
+            你从血煞宗总坛中发现了一份密信，
+            上面提到了一个你从未听过的名字——
+
+            「天命之子。」
+
+            密信中说：天命之子即将觉醒，
+            一旦觉醒，三界格局将被彻底改写。
+
+            而那个被选中的人……可能就在你身边。
+
+            ═══════════════════════════════
+            卷三完
+            ═══════════════════════════════
+      rewards:
+        tags: ["卷三完结", "天命之子线索"]

@@ -30,7 +30,7 @@ class BaseAdapter(ABC):
     ADAPTER_VERSION: str = ""
 
     def __init__(self):
-        self.server_url = f"http://127.0.0.1:{config.core_server_port}"
+        self.server_url = str(getattr(config, "core_server_url", "") or f"http://127.0.0.1:{config.core_server_port}").rstrip("/")
         self.internal_api_token = (config.internal_api_token or "").strip()
         self.logger = self._setup_logger()
 

@@ -1,0 +1,785 @@
+# 卷一：苍澜风云（凡人 → 筑基圆满）
+# 完整25章，覆盖苍澜洲所有区域
+# 核心线：下等灵根少年的崛起 + 与沈无极的友谊
+# 地图覆盖：苍澜城 → 东郊灵林 → 南市坊市 → 北望灵山 → 落星湖 → 落霞谷 → 苍澜矿脉 → 迷雾沼泽
+
+volume_1:
+  title: "卷一：苍澜风云"
+  realm_range: [1, 9]
+  main_npcs: [mc_shen_wuji, mentor_old_beggar, villager_shi_bo, merchant_wang, herb_ling_er, hunter_zhangda, hermit_lin, pet_xiaojin, dan_master_chen, liu_qingzhu, bully_zhao, thief_shadow]
+
+  chapters:
+
+    # ──────────── 练气期前段（凡人→练气三层）────────────
+
+    ch01_awakening:
+      title: "第一章：灵根测试"
+      trigger: {type: "prologue"}
+      map: canglan_city
+      summary: "灵根测试，沈无极被判废灵根，玩家被判下等灵根。两人结识，沈无极分享功法。"
+
+    ch02_first_steps:
+      title: "第二章：踏上修途"
+      trigger: {type: "realm_reach", realm: 2}
+      map: canglan_city
+      scenes:
+        - type: narration
+          text: |
+            你按照沈无极抄给你的引气入体法修炼了数日，
+            灵气虽然微弱，但一丝一缕地积聚在丹田中，
+            你的修为终于从凡人跨入了练气初期。
+
+            这一天，你在苍澜城东门遇到了沈无极。
+        - type: dialogue
+          lines:
+            - speaker: 沈无极
+              text: "你也突破了？不错，速度比我预想的快。"
+            - speaker: null
+              text: 你注意到他的气息也有了变化，似乎比你更快。
+            - speaker: 沈无极
+              text: "城东有片灵林，里面有些低阶灵兽。想去试试吗？反正在城里修炼也没多大长进。"
+
+    ch03_east_forest:
+      title: "第三章：东郊灵林"
+      trigger: {type: "first_visit", map: "east_forest"}
+      map: east_forest
+      scenes:
+        - type: narration
+          text: |
+            东郊灵林比你想象的更大，也更危险。
+
+            古木参天，灌木丛生，偶尔有灵兽的嘶鸣从深处传来。
+            你握紧了手中的木杖——这是你目前唯一的武器。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: 一个中年猎户扛着一头灰狼的尸体从林中走出，看到你时，咧嘴一笑。
+            - speaker: 张大
+              text: "小兄弟！头一回来？别往深处走，那边有筑基级的灵兽。"
+            - speaker: 张大
+              text: "先在外围练练手。这片林子的灵鼠最适合新手——皮薄肉多，还给经验。"
+      rewards:
+        tags: ["张大结识"]
+
+    ch04_first_blood:
+      title: "第四章：初战灵鼠"
+      trigger: {type: "hunt_count", count: 1}
+      map: east_forest
+      scenes:
+        - type: narration
+          text: |
+            你的第一场战斗比想象中更加狼狈。
+
+            一头灰毛灵鼠从灌木丛中窜出时，你差点被吓得后退。
+            它只有猫那么大，但速度极快，牙齿锋利如刀。
+
+            你挥出木杖，偏了。
+            灵鼠反扑，在你手臂上留下一道血痕。
+            痛感让你冷静下来——第二次挥击，正中。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                灵鼠倒地抽搐，然后不动了。
+                你喘着粗气，手臂上的血还在往下淌。
+
+                但心中涌起一股奇异的亢奋——你赢了。
+                虽然对手只是一头最低等的灵鼠，但你确实赢了。
+            - speaker: 张大
+              text: "不错！第一次就能打赢灵鼠，你小子有点东西。来，这是止血草，敷上。"
+            - speaker: 张大
+              text: "明天再来。多打几次你就不怕了。记住——修仙不是光打坐，得见血。"
+
+    ch05_hermit:
+      title: "第五章：林中隐者"
+      trigger: {type: "cultivate_count", count: 3}
+      map: east_forest
+      scenes:
+        - type: narration
+          text: |
+            连续修炼三次后，你发现自己的功法运转出了问题——
+            灵气在经脉中走的路径似乎有偏差，越修炼越不舒服。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: 正当你苦恼时，一个声音从树梢传来。
+            - speaker: 林中老人
+              text: "你的功法……不对。气走偏了半寸。"
+            - speaker: null
+              text: |
+                你抬头，一个白发老者坐在粗壮的树枝上，
+                手中握着一壶酒，神态悠闲。
+            - speaker: 林中老人
+              text: "过来，我教你调息。免费的——算是看在你还算努力的份上。"
+            - speaker: null
+              text: |
+                老者指点了你半个时辰，效果立竿见影。
+                修正后的功法运转顺畅了数倍，修炼效率明显提升。
+            - speaker: 林中老人
+              text: "记住，修行之道在于恒心。水滴石穿，看似慢，实则最快。"
+      rewards:
+        tags: ["林老指点"]
+        effect: {cultivation_bonus: 0.1}
+
+    ch06_south_market:
+      title: "第六章：南市坊市"
+      trigger: {type: "first_visit", map: "south_market"}
+      map: south_market
+      scenes:
+        - type: narration
+          text: |
+            苍澜城南门外，坊市热闹非凡。
+
+            摊位沿街铺开，灵草、丹药、法器、灵石……
+            你第一次见到这么多修仙物资堆在一起。
+            空气中混杂着各种灵药的香气，令人微微晕眩。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: 一个圆脸胖子满面堆笑地迎上来。
+            - speaker: 王掌柜
+              text: "这位道友面生，第一次来坊市？来来来，万宝楼苍澜分号，天下修士信得过的老字号！"
+            - speaker: 王掌柜
+              text: "不管买不买，先进来喝杯灵茶。免费的，免费的。"
+            - speaker: null
+              text: |
+                你走进去，琳琅满目的法器让你眼花缭乱。
+                但你的眼光落在了一把做工简朴的铁剑上——
+
+                标价：50下品灵石。
+
+                你摸了摸口袋。空的。
+            - speaker: 王掌柜
+              text: "看上那把了？好眼光！那可是东山铁匠铺老赵的手艺。50灵石，给你打个折，45。"
+            - speaker: 王掌柜
+              text: "……没钱？没关系，先记下。改天发了财再来。我王掌柜做买卖讲信用，绝不催债。"
+
+    ch07_herb_girl:
+      title: "第七章：采药女灵儿"
+      trigger: {type: "gather_herb_count", count: 3}
+      map: east_forest
+      scenes:
+        - type: narration
+          text: |
+            在东郊灵林采药时，你听到前方传来一声尖叫。
+
+            循声赶去，只见一个扎着双髻的姑娘被一头发怒的毒蛇逼到了树下，
+            手里紧紧攥着一株灵草，脸色发白但就是不肯松手。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: 你冲上前去，一杖打在毒蛇身上，将它赶走了。
+            - speaker: 药灵儿
+              text: "谢谢你！呜呜，那条蛇好凶……但这株灵芝我等了三天了，不能让给它！"
+            - speaker: null
+              text: 她抖了抖身上的泥，冲你露出一个灿烂的笑容。
+            - speaker: 药灵儿
+              text: "我叫灵儿，药灵儿。你叫什么？——你认识灵草吗？不认识？来来来，我教你！"
+            - speaker: null
+              text: |
+                就这样，你认识了药灵儿。
+                她对灵药如数家珍，随手指一株草就能报出名字、药性、毒性。
+                和她一起采药，效率高了不止十倍。
+            - speaker: 药灵儿
+              text: "对了，你要是想学炼丹，我可以介绍你认识陈丹师。不过那老头脾气可不好哦。"
+      rewards:
+        tags: ["药灵儿结识"]
+
+    ch08_spirit_egg:
+      title: "第八章：灵宠蛋"
+      trigger: {type: "explore_count", map: "north_mountain", count: 5}
+      map: north_mountain
+      scenes:
+        - type: narration
+          text: |
+            在北山探索时，你在一处隐蔽的洞穴中发现了一颗拳头大小的金色蛋。
+
+            蛋的表面布满细密的纹路，散发着微弱但温暖的光芒。
+            你伸手碰触的瞬间，金蛋猛然一颤——
+
+            它在回应你。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你将金蛋小心翼翼地收入怀中。
+                它轻轻震动着，像是一颗正在跳动的心脏。
+
+                你不知道这颗蛋里面是什么，
+                但你能感觉到——它选择了你。
+      rewards:
+        items: [{id: "spirit_egg_golden", qty: 1}]
+        tags: ["灵宠蛋"]
+
+    ch09_bully:
+      title: "第九章：城中恶霸"
+      trigger: {type: "realm_reach", realm: 3}
+      map: canglan_city
+      scenes:
+        - type: narration
+          text: |
+            练气三层后，你感觉自己比以前强了不少。
+            但修仙界不只有妖兽——人心有时比妖兽更危险。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                回到苍澜城时，你看到一群人围在城门口。
+                三个穿着统一青衫的年轻修士正在欺负一个卖灵果的老人，
+                将他的灵果篮子踢翻在地。
+            - speaker: 赵三
+              text: "老东西，这片地盘的保护费三天没交了。不交就别做生意！"
+            - speaker: null
+              text: 周围的人都低着头，没人敢出声。你犹豫了一下——
+        - type: choice
+          choices:
+            - label: "上前制止"
+              result: |
+                你走上前去。三个青衫修士都是练气二层，比你低一个小境界。
+                赵三看了你一眼，不屑地冷笑。
+                赵三：又来一个不怕死的。
+                你没有废话，直接出手。三招之内，赵三被你打趴在地。
+                另外两个连忙扶起他，灰溜溜地跑了。
+                老人颤颤巍巍地向你道谢，塞给你三颗灵果。
+              effect: {mentality: 3, reputation: 10}
+              tags: ["行侠仗义"]
+            - label: "默默走开"
+              result: |
+                你低下头，从人群边绕过去。
+                不是你不想管，而是……你还不够强。
+                心里有什么东西硌得慌，但你强迫自己不去想。
+              effect: {mentality: -2}
+              tags: ["旁观者"]
+            - label: "偷偷记下他们的样貌"
+              result: |
+                你没有冲上去，而是默默记住了三个人的脸。
+                赵三、赵家帮——这些名字你记下了。
+                等你足够强的时候，会有清算的一天。
+              effect: {dao_ni: 2}
+              tags: ["暗中观察"]
+
+    ch10_shen_wuji_secret:
+      title: "第十章：沈无极的秘密"
+      trigger: {type: "realm_reach", realm: 4}
+      map: canglan_city
+      scenes:
+        - type: narration
+          text: |
+            练气四层。你的修炼速度虽然不快，但一步一个脚印，根基格外扎实。
+
+            这天傍晚，你去找沈无极，却发现破庙的门紧闭着。
+            里面传来一阵奇异的光芒——不是灵力的光，
+            而是一种混合了金、银、紫三色的光华。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你推开门，看到沈无极盘坐在地上，
+                怀中那颗灰暗的珠子正散发着三色光芒。
+                光芒在他周围旋转，形成了一个微型漩涡。
+
+                沈无极猛然睁眼，三色光芒瞬间收敛，珠子恢复了灰暗。
+            - speaker: 沈无极
+              text: "……你来了。"
+            - speaker: null
+              text: 他的表情有些不自然，像是被看到了不想被看到的东西。
+            - speaker: 沈无极
+              text: "这颗珠子……不是普通的东西。我最近才发现。"
+            - speaker: 沈无极
+              text: "它好像能吸收天地灵气，而且是三种不同性质的灵气同时吸收。"
+            - speaker: null
+              text: |
+                三种不同性质的灵气——恒、逆、衍？
+                你想起了林中老人说的话：修行之道，选一条走到底。
+                但沈无极的珠子似乎在让他同时走三条路？
+            - speaker: 沈无极
+              text: "别告诉任何人。我有种感觉……这东西要是被人知道了，会招来大麻烦。"
+      rewards:
+        tags: ["鸿蒙珠秘密"]
+
+    ch11_fallen_star_lake:
+      title: "第十一章：落星湖畔"
+      trigger: {type: "first_visit", map: "fallen_star_lake"}
+      map: fallen_star_lake
+      scenes:
+        - type: narration
+          text: |
+            落星湖。
+
+            传说万年前有一颗星辰坠落于此，形成了这片湖泊。
+            湖水清澈见底，却深不见底。
+            偶尔有奇异的光芒从湖底深处闪烁，像是沉睡的星辰在呼吸。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你在湖边修炼时，发现了一件奇怪的事——
+                湖水中的灵气比岸上浓郁了数倍，
+                而且带有一种你从未感受过的属性。
+
+                不是金木水火土任何一种，
+                而是更加深远、宏大的东西……
+                像是星辰的余韵。
+            - speaker: null
+              text: |
+                你将手探入湖水，一缕银色灵气自动缠上了你的手指。
+                只是一瞬间，你的修为便微微提升了。
+
+                这个地方不简单。
+      rewards:
+        tags: ["落星湖探索"]
+
+    ch12_pill_master:
+      title: "第十二章：丹道入门"
+      trigger: {type: "realm_reach", realm: 5, tags: ["药灵儿结识"]}
+      map: luoxia_valley
+      scenes:
+        - type: narration
+          text: |
+            修为积累到练气五层，你意识到仅凭打坐修炼已经不够了。
+            你需要丹药的辅助，才能更高效地积累灵力。
+
+            在药灵儿的介绍下，你找到了落霞谷的陈丹师。
+        - type: dialogue
+          lines:
+            - speaker: 陈丹师
+              text: "你想学炼丹？先去认识一百种灵草再来。"
+            - speaker: null
+              text: 你张了张嘴，想说什么，但看到陈丹师那张不容反驳的脸，只好闭嘴。
+            - speaker: 陈丹师
+              text: "灵草图谱在药灵儿那里，去借。三天后来找我，少一种都不行。"
+            - speaker: null
+              text: |
+                三天后，你带着100种灵草的笔记回来了。
+                陈丹师翻了翻，眉头微微松开。
+            - speaker: 陈丹师
+              text: "凑合。不过你的字太难看了。"
+            - speaker: 陈丹师
+              text: "这是最基础的回灵丹丹方。去炼。炼废了不许哭。"
+      rewards:
+        tags: ["丹道入门"]
+
+    # ──────────── 练气期后段（练气四层→练气圆满）────────────
+
+    ch13_mine_incident:
+      title: "第十三章：矿脉异变"
+      trigger: {type: "first_visit", map: "canglan_mines"}
+      map: canglan_mines
+      scenes:
+        - type: narration
+          text: |
+            苍澜矿脉深处，最近频繁传出异响。
+
+            石伯找到你：矿工们说深层矿道中有妖兽出没，
+            已经有三个矿工失踪了。他请你去查看情况。
+        - type: dialogue
+          lines:
+            - speaker: 石伯
+              text: "小修士，老头子知道你修为不高，但别的修士嫌报酬太少不愿来。"
+            - speaker: 石伯
+              text: "你就帮忙看看，能解决就解决，解决不了就回来告诉我，我再想办法。"
+            - speaker: null
+              text: |
+                你进入矿道深处，发现了一个被掘开的暗室。
+                暗室中有一头受伤的穴居灵蛇，正蜷缩着护住一窝蛇卵。
+
+                它攻击矿工是因为矿工挖穿了它的巢穴。
+                这不是恶意袭击，而是一个母亲在保护自己的孩子。
+        - type: choice
+          choices:
+            - label: "帮灵蛇换个巢穴"
+              result: |
+                你花了半天时间，在矿脉侧面挖了一个新洞穴，
+                引导灵蛇搬迁过去。它似乎理解了你的善意，
+                临走前从口中吐出一颗拇指大小的灵石，推到你面前。
+                石伯：好小子！既解决了问题，又没杀生。大善！
+              effect: {mentality: 5, karma: 3}
+              tags: ["灵蛇善缘"]
+            - label: "击退灵蛇，保护矿工"
+              result: |
+                你和灵蛇缠斗了一刻钟，最终将它逼退到更深处。
+                矿道恢复了安全，矿工们回来继续工作。
+                石伯：辛苦了！这是报酬，虽然不多……
+              effect: {exp: 50, copper: 30}
+              tags: ["矿脉清理"]
+
+    ch14_swamp_mystery:
+      title: "第十四章：迷雾沼泽"
+      trigger: {type: "first_visit", map: "misty_swamp"}
+      map: misty_swamp
+      scenes:
+        - type: narration
+          text: |
+            迷雾沼泽。
+
+            永远弥漫着浓雾的不祥之地。
+            苍澜洲的修士通常不会来这里——
+            因为这里不仅有毒虫毒草，
+            还有传闻中的……诡异之物。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你是跟着一条线索来的。
+                在矿脉中发现的那颗灵石上刻有奇怪的符号，
+                药灵儿辨认后说：这是万鬼门的标记。
+
+                万鬼门——邪道宗门之一，专修鬼道。
+                他们为什么会在苍澜矿脉出没？
+            - speaker: null
+              text: |
+                沼泽深处，你找到了一座废弃的祭坛。
+                祭坛上残留着新鲜的血迹和阵法痕迹——
+                有人在这里进行过某种仪式，而且就在最近。
+
+                你将线索记了下来。这件事背后，一定不简单。
+      rewards:
+        tags: ["沼泽线索", "万鬼门踪迹"]
+
+    ch15_egg_hatching:
+      title: "第十五章：破壳"
+      trigger: {type: "realm_reach", realm: 6, tags: ["灵宠蛋"]}
+      map: any
+      scenes:
+        - type: narration
+          text: |
+            就在你突破到练气六层的那一刻，
+            怀中的金色蛋突然剧烈颤动起来。
+
+            裂缝在蛋壳表面蔓延，金色的光芒从裂缝中涌出——
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                一只小巧的生物从蛋壳中钻出。
+
+                它全身覆盖着金色绒毛，四条短腿，一对翅膀，
+                一双圆溜溜的大眼睛好奇地打量着你。
+
+                然后它张开嘴，发出了一声——
+
+                「吱！」
+
+                ……完全没有威慑力。
+            - speaker: null
+              text: |
+                它扑棱着小翅膀飞到你肩上，蹭了蹭你的脸。
+                那种温暖的感觉和金蛋一模一样。
+
+                你决定叫它小金。
+            - speaker: 沈无极
+              text: "这是什么？金翎雀？不对，翅膀不一样……你从哪弄来的？"
+            - speaker: null
+              text: |
+                沈无极伸手要摸小金，小金歪了歪头，啄了他一口。
+            - speaker: 沈无极
+              text: "……好凶。看来它只认你。"
+      rewards:
+        tags: ["小金孵化"]
+
+    ch16_luoxia_valley:
+      title: "第十六章：落霞谷"
+      trigger: {type: "first_visit", map: "luoxia_valley"}
+      map: luoxia_valley
+      scenes:
+        - type: narration
+          text: |
+            落霞谷。
+
+            黄昏时分，整个山谷被染成金红色，
+            灵气如薄雾般弥漫，每一次呼吸都令经脉舒张。
+
+            这里是苍澜洲灵气最浓郁的区域之一，
+            许多散修在此修建了简陋的洞府。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你在谷中转了一圈，发现了一处无人的小型石洞。
+                洞口朝南，灵气汇聚，是天然的修炼佳地。
+
+                你在洞口布下简单的遮掩，暂时将这里作为你的据点。
+
+                从一个流浪的散修到拥有了自己的修炼洞府——
+                虽然简陋，但这是属于你的第一个"家"。
+
+    ch17_blood_shadow_clue:
+      title: "第十七章：血影"
+      trigger: {type: "hunt_count", count: 20, tags: ["沼泽线索"]}
+      map: misty_swamp
+      scenes:
+        - type: narration
+          text: |
+            你再次深入迷雾沼泽，沿着之前发现的线索追踪。
+
+            在一处被枯木遮掩的洞穴中，你发现了更多证据——
+            一件沾满血迹的黑袍，上面绣着一个血红色的图案。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你认出了这个图案——不是万鬼门的，而是血煞宗的。
+
+                血煞宗和万鬼门的标记同时出现在苍澜洲？
+                这两个邪道宗门在这偏僻之地做什么？
+            - speaker: null
+              text: |
+                一阵阴冷的气息从洞穴深处传来。
+                你的神识感应到了一道微弱但充满恶意的灵力波动——
+
+                有人在这里修炼过某种邪术。
+                而且就在不久前。
+
+                你后背一凉，决定先撤退。
+                这件事已经超出了你目前的能力范围。
+
+                但你把黑袍带走了。
+      rewards:
+        tags: ["血影线索", "邪修踪迹"]
+
+    # ──────────── 筑基期（练气圆满→筑基圆满）────────────
+
+    ch18_breakthrough_zhuji:
+      title: "第十八章：筑基之路"
+      trigger: {type: "realm_reach", realm: 6}
+      map: any
+      scenes:
+        - type: narration
+          text: |
+            练气圆满。
+
+            你感到体内灵力已经积蓄到了一个极限，
+            经脉中的灵气几乎要溢出来。
+
+            这是突破的征兆——你需要筑基。
+
+            但筑基不是简单地积累灵力就能完成的。
+            你需要将散乱的灵力凝聚成一个「基」，
+            就像建房子需要先打地基一样。
+        - type: dialogue
+          lines:
+            - speaker: 林中老人
+              text: "你到瓶颈了。"
+            - speaker: null
+              text: 不知何时，林中老人出现在你身后。你已经习惯了他这种出没方式。
+            - speaker: 林中老人
+              text: "筑基不难，但也不简单。你需要一个安静的地方，三天不被打扰。"
+            - speaker: 林中老人
+              text: "还需要一枚筑基丹。没有的话……硬突也行，但成功率低。"
+            - speaker: null
+              text: |
+                筑基丹——你在南市坊市见过，王掌柜那里有卖。
+                但价格对你来说是天文数字。
+
+                或者……去找陈丹师。
+                你已经学会了基础炼丹，也许能自己炼一枚。
+      rewards:
+        tags: ["筑基在望"]
+
+    ch19_zhuji_pill:
+      title: "第十九章：炼制筑基丹"
+      trigger: {type: "alchemy_count", count: 5, tags: ["丹道入门"]}
+      map: luoxia_valley
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 陈丹师
+              text: "你要炼筑基丹？就凭你现在的水平？"
+            - speaker: null
+              text: 陈丹师看了你一眼，嘴角微微抽搐。
+            - speaker: 陈丹师
+              text: "……算了。材料我给你列了单子，自己去凑。"
+            - speaker: 陈丹师
+              text: "灵芝草，五行灵泉水，还有一颗灵兽内丹——至少三阶的。"
+            - speaker: 陈丹师
+              text: "凑齐了来找我。我看着你炼。免得你把丹炉给我炸了。"
+            - speaker: null
+              text: |
+                灵芝草，药灵儿那里有。
+                五行灵泉水，落星湖可以取。
+                三阶灵兽内丹……
+
+                你需要去打一头至少练气圆满级别的灵兽。
+                这是你目前面临的最大挑战。
+
+    ch20_boss_fight:
+      title: "第二十章：林中之王"
+      trigger: {type: "hunt_count", count: 30}
+      map: east_forest
+      scenes:
+        - type: narration
+          text: |
+            东郊灵林深处。
+
+            张大说过，林子深处有一头独眼灵狼，
+            已经在这片林子称王多年，修为至少练气圆满。
+            所有猎户都绕着它走。
+
+            但你需要它的内丹来炼制筑基丹。
+        - type: dialogue
+          lines:
+            - speaker: 张大
+              text: "你要去找那头独眼狼？兄弟，你疯了吧？"
+            - speaker: 张大
+              text: "……行吧。你的眼神告诉我劝不住。那我陪你去。"
+            - speaker: null
+              text: |
+                林中深处，一头银毛独眼巨狼卧在一块巨石上。
+                它只有一只眼睛，但那只眼睛中的寒光，
+                比任何你见过的灵兽都要骇人。
+
+                战斗异常惨烈。
+                张大帮你缠住了狼群中的三头小狼，
+                你独自面对独眼狼王。
+
+                三次被掀翻，三次爬起来。
+                最终，你找到了它的盲区——右侧。
+                一杖直捣心口，独眼狼王轰然倒地。
+            - speaker: 张大
+              text: "……你这小子，真他娘的硬。我服了。"
+      rewards:
+        items: [{id: "beast_core_3", qty: 1}]
+        tags: ["独眼狼王"]
+
+    ch21_zhuji_success:
+      title: "第二十一章：筑基"
+      trigger: {type: "breakthrough_success", from_stage: "lianqi"}
+      map: luoxia_valley
+      scenes:
+        - type: narration
+          text: |
+            落霞谷，你的洞府。
+
+            筑基丹入口，灵力如洪流般在体内翻涌。
+            你咬紧牙关，引导灵力按照功法口诀的路径运行——
+
+            散乱的灵力一丝一缕地凝聚，
+            在丹田正中汇成一个微型的灵气漩涡。
+
+            漩涡越转越快，越转越实——
+
+            「轰！」
+
+            丹田深处一声闷响，
+            那个灵气漩涡固化成了一块晶莹的灵力结晶。
+
+            筑基成功。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你缓缓睁开眼，感受着体内翻天覆地的变化。
+
+                灵力比之前充沛了数倍，
+                神识范围扩大了十余丈，
+                就连视力和听力都有了明显提升。
+
+                这就是筑基——修仙路上的第一个真正台阶。
+            - speaker: 沈无极
+              text: "你筑基了？"
+            - speaker: null
+              text: 不知何时，沈无极出现在洞府门口，脸上的笑容真诚而开心。
+            - speaker: 沈无极
+              text: "比我快了三天。看来下等灵根也不是没有希望。"
+            - speaker: null
+              text: |
+                你注意到他身上的气息也变了——他也筑基了。
+
+                两个被判定为废灵根和下等灵根的人，
+                在没有任何宗门支持的情况下，完成了筑基。
+
+                这本身就是一种奇迹。
+            - speaker: 沈无极
+              text: "接下来怎么办？筑基之后，在苍澜洲已经很难有大的提升了。"
+            - speaker: 沈无极
+              text: "也许……该考虑去更大的世界看看了。"
+      rewards:
+        tags: ["筑基成功"]
+
+    ch22_sect_call:
+      title: "第二十二章：宗门的召唤"
+      trigger: {type: "realm_reach", realm: 7}
+      map: canglan_city
+      scenes:
+        - type: narration
+          text: |
+            筑基中期。
+
+            有一天，苍澜城的天空中突然出现了数道遁光——
+            那是高阶修士才有的飞行之术。
+            整座城池的修士都抬起了头。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                遁光落在城中广场，化为几名气度不凡的修士。
+                他们身着各色宗门道袍，带着一种居高临下的从容。
+
+                是宗门来招收弟子了。
+            - speaker: 宗门执事
+              text: "奉各宗长老之命，在苍澜洲遴选有潜力的散修弟子。筑基期以上者，可前来报名。"
+            - speaker: null
+              text: |
+                你和沈无极对视一眼。
+                机会来了。
+
+                但问题是——选哪个宗门？
+
+                正道有太清宗的恒道传承，天剑门的剑道极致；
+                邪道有逆天殿的逆天改命，血煞宗的以战养战。
+                每一条路都截然不同，一旦选择，便难以回头。
+            - speaker: 沈无极
+              text: "我可能……不会加入任何宗门。"
+            - speaker: null
+              text: 你有些意外。
+            - speaker: 沈无极
+              text: "我身上的东西太特殊了。加入宗门反而不方便。我打算当散修。"
+            - speaker: 沈无极
+              text: "但你不一样。你的根基扎实，宗门能给你更好的资源和传承。去吧。"
+      rewards:
+        tags: ["宗门招聘"]
+
+    ch23_parting:
+      title: "第二十三章：分别"
+      trigger: {type: "join_sect"}
+      map: canglan_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                入宗的那一天，你收拾了落霞谷洞府里不多的行李。
+
+                沈无极来送你。
+                他靠在城门边，手里还是啃着半个馒头。
+            - speaker: 沈无极
+              text: "又不是去送死，至于那么严肃吗？"
+            - speaker: null
+              text: 你笑了笑，但心里确实有些不舍。从灵根测试那天起，你们已经相处了很长时间。
+            - speaker: 沈无极
+              text: "在宗门里好好修炼。不过——别忘了你是谁。"
+            - speaker: 沈无极
+              text: "不管在哪个宗门，你首先是你自己。别被规矩磨没了棱角。"
+            - speaker: null
+              text: |
+                你点了点头。
+
+                小金从你肩上飞到沈无极面前，蹭了蹭他的脸，
+                然后又飞了回来。
+
+                算是它的道别方式。
+            - speaker: 沈无极
+              text: "走吧。下次见面的时候，看看谁更强。"
+            - speaker: null
+              text: |
+                你转身走向宗门的遁光飞舟，没有回头。
+
+                但你知道——这不是结束，而是新的开始。
+                苍澜洲的故事告一段落。
+                更大的世界，正在前方等着你。
+
+                ═══════════════════════════════
+                卷一完
+                ═══════════════════════════════
+      rewards:
+        tags: ["卷一完结", "苍澜告别"]

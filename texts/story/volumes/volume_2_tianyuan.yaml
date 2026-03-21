@@ -1,0 +1,739 @@
+# 卷二：天渊风云（金丹初期 → 金丹圆满）
+# 完整35章，覆盖天元宗城/万剑峰/丹鼎阁/乱星海等区域
+# 核心线：宗门历练 + 三女主登场 + 试剑大会 + 邪修暗线
+# 地图覆盖：天元宗城 → 万剑峰 → 丹鼎阁 → 乱星海 → 魔域密林 → 逆命之地 → 命运裂隙 → 古战场 → 星陨之海
+
+volume_2:
+  title: "卷二：天渊风云"
+  realm_range: [10, 13]
+  main_npcs: [xiao_han_cang, chu_qianshang, wang_ni, xing_xuan, qin_xinghe, mo_wuchang, elder_chen_sect, sword_master_li, pill_elder, sect_leader, spy_shadow, liu_qingzhu]
+
+  chapters:
+
+    # ──────────── 宗门初入（金丹初期）────────────
+
+    ch01_arrival:
+      title: "第一章：新世界"
+      trigger: {type: "join_sect"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            遁光飞舟掠过云海，你第一次见到了天元宗城的全貌。
+
+            城池建在一座万丈高山的山腰，宫殿楼阁层层叠叠，
+            灵气浓度是苍澜城的数十倍。
+            空中不时有剑光遁光掠过，每一道都代表着一位修士。
+
+            这里的修士最低都是筑基期。
+            你曾经引以为豪的筑基修为，在这里只是最底层。
+
+    ch02_outer_disciple:
+      title: "第二章：外门弟子"
+      trigger: {type: "sect_role", role: "outer"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            作为外门弟子，你被分配到了山脚的一间小屋。
+            每天的日程被安排得满满的：晨起修炼、午时听课、下午完成宗门任务。
+
+            宗门任务大多是些苦差：巡山、种灵田、打扫丹房……
+            但每完成一次任务，都能获得宗门贡献点，
+            用贡献点可以兑换丹药、功法、法器。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你正在灵田里拔草时，一个大块头走了过来。
+                他足有六尺高，膀大腰圆，脸上却带着憨厚的笑。
+            - speaker: 韩苍
+              text: "师弟！你也是新来的？太好了！我叫韩苍，以后咱俩搭伙！"
+            - speaker: null
+              text: 你还没来得及回答，他已经帮你拔起了一大把灵草。
+            - speaker: 韩苍
+              text: "这活儿我干得快。你去歇着，我一个人就行。"
+            - speaker: null
+              text: |
+                韩苍，金丹初期修士，比你高一个小境界。
+                资质算不上好，但胜在力气大、脾气好。
+                在宗门里，像他这样不争不抢的老实人，最容易被欺负。
+
+                但你很快发现——他不是没脾气，
+                只是把脾气都留给了保护朋友的时候。
+
+    ch03_sect_life:
+      title: "第三章：宗门日常"
+      trigger: {type: "sect_quest_complete", count: 3}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 韩苍
+              text: "师弟！食堂今天有红烧妖肉！走走走！"
+            - speaker: null
+              text: |
+                你和韩苍逐渐成了形影不离的搭档。
+                他负责出力，你负责出主意。
+                宗门任务的效率比单打独斗高了数倍。
+            - speaker: 韩苍
+              text: "师弟，你有没有觉得……修炼其实挺孤独的？"
+            - speaker: 韩苍
+              text: "但有朋友就不一样了。以后我罩着你！"
+            - speaker: null
+              text: |
+                你笑了笑，心里涌起一种久违的温暖。
+                在苍澜城有沈无极，在宗门有韩苍。
+                修仙路上最珍贵的，或许不是功法和丹药，
+                而是这些并肩而行的人。
+
+    ch04_inner_conflict:
+      title: "第四章：外门欺压"
+      trigger: {type: "sect_quest_complete", count: 5}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                宗门不是净土。有人的地方就有争斗。
+
+                外门弟子中有一群人，自称「天元七子」，
+                仗着背后有内门师兄撑腰，对其他外门弟子横征暴敛。
+                他们向每个外门弟子收取「保护费」——不交就找麻烦。
+            - speaker: 天元七子·头目
+              text: "新来的？交100贡献点，保你在外门平平安安。不交？呵呵。"
+            - speaker: 韩苍
+              text: "别理他们。上个月他们欺负我，我一拳把他们头目打飞了。后来被内门师兄罚了三天面壁。"
+            - speaker: 韩苍
+              text: "但我不后悔。挨罚也比当缩头乌龟强。"
+        - type: choice
+          choices:
+            - label: "和韩苍一起反抗"
+              result: |
+                你和韩苍联手对抗天元七子。
+                战斗中你发现他们虽然人多，但各自为战，配合极差。
+                两人合力将他们打散，但背后的内门师兄一定不会善罢甘休。
+              tags: ["反抗天元七子"]
+            - label: "暂时隐忍，搜集他们的违规证据"
+              result: |
+                你没有急着出手，而是默默搜集天元七子欺压弟子的证据。
+                一份份证词、一笔笔强收的贡献点记录……
+                等材料够了，直接交给宗门执法堂。
+              tags: ["搜集证据"]
+
+    ch05_elder_notice:
+      title: "第五章：长老注意"
+      trigger: {type: "sect_contribution", min: 100}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你的努力被宗门长老注意到了。
+
+                一天修炼结束后，一个弟子来传话：
+                陈长老要见你。
+            - speaker: 陈长老
+              text: "你就是那个下等灵根的新弟子？"
+            - speaker: null
+              text: 你点了点头，心中有些紧张。
+            - speaker: 陈长老
+              text: "嗯。根骨虽差，但踏实肯干。宗门需要的就是这种人。"
+            - speaker: 陈长老
+              text: "我给你一个机会——三个月后的内门考核，如果你能通过，我提你进内门。"
+            - speaker: 陈长老
+              text: "不过……你现在的修为还不够。这三个月，好好准备。"
+      rewards:
+        tags: ["陈长老认可"]
+
+    ch06_training:
+      title: "第六章：突破瓶颈"
+      trigger: {type: "realm_reach", realm: 11}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            为了通过内门考核，你拼命修炼。
+
+            金丹中期——这个目标比你想象的更难。
+            你的灵根资质限制了灵气吸收速度，
+            同样的修炼量，别人突破用三天，你需要十天。
+
+            但你有一个别人没有的优势：你的根基比谁都扎实。
+            从凡人一路走来，每一步都是实打实练出来的。
+
+    ch07_herb_quest:
+      title: "第七章：药园守护"
+      trigger: {type: "sect_quest", quest_id: "herb_garden"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "宗门后山的灵药园最近总遭偷袭。你和韩苍去守三天。"
+            - speaker: null
+              text: |
+                三天三夜的守护中，你遇到了两次灵兽袭击和一次蒙面人偷盗。
+
+                灵兽好对付，但那个蒙面人的身手——
+                至少金丹后期，远超你的应对能力。
+                他被你和韩苍联手逼退，但临走时扔下了一句话。
+            - speaker: 蒙面人
+              text: "别多管闲事。这些灵药……本来就不该属于你们宗门。"
+            - speaker: null
+              text: |
+                蒙面人消失了，留下一地疑问。
+                他的声音……你觉得有点耳熟。
+      rewards:
+        tags: ["药园事件"]
+
+    # ──────────── 试剑大会 + 女主登场 ────────────
+
+    ch08_tournament_announce:
+      title: "第八章：试剑大会"
+      trigger: {type: "sect_event", event: "tournament"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            宗门大比——每三年一次的盛会。
+
+            所有境界在金丹期以下的弟子都可以参加，
+            前十名可直接进入内门，第一名可获得长老亲传资格。
+
+            更重要的是，各大宗门都会派人观战。
+            在大比中脱颖而出，就等于在整个修仙界亮了相。
+        - type: dialogue
+          lines:
+            - speaker: 韩苍
+              text: "师弟！大比的报名你交了没？"
+            - speaker: 韩苍
+              text: "我听说今年有好几个金丹圆满的参加，我们估计打不过……但总得试试！"
+
+    ch09_first_round:
+      title: "第九章：初战告捷"
+      trigger: {type: "tournament_win", count: 1}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            大比第一轮，淘汰赛。
+
+            你的对手是一个比你高半个小境界的弟子，
+            但他的根基浮虚，灵力运转有明显的漏洞。
+
+            你耐心地防守，等他灵力消耗过半时，
+            一击制胜。
+        - type: dialogue
+          lines:
+            - speaker: 韩苍
+              text: "干得漂亮！我也赢了！第二轮见！"
+
+    ch10_sword_peak:
+      title: "第十章：剑峰初遇"
+      trigger: {type: "first_visit", map: "sword_peak"}
+      map: sword_peak
+      scenes:
+        - type: narration
+          text: |
+            大比间歇期，你来到万剑峰磨砺剑术。
+
+            万剑峰上剑气纵横，数百把古剑在空中盘旋，
+            每一把都散发着不同的剑意。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                她一袭黑衣，长发如瀑，手持一把没有剑鞘的长剑，
+                站在悬崖边上，与山风对峙。
+            - speaker: 楚千殇
+              text: "你的剑，太慢了。"
+            - speaker: null
+              text: 你还没反应过来，一道剑光已经掠过你的衣袖——不伤人，只裁衣。
+            - speaker: 楚千殇
+              text: "如果这是生死搏杀，你已经死了三次。"
+            - speaker: null
+              text: |
+                你握紧了手中的剑，心中升起一股不服输的意志。
+                她的眼中闪过一丝意外。
+            - speaker: 楚千殇
+              text: "……不错，至少你没跑。下次再来时，让我看看你进步了多少。"
+            - speaker: null
+              text: |
+                楚千殇，天剑门内门弟子，金丹后期。
+                她的剑快到极致，冷到极致，
+                但你在那冷冽的眼神深处，看到了一丝孤独。
+
+                她不是看不起人——她只是找不到对手。
+      rewards:
+        tags: ["楚千殇初遇"]
+
+    ch11_semifinal:
+      title: "第十一章：半决赛"
+      trigger: {type: "tournament_win", count: 5}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你一路过关斩将，进入了前十。
+                但在半决赛的对阵表上，你看到了一个陌生的名字——
+
+                王逆。逆天殿。
+            - speaker: 韩苍
+              text: "王逆？逆天殿少主！师弟你要小心，这家伙是金丹圆满……"
+            - speaker: null
+              text: 金丹圆满对金丹中期。差距不是一星半点。
+
+    ch12_wang_ni:
+      title: "第十二章：逆天殿少主"
+      trigger: {type: "tournament_match", opponent: "wang_ni"}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: 王逆
+              text: "你就是那个下等灵根？有意思。"
+            - speaker: 王逆
+              text: "我听说你和沈无极是朋友。那个废灵根身上有些有趣的东西。"
+            - speaker: null
+              text: |
+                你皱起了眉。他知道沈无极？
+                而且他用的词是「有趣的东西」——他知道鸿蒙珠？
+            - speaker: 王逆
+              text: "别紧张。我对他没兴趣。我只对强者有兴趣。来吧，让我看看你有多少本事。"
+            - speaker: null
+              text: |
+                战斗持续了三十六招。
+                你输了——但你撑了三十六招。
+                王逆的表情从轻蔑变成了认真，最后变成了……尊重。
+            - speaker: 王逆
+              text: "三十六招。比我预想的多二十招。你很强。"
+            - speaker: 王逆
+              text: "下次见面，也许我就不会手下留情了。"
+      rewards:
+        tags: ["王逆初遇"]
+
+    ch13_pill_pavilion:
+      title: "第十三章：丹鼎阁之行"
+      trigger: {type: "first_visit", map: "pill_pavilion"}
+      map: pill_pavilion
+      scenes:
+        - type: narration
+          text: |
+            大比结束后，你带着陈长老的推荐信来到丹鼎阁交流。
+
+            丹鼎阁是天下丹道至尊，连空气中都弥漫着各种丹香。
+            你在苍澜城跟陈丹师学的那点东西，在这里只是最初级的皮毛。
+        - type: dialogue
+          lines:
+            - speaker: 丹鼎阁弟子
+              text: "交流生？哦，外门的。去三号丹房，今天教的是凝气散的炼制。"
+            - speaker: null
+              text: |
+                你在丹鼎阁待了七天，学到的东西比过去一年还多。
+                但最大的收获不是丹方——
+                而是你偶然听到的一段对话。
+            - speaker: 丹鼎阁弟子甲
+              text: "听说了吗？最近有人在大量收购凝魂香……"
+            - speaker: 丹鼎阁弟子乙
+              text: "凝魂香？那是炼制傀儡丹的材料！谁会需要那种邪物？"
+            - speaker: null
+              text: |
+                凝魂香。傀儡丹。
+                你想起了苍澜洲的迷雾沼泽——
+                那里发现的血煞宗黑袍和万鬼门符文。
+
+                这些线索之间，似乎有某种联系。
+      rewards:
+        tags: ["丹鼎阁交流", "凝魂香线索"]
+
+    # ──────────── 乱星海 + 柳清竹 ────────────
+
+    ch14_chaos_sea:
+      title: "第十四章：乱星海"
+      trigger: {type: "first_visit", map: "chaos_sea"}
+      map: chaos_sea
+      scenes:
+        - type: narration
+          text: |
+            乱星海。
+
+            天元大陆东南方向的广袤海域，无数岛屿星罗棋布。
+            这里是散修的天堂和坟场——
+            没有宗门的约束，也没有宗门的庇护。
+            弱肉强食，是这里唯一的法则。
+
+            宗门派你来这里完成一个任务：
+            寻找一种叫做「海心珊瑚」的材料，用于宗门的大型阵法修复。
+
+    ch15_sea_storm:
+      title: "第十五章：海上风暴"
+      trigger: {type: "explore_count", map: "chaos_sea", count: 3}
+      map: chaos_sea
+      scenes:
+        - type: narration
+          text: |
+            乱星海外海，风浪如山。
+
+            你乘坐的小舟在灵暴中剧烈摇晃，
+            就在你以为自己要被卷入海底的时候——
+
+            你看到了另一艘船，也在风暴中挣扎。
+            船上只有一个人，一个身着白衣的女修。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: 你来不及多想，催动遁光靠了过去。
+            - speaker: 柳清竹
+              text: "……你是谁？"
+            - speaker: null
+              text: |
+                她的声音很轻，像是快要支撑不住了。
+                你没有回答，先帮她稳住了船。
+            - speaker: 柳清竹
+              text: "……谢谢你。如果不是你，我可能就……"
+            - speaker: null
+              text: |
+                风暴过后，你们在一座无名小岛上歇息。
+                她说她叫柳清竹，是个散修，来乱星海寻找一种灵药。
+
+                但你从她的眼神中看到了一些她没有说出口的东西——
+                某种深藏在平静表面下的复杂情绪。
+            - speaker: 柳清竹
+              text: "你不用问。有些事……我还不能说。"
+            - speaker: 柳清竹
+              text: "但你救了我的命。这份情，我记下了。"
+      rewards:
+        tags: ["道侣相遇", "柳清竹初遇"]
+
+    ch16_island_adventure:
+      title: "第十六章：岛上七日"
+      trigger: {type: "explore_count", map: "chaos_sea", count: 5, tags: ["柳清竹初遇"]}
+      map: chaos_sea
+      scenes:
+        - type: narration
+          text: |
+            风暴持续了七天。你和柳清竹被困在小岛上。
+
+            七天里，你们各自修炼，偶尔交谈。
+            她话不多，但每句话都经过深思熟虑。
+            你逐渐发现——她的修为远不止表面看到的那么简单。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                第五天夜里，你在修炼时感应到了异样的灵力波动。
+                循着感应找去，看到柳清竹独自坐在礁石上，
+                周身萦绕着一股你从未见过的灵力——纯净、温润，如月华。
+            - speaker: 柳清竹
+              text: "……你来了。"
+            - speaker: null
+              text: 她没有收敛灵力，似乎默许了你的观察。
+            - speaker: 柳清竹
+              text: "你一定很好奇。"
+            - speaker: 柳清竹
+              text: "我的灵根……不是普通灵根。但它也是我所有痛苦的根源。"
+            - speaker: 柳清竹
+              text: "总有一天我会告诉你全部。但不是现在。"
+            - speaker: null
+              text: |
+                风暴在第七天停歇。
+                你们各自离开小岛。
+                临别前，她递给你一枚玉简。
+            - speaker: 柳清竹
+              text: "灵识印入其中，可以联系我。如果你遇到危险……"
+            - speaker: null
+              text: 她没有说完这句话，转身飞走了。
+
+    # ──────────── 暗线推进 + 星璇 ────────────
+
+    ch17_demon_forest:
+      title: "第十七章：魔域密林"
+      trigger: {type: "first_visit", map: "demon_forest"}
+      map: demon_forest
+      scenes:
+        - type: narration
+          text: |
+            魔域密林。天元大陆西北方向的禁地。
+
+            这里阴气弥漫，妖兽横行，
+            连空气中都带着一种令人精神恍惚的毒气。
+
+            你来这里是因为一条线索——
+            凝魂香的产地就在魔域密林深处。
+
+            如果能追查到谁在收购凝魂香，
+            也许就能揭开苍澜洲邪修事件的真相。
+
+    ch18_spy_discovered:
+      title: "第十八章：内鬼"
+      trigger: {type: "explore_count", map: "demon_forest", count: 3, tags: ["凝魂香线索"]}
+      map: demon_forest
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                追踪凝魂香的交易路线，你发现了一个惊人的事实——
+
+                这些邪物的最终买家……不是外部的邪修，
+                而是来自你所在宗门内部的人。
+
+                更准确地说，是某个内门弟子在暗中操作。
+            - speaker: null
+              text: |
+                你将这个发现告诉了韩苍。
+            - speaker: 韩苍
+              text: "内鬼？！这……这要是真的，那可是大事！"
+            - speaker: 韩苍
+              text: "师弟，这件事不能瞎说。你有多少把握？"
+            - speaker: null
+              text: |
+                你把搜集到的所有证据摆在韩苍面前。
+                他沉默了很久。
+            - speaker: 韩苍
+              text: "去找陈长老。只有他能处理这件事。"
+      rewards:
+        tags: ["发现内鬼"]
+
+    ch19_confrontation:
+      title: "第十九章：对峙"
+      trigger: {type: "sect_quest", quest_id: "expose_spy", tags: ["发现内鬼"]}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            在陈长老的安排下，一场秘密审查在宗门内部展开。
+
+            最终锁定的目标是——刘师兄。
+            内门排名第七的弟子，金丹圆满，表面上温文尔雅。
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "证据确凿。刘远，你还有什么好说的？"
+            - speaker: 刘远
+              text: "呵。陈长老，你觉得……仅凭一个外门弟子搜集的'证据'就能定我的罪？"
+            - speaker: null
+              text: |
+                刘远的笑容令人毛骨悚然。
+                他忽然爆发出远超金丹圆满的灵力——
+                那是借助邪术强行催发的力量。
+            - speaker: 刘远
+              text: "可惜了，本来还想多潜伏一段时间。"
+            - speaker: 刘远
+              text: "不过也够了。需要的东西已经到手了。"
+            - speaker: null
+              text: |
+                他从袖中取出一个漆黑的球体，猛然掷向地面——
+                黑雾弥漫，等雾散去，他已经消失了。
+
+                桌上留下一张纸条：「血煞宗，等着。」
+
+                宗门内鬼的真正身份揭晓——他是血煞宗的暗探。
+      rewards:
+        tags: ["内鬼揭露", "血煞宗暗线"]
+
+    ch20_star_fall_sea:
+      title: "第二十章：星陨之海"
+      trigger: {type: "first_visit", map: "star_fall_sea", tags: ["星力觉醒"]}
+      map: star_fall_sea
+      scenes:
+        - type: narration
+          text: |
+            星陨之海。
+
+            这里是天元大陆最神秘的区域之一，
+            天空中永远飘着星辰碎片，海面折射出五颜六色的光芒。
+
+            在这里，你遇见了她。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                她站在一块浮空的星石上，银色长发在星光中飘动。
+                她没有看你，而是看着天空，像是在与星辰对话。
+            - speaker: 星璇
+              text: "你的眼中……有星光。和我一样。"
+            - speaker: null
+              text: 她转过身来，面容绝美，但眼神中有一种超越年龄的通透。
+            - speaker: 星璇
+              text: "星辰运行有迹可循，你我的相遇，也是。"
+            - speaker: 星璇
+              text: "我叫星璇。星辰阁的人。你不需要知道更多。"
+            - speaker: 星璇
+              text: "只需要知道——某一天，你会需要我的帮助。那一天来临时，来星陨之海找我。"
+      rewards:
+        tags: ["星璇初遇"]
+
+    # ──────────── 古战场 + 卷二终章 ────────────
+
+    ch21_ancient_battlefield:
+      title: "第二十一章：古战场"
+      trigger: {type: "first_visit", map: "ancient_battlefield"}
+      map: ancient_battlefield
+      scenes:
+        - type: narration
+          text: |
+            古战场遗迹。
+
+            这里曾是上古大能厮杀的地方，
+            空气中至今残留着令人窒息的战意。
+            断刀残剑插在焦黑的土地上，
+            每一把都在无声地诉说着当年的惨烈。
+
+    ch22_mo_wuchang:
+      title: "第二十二章：失败者的忠告"
+      trigger: {type: "explore_complete", map: "ancient_battlefield", tags: ["枯骨玉佩"]}
+      map: ancient_battlefield
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                古战场遗迹深处，你遇到了一个苍老的修士。
+                他坐在一块巨石上，浑身散发着三种截然不同的道韵——
+                恒、逆、衍，三道并存，却又相互撕扯。
+            - speaker: 墨无常
+              text: "三道融合……你也想走这条路？"
+            - speaker: 墨无常
+              text: "看看我。这就是三道融合失败的下场。"
+            - speaker: null
+              text: |
+                他的身体在缓慢地崩溃——三种道韵在体内打架，
+                每时每刻都在消耗他的生命。
+            - speaker: 墨无常
+              text: "那个叫沈无极的小子……他或许能成功。因为他有鸿蒙珠。"
+            - speaker: 墨无常
+              text: "但你不一样。你没有鸿蒙珠。所以——选一条道，走到底。"
+            - speaker: 墨无常
+              text: "恒道厚积薄发，逆道逆天改命，衍道万物衍化。哪条都行。但只能选一条。"
+      rewards:
+        tags: ["墨无常忠告"]
+
+    ch23_jindan_material:
+      title: "第二十三章：金丹之基"
+      trigger: {type: "realm_reach", realm: 13}
+      map: any
+      scenes:
+        - type: narration
+          text: |
+            金丹圆满。
+
+            你感到丹田中的灵力已经达到了某种极限。
+            金丹在丹田中缓缓旋转，表面出现了细密的裂纹。
+
+            这不是损伤——这是突破的前兆。
+            金丹破碎，元婴便在碎片中诞生。
+
+            但元婴突破需要「元婴结晶」——一种极为稀有的材料。
+        - type: dialogue
+          lines:
+            - speaker: 陈长老
+              text: "元婴结晶……不是轻易能得到的东西。"
+            - speaker: 陈长老
+              text: "传闻星陨秘境深处有产出。但那个地方……连元婴修士进去都是九死一生。"
+            - speaker: 陈长老
+              text: "你现在还不能去。先积攒实力，等机缘到来。"
+      rewards:
+        tags: ["元婴材料线索"]
+
+    ch24_shen_wuji_return:
+      title: "第二十四章：故人重逢"
+      trigger: {type: "realm_reach", realm: 13, tags: ["卷一完结"]}
+      map: tianyuan_sect_city
+      scenes:
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                宗门外，一个熟悉的身影靠在大门边的石柱上。
+
+                还是那副不紧不慢的样子，
+                还是那半个馒头。
+
+                但他的气息……变得深不可测。
+            - speaker: 沈无极
+              text: "好久不见。你变强了不少。"
+            - speaker: null
+              text: |
+                你也在打量他。
+                他的修为……你竟然看不透了。
+                上次见面时他还是筑基期，现在——
+            - speaker: 沈无极
+              text: "别看了。金丹圆满。比你快了一点点。"
+            - speaker: null
+              text: 一点点？你用了数年的时间才到金丹圆满，他一个散修——
+            - speaker: 沈无极
+              text: "珠子的功劳。三道并修的效率确实比单道快。"
+            - speaker: 沈无极
+              text: "但代价也有。我的身体……偶尔会承受不住。"
+            - speaker: null
+              text: |
+                你注意到他的手指微微颤抖——那是灵力紊乱的征兆。
+                三道并修的反噬，已经开始显现了。
+            - speaker: 沈无极
+              text: "别担心我。我来找你是有正事。"
+            - speaker: 沈无极
+              text: "苍澜洲出事了。血煞宗的人在那边搞了个大阵法，正在抽取地脉灵气。"
+            - speaker: 沈无极
+              text: "如果不阻止，整个苍澜洲的灵脉会在三个月内枯竭。"
+      rewards:
+        tags: ["沈无极重逢", "苍澜危机"]
+
+    ch25_volume2_end:
+      title: "第二十五章：风暴前夕"
+      trigger: {type: "realm_reach", realm: 13, tags: ["苍澜危机"]}
+      map: tianyuan_sect_city
+      scenes:
+        - type: narration
+          text: |
+            你面前摆着两个选择：
+
+            一、留在宗门，按部就班地积累实力，等待元婴突破的机缘。
+            二、回苍澜洲，和沈无极一起阻止血煞宗的阴谋。
+
+            陈长老的话犹在耳畔：不要急于求成。
+            但苍澜洲是你的故乡。石伯、药灵儿、张大、陈丹师……
+            那些帮助过你的人，都还在那里。
+
+            你做出了决定。
+        - type: dialogue
+          lines:
+            - speaker: null
+              text: |
+                你找到韩苍。
+            - speaker: 韩苍
+              text: "回苍澜洲？你疯了吧？血煞宗可不是闹着玩的！"
+            - speaker: 韩苍
+              text: "……算了。你什么时候做过不疯的事？"
+            - speaker: 韩苍
+              text: "我去跟长老请假。等我。"
+            - speaker: null
+              text: |
+                你又找到了楚千殇。
+            - speaker: 楚千殇
+              text: "你要去送死？"
+            - speaker: null
+              text: 你把情况说了一遍。
+            - speaker: 楚千殇
+              text: "……"
+            - speaker: 楚千殇
+              text: "万剑峰那边我说不了话。但如果你在路上遇到了天剑门的人，报我的名字。"
+            - speaker: null
+              text: |
+                这是楚千殇第一次主动帮你。
+                虽然只是一句话，但你知道它的分量。
+
+                ═══════════════════════════════
+                卷二完
+                ═══════════════════════════════
+
+                风暴即将来临。
+                你的修仙之路，从苍澜一隅走向了天元大陆的中心。
+                而更大的浪潮，正在远方酝酿。
+      rewards:
+        tags: ["卷二完结"]

@@ -4,6 +4,7 @@ import atexit
 import faulthandler
 import logging
 import os
+import shutil
 import sys
 import threading
 import time
@@ -53,12 +54,26 @@ def _project_root_from_module() -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def _ensure_dirs(project_root: str) -> tuple[str, str]:
+def _ensure_dirs(project_root: str) -> str:
     logs_dir = os.path.join(project_root, "logs")
-    log_dir = os.path.join(project_root, "log")
     os.makedirs(logs_dir, exist_ok=True)
-    os.makedirs(log_dir, exist_ok=True)
-    return logs_dir, log_dir
+    legacy_log_dir = os.path.join(project_root, "log")
+    if os.path.isdir(legacy_log_dir):
+        for name in os.listdir(legacy_log_dir):
+            src = os.path.join(legacy_log_dir, name)
+            dst = os.path.join(logs_dir, name)
+            if os.path.exists(dst):
+                continue
+            try:
+                shutil.move(src, dst)
+            except Exception:
+                continue
+        try:
+            if not os.listdir(legacy_log_dir):
+                os.rmdir(legacy_log_dir)
+        except Exception:
+            pass
+    return logs_dir
 
 
 def _rotating_file_handler(path: str, level: int) -> RotatingFileHandler:
@@ -143,23 +158,22 @@ def setup_runtime_logging(
         return logging.getLogger(service_name)
 
     project_root = project_root or _project_root_from_module()
-    logs_dir, log_dir = _ensure_dirs(project_root)
+    logs_dir = _ensure_dirs(project_root)
 
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
     logging.captureWarnings(True)
 
-    # Keep historical compatibility (`logs/`) and add explicit debug-focused files (`log/`).
+    # All runtime logs are written into a single `logs/` directory.
     root_logger.addHandler(_rotating_file_handler(os.path.join(logs_dir, f"{service_name}.log"), logging.INFO))
-    root_logger.addHandler(_rotating_file_handler(os.path.join(log_dir, f"{service_name}.log"), logging.INFO))
-    root_logger.addHandler(_rotating_file_handler(os.path.join(log_dir, f"{service_name}_errors.log"), logging.ERROR))
+    root_logger.addHandler(_rotating_file_handler(os.path.join(logs_dir, f"{service_name}_errors.log"), logging.ERROR))
 
     stats_state = _StatsState()
     root_logger.addHandler(_StatsHandler(stats_state))
 
     # Persist fatal native crashes (segfault, abort) to file for post-mortem debug.
     try:
-        fatal_path = os.path.join(log_dir, f"{service_name}_fatal.log")
+        fatal_path = os.path.join(logs_dir, f"{service_name}_fatal.log")
         fatal_stream = open(fatal_path, "a", encoding="utf-8")
         faulthandler.enable(fatal_stream)
         atexit.register(fatal_stream.close)

@@ -19,7 +19,7 @@ from adapters.actor_paths import compiled_actor_path_patterns
 from core.config import config
 
 
-SERVER_URL = f"http://127.0.0.1:{int(config.core_server_port)}"
+SERVER_URL = str(getattr(config, "core_server_url", "") or f"http://127.0.0.1:{int(config.core_server_port)}").rstrip("/")
 INTERNAL_API_TOKEN = str(config.internal_api_token or "").strip()
 _ACTOR_PATTERNS = compiled_actor_path_patterns()
 _HTTP_SESSION: aiohttp.ClientSession | None = None

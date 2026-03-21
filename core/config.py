@@ -9,6 +9,7 @@ import os
 import json
 import logging
 from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 
 logger = logging.getLogger("core.config")
 
@@ -132,6 +133,28 @@ class _AppConfig:
     @property
     def core_server_port(self) -> int:
         return int(self.get_nested("core_server", "port", default=11450))
+
+    @property
+    def core_server_host(self) -> str:
+        host = os.environ.get("XXBOT_CORE_SERVER_HOST") or \
+               os.environ.get("CORE_SERVER_HOST") or \
+               self.get_nested("core_server", "host", default="127.0.0.1")
+        host = str(host or "").strip()
+        return host or "127.0.0.1"
+
+    @property
+    def core_server_url(self) -> str:
+        raw = os.environ.get("XXBOT_CORE_SERVER_URL") or \
+              os.environ.get("CORE_SERVER_URL") or \
+              self.get_nested("core_server", "url", default="")
+        raw = str(raw or "").strip()
+        if raw:
+            if not raw.startswith(("http://", "https://")):
+                raw = f"http://{raw}"
+            parsed = urlparse(raw)
+            if parsed.scheme and parsed.netloc:
+                return raw.rstrip("/")
+        return f"http://{self.core_server_host}:{self.core_server_port}"
 
     @property
     def admin_panel_port(self) -> int:

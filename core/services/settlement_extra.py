@@ -187,11 +187,13 @@ def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: 
     boost_pct = float(user.get("breakthrough_boost_pct", 0) or 0)
     boost_active = boost_until > now and boost_pct > 0
 
-    cost = calculate_breakthrough_cost(current_rank)
+    bt_cfg = _breakthrough_cfg()
+    base_cost = calculate_breakthrough_cost(current_rank)
+    protect_need = _protect_material_need(current_rank, bt_cfg) if strategy == "protect" else 0
+    cost = int(base_cost + protect_need)
     threshold = get_hard_pity_threshold(current_rank)
     pity = int(user.get("breakthrough_pity", 0) or 0)
     base_rate = float(next_realm.get("break_rate", 0.0) or 0.0)
-    bt_cfg = _breakthrough_cfg()
     fire_bonus = float(bt_cfg.get("fire_bonus", 0.03) or 0.03)
     steady_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
     rate_parts = [f"基础成功率 {int(base_rate * 100)}%"]
@@ -222,8 +224,7 @@ def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: 
         rate_parts.append(f"突破丹 +{_format_ratio_percent(steady_bonus)}")
         extra_cost_text = "额外消耗: 突破丹 x1"
     elif strategy == "protect":
-        protect_need = _protect_material_need(current_rank, bt_cfg)
-        extra_cost_text = f"额外消耗: 灵石 x{protect_need}"
+        extra_cost_text = f"额外消耗: 下品灵石 x{protect_need}"
         rate_parts.append("护脉: 失败不进虚弱")
     elif strategy == "desperate":
         extra_cost_text = "额外效果: 成功额外奖励，失败惩罚更重"
@@ -241,7 +242,6 @@ def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: 
     if boost_active:
         base_for_notes = min(1.0, base_for_notes + boost_pct / 100.0)
     base_for_notes = min(1.0, base_for_notes + pity_bonus(pity))
-    protect_need = _protect_material_need(current_rank, bt_cfg)
     steady_rate = min(1.0, base_for_notes + steady_bonus)
     protect_rate = base_for_notes
     desperate_rate = base_for_notes
@@ -260,7 +260,7 @@ def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: 
     )
     strategy_notes = (
         f"稳妥突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
-        f"护脉突破：消耗下品灵石 + 灵石 x{protect_need}，成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
+        f"护脉突破：消耗下品灵石（含附加 x{protect_need}），成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
         f"生死突破：只消耗下品灵石，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重"
     )
 
@@ -273,6 +273,8 @@ def get_breakthrough_preview(*, user_id: str, use_pill: bool = False, strategy: 
             "current_realm": current_realm.get("name", "当前境界"),
             "next_realm": next_realm.get("name", "下一境界"),
             "cost_copper": int(cost),
+            "base_cost_copper": int(base_cost),
+            "extra_cost_copper": int(protect_need if strategy == "protect" else 0),
             "stamina_cost": stamina_cost,
             "success_rate": float(shown_rate),
             "success_rate_pct": int(shown_rate * 100),
@@ -789,7 +791,10 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
         )
         return {"success": False, "code": "INSUFFICIENT_EXP", "message": "修为不足，无法突破"}, 400
 
-    cost = calculate_breakthrough_cost(current_rank)
+    bt_cfg = _breakthrough_cfg()
+    base_cost = calculate_breakthrough_cost(current_rank)
+    protect_material_need = _protect_material_need(current_rank, bt_cfg) if strategy == "protect" else 0
+    cost = int(base_cost + protect_material_need)
     if user.get("copper", 0) < cost:
         log_event(
             "breakthrough",
@@ -797,7 +802,7 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
             success=False,
             rank=rank,
             reason="INSUFFICIENT_COPPER",
-            meta={"strategy": strategy, "cost": cost},
+            meta={"strategy": strategy, "cost": cost, "base_cost": base_cost, "extra_cost": protect_material_need},
         )
         return {"success": False, "code": "INSUFFICIENT_COPPER", "message": f"下品灵石不足，需要 {cost} 下品灵石"}, 400
 
@@ -814,22 +819,15 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
         )
         return {"success": False, "code": "MAX", "message": "你已达到最高境界！"}, 400
     base_rate = float(next_realm.get("break_rate", 0.0) or 0.0)
-    bt_cfg = _breakthrough_cfg()
     consume_item_id = None
     consume_item_type = None
     consume_item_qty = 0
-    protect_material_need = 0
     pill_bonus = 0.0
     if strategy == "steady":
         consume_item_id = "breakthrough_pill"
         consume_item_type = "pill"
         consume_item_qty = 1
         pill_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
-    elif strategy == "protect":
-        consume_item_id = "spirit_stone"
-        consume_item_type = "material"
-        protect_material_need = _protect_material_need(current_rank, bt_cfg)
-        consume_item_qty = protect_material_need
     hard_pity_threshold = get_hard_pity_threshold(current_rank)
 
     item_row = None
@@ -845,14 +843,14 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
                 consume_item_qty = 0
                 pill_bonus = 0.0
             else:
-                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "灵石"
+                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
                 log_event(
                     "breakthrough",
                     user_id=user_id,
                     success=False,
                     rank=rank,
                     reason="INSUFFICIENT_ITEM",
-                    meta={"strategy": strategy, "item_id": consume_item_id},
+                    meta={"strategy": strategy, "item_id": consume_item_id, "cost": cost, "base_cost": base_cost, "extra_cost": protect_material_need},
                 )
                 return {"success": False, "code": "INSUFFICIENT_ITEM", "message": f"{item_name}不足，无法使用当前冲关策略"}, 400
 
@@ -1030,14 +1028,14 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
                     "copper": int((latest or {}).get("copper", 0) or 0),
                 }, 400
             if reason == "INSUFFICIENT_ITEM":
-                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "灵石"
+                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
                 log_event(
                     "breakthrough",
                     user_id=user_id,
                     success=False,
                     rank=rank,
                     reason=reason,
-                    meta={"strategy": strategy, "item_id": consume_item_id},
+                    meta={"strategy": strategy, "item_id": consume_item_id, "cost": cost, "base_cost": base_cost, "extra_cost": protect_material_need},
                 )
                 return {"success": False, "code": "INSUFFICIENT_ITEM", "message": f"{item_name}不足，无法使用当前冲关策略"}, 400
             raise
@@ -1068,10 +1066,10 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
         if copper_reward > 0:
             resp["copper_reward"] = copper_reward
             resp["message"] += f"\n💰 生死破境额外获得 {copper_reward} 下品灵石！"
-        if item_row:
-            resp["strategy_cost_text"] = (
-                "消耗突破丹 x1" if strategy == "steady" else f"消耗灵石 x{protect_material_need}"
-            )
+        if strategy == "steady" and item_row:
+            resp["strategy_cost_text"] = "消耗突破丹 x1"
+        elif strategy == "protect" and protect_material_need > 0:
+            resp["strategy_cost_text"] = f"护脉附加消耗下品灵石 x{protect_material_need}"
         story_update = []
         try:
             story_update = track_story_action(user_id, "breakthrough_success")
@@ -1219,14 +1217,14 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
                 "copper": int((latest or {}).get("copper", 0) or 0),
             }, 400
         if reason == "INSUFFICIENT_ITEM":
-            item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "灵石"
+            item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
             log_event(
                 "breakthrough",
                 user_id=user_id,
                 success=False,
                 rank=rank,
                 reason=reason,
-                meta={"strategy": strategy, "item_id": consume_item_id},
+                meta={"strategy": strategy, "item_id": consume_item_id, "cost": cost, "base_cost": base_cost, "extra_cost": protect_material_need},
             )
             return {"success": False, "code": "INSUFFICIENT_ITEM", "message": f"{item_name}不足，无法使用当前冲关策略"}, 400
         raise
@@ -1254,10 +1252,10 @@ def settle_breakthrough(*, user_id: str, use_pill: bool, strategy: str = "normal
         "stamina_cost": stamina_cost,
         "event_title": "天劫未过，但道心未碎",
         "event_flavor": f"这次冲关虽然折戟，但你已经摸到瓶颈裂缝。当前保底进度 {pity_now}/{hard_pity_threshold}。",
-        "next_goal": "建议先恢复状态，补齐突破丹或材料，再择时再次冲关。",
+        "next_goal": "建议先恢复状态，补齐突破丹或下品灵石，再择时再次冲关。",
         "strategy_cost_text": (
             "已消耗突破丹 x1" if strategy == "steady"
-            else (f"已消耗灵石 x{protect_material_need}" if strategy == "protect" else "")
+            else (f"已额外消耗下品灵石 x{protect_material_need}" if strategy == "protect" else "")
         ),
     }
     if protect_active:

@@ -199,7 +199,7 @@ for _handler in logging.getLogger().handlers:
     _handler.addFilter(_TelegramTokenRedactionFilter())
 
 DEFAULT_SERVER_PORT = 11450
-SERVER_URL = f"http://127.0.0.1:{DEFAULT_SERVER_PORT}"
+SERVER_URL = str(getattr(config, "core_server_url", "") or f"http://127.0.0.1:{DEFAULT_SERVER_PORT}").rstrip("/")
 INTERNAL_API_TOKEN = (config.internal_api_token or "").strip()
 TELEGRAM_POLL_TIMEOUT = max(1, int(os.getenv("TELEGRAM_POLL_TIMEOUT", "3")))
 TELEGRAM_PROXY_URL = (os.getenv("TELEGRAM_PROXY_URL", "") or "").strip() or None
@@ -2551,7 +2551,7 @@ def _build_breakthrough_preview(user_data: dict, *, strategy: str = "normal") ->
         extra_cost_text = "额外消耗: 突破丹 x1"
     elif strategy == "protect":
         need = _breakthrough_protect_material_need(current_rank)
-        extra_cost_text = f"额外消耗: 灵石 x{need}"
+        extra_cost_text = f"额外消耗: 下品灵石 x{need}"
         rate_parts.append("护脉: 失败不进虚弱")
     elif strategy == "desperate":
         extra_cost_text = "额外效果: 成功额外奖励，失败惩罚更重"
@@ -2592,7 +2592,7 @@ def _build_breakthrough_strategy_notes(user_data: dict) -> str:
     desperate_rate = base_rate
     return (
         f"稳妥突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
-        f"护脉突破：消耗下品灵石 + 灵石 x{protect_need}，成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
+        f"护脉突破：消耗下品灵石（含附加 x{protect_need}），成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
         f"生死突破：只消耗下品灵石，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重"
     )
 
@@ -6673,8 +6673,8 @@ def main():
     from core.config import config as app_config
 
     global SERVER_URL
-    port = app_config.core_server_port
-    SERVER_URL = f"http://127.0.0.1:{port}"
+    SERVER_URL = str(getattr(app_config, "core_server_url", "") or f"http://127.0.0.1:{app_config.core_server_port}").rstrip("/")
+    logger.info("Telegram core API target: %s", SERVER_URL)
 
     if not _acquire_pid_lock():
         return

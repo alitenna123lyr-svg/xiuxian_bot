@@ -32,7 +32,7 @@ from core.config import config
 logger = logging.getLogger("adapters.aiogram.legacy_bridge")
 router = Router(name="aiogram_full_fsm_bridge")
 
-legacy_bot.SERVER_URL = f"http://127.0.0.1:{int(config.core_server_port)}"
+legacy_bot.SERVER_URL = str(getattr(config, "core_server_url", "") or f"http://127.0.0.1:{int(config.core_server_port)}").rstrip("/")
 legacy_bot.INTERNAL_API_TOKEN = str(config.internal_api_token or "").strip()
 
 _BOT_DATA: dict[str, Any] = {}
