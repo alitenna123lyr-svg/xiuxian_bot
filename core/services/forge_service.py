@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import random
+import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -15,6 +16,7 @@ from core.database.connection import (
     fetch_one,
     fetch_all,
     db_transaction,
+    get_sqlite,
     get_item_by_db_id,
     get_user_by_id,
     refresh_user_stamina,
@@ -26,6 +28,8 @@ from core.services.metrics_service import log_event, log_economy_ledger
 from core.utils.number import format_stamina_value
 
 logger = logging.getLogger("core.forge")
+_FORGE_SCHEMA_READY = False
+_FORGE_SCHEMA_LOCK = threading.Lock()
 
 _QUALITY_ORDER = {
     "common": 0,
@@ -34,6 +38,59 @@ _QUALITY_ORDER = {
     "divine": 3,
     "holy": 4,
 }
+
+
+def _ensure_forge_schema() -> None:
+    conn = get_sqlite()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS codex_items (
+            id SERIAL PRIMARY KEY,
+            user_id TEXT,
+            item_id TEXT,
+            first_seen_at INTEGER,
+            last_seen_at INTEGER,
+            total_obtained INTEGER DEFAULT 0,
+            UNIQUE(user_id, item_id)
+        )
+        """
+    )
+
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND table_schema = 'public'")
+    user_columns = {row[0] for row in cur.fetchall()}
+    for col_name, sql in [
+        ("stamina", "ALTER TABLE users ADD COLUMN stamina INTEGER DEFAULT 24"),
+        ("stamina_updated_at", "ALTER TABLE users ADD COLUMN stamina_updated_at INTEGER DEFAULT 0"),
+    ]:
+        if col_name not in user_columns:
+            cur.execute(sql)
+
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'items' AND table_schema = 'public'")
+    item_columns = {row[0] for row in cur.fetchall()}
+    for col_name, sql in [
+        ("mp_bonus", "ALTER TABLE items ADD COLUMN mp_bonus INTEGER DEFAULT 0"),
+        ("first_round_reduction_pct", "ALTER TABLE items ADD COLUMN first_round_reduction_pct REAL DEFAULT 0"),
+        ("crit_heal_pct", "ALTER TABLE items ADD COLUMN crit_heal_pct REAL DEFAULT 0"),
+        ("element_damage_pct", "ALTER TABLE items ADD COLUMN element_damage_pct REAL DEFAULT 0"),
+        ("low_hp_shield_pct", "ALTER TABLE items ADD COLUMN low_hp_shield_pct REAL DEFAULT 0"),
+    ]:
+        if col_name not in item_columns:
+            cur.execute(sql)
+
+    conn.commit()
+
+
+def _ensure_forge_schema_once() -> None:
+    global _FORGE_SCHEMA_READY
+    if _FORGE_SCHEMA_READY:
+        return
+    with _FORGE_SCHEMA_LOCK:
+        if _FORGE_SCHEMA_READY:
+            return
+        _ensure_forge_schema()
+        _FORGE_SCHEMA_READY = True
 
 
 def _item_display_name(item_id: str) -> str:
@@ -177,6 +234,7 @@ def forge(
     mode: str = "normal",
     request_id: Optional[str] = None,
 ) -> Tuple[Dict[str, Any], int]:
+    _ensure_forge_schema_once()
     if request_id:
         status, cached = reserve_request(request_id, user_id=user_id, action="forge")
         if status == "cached" and cached:
@@ -308,6 +366,23 @@ def forge(
             }, 400)
         log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
         return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {base_cost}"}, 400)
+    except Exception as exc:
+        logger.exception(
+            "forge unexpected error user_id=%s mode=%s request_id=%s",
+            user_id,
+            mode_key,
+            request_id,
+            exc_info=exc,
+        )
+        log_event("forge", user_id=user_id, success=False, request_id=request_id, reason="SERVER_ERROR", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return(
+            {
+                "success": False,
+                "code": "FORGE_SERVER_ERROR",
+                "message": "锻造服务异常，请稍后重试",
+            },
+            500,
+        )
 
     if drop:
         try:
@@ -353,10 +428,15 @@ def forge(
 
 
 def forge_catalog(user_id: str) -> List[Dict[str, Any]]:
-    rows = fetch_all(
-        "SELECT item_id, total_obtained FROM codex_items WHERE user_id = ? ORDER BY total_obtained DESC, last_seen_at DESC",
-        (user_id,),
-    )
+    _ensure_forge_schema_once()
+    try:
+        rows = fetch_all(
+            "SELECT item_id, total_obtained FROM codex_items WHERE user_id = ? ORDER BY total_obtained DESC, last_seen_at DESC",
+            (user_id,),
+        )
+    except Exception as exc:
+        logger.exception("forge_catalog unexpected error user_id=%s", user_id, exc_info=exc)
+        return []
     result = []
     for row in rows:
         item = get_item_by_id(row["item_id"])
@@ -383,6 +463,7 @@ def forge_targeted(
     cfg: Dict[str, Any],
     request_id: Optional[str] = None,
 ) -> Tuple[Dict[str, Any], int]:
+    _ensure_forge_schema_once()
     if request_id:
         status, cached = reserve_request(request_id, user_id=user_id, action="forge_targeted")
         if status == "cached" and cached:
@@ -472,6 +553,23 @@ def forge_targeted(
             return _dedup_return({"success": False, "code": "INSUFFICIENT_MATERIAL", "message": f"材料不足，需要 {target_mat_need} 个 {mat_name}"}, 400)
         log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="INSUFFICIENT", rank=int(user.get("rank", 1) or 1))
         return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": f"下品灵石不足，需要 {target_cost}"}, 400)
+    except Exception as exc:
+        logger.exception(
+            "forge_targeted unexpected error user_id=%s item_id=%s request_id=%s",
+            user_id,
+            item_id,
+            request_id,
+            exc_info=exc,
+        )
+        log_event("forge_targeted", user_id=user_id, success=False, request_id=request_id, reason="SERVER_ERROR", rank=int(user.get("rank", 1) or 1))
+        return _dedup_return(
+            {
+                "success": False,
+                "code": "FORGE_TARGETED_SERVER_ERROR",
+                "message": "定向锻造服务异常，请稍后重试",
+            },
+            500,
+        )
     try:
         from core.services.codex_service import ensure_item
         ensure_item(user_id, reward["item_id"], 1)
@@ -512,6 +610,7 @@ def forge_targeted(
 
 
 def decompose_item(*, user_id: str, item_db_id: int) -> Tuple[Dict[str, Any], int]:
+    _ensure_forge_schema_once()
     item = get_item_by_db_id(item_db_id)
     if not item or str(item.get("user_id")) != str(user_id):
         log_event("decompose", user_id=user_id, success=False, reason="NOT_FOUND")
@@ -566,6 +665,10 @@ def decompose_item(*, user_id: str, item_db_id: int) -> Tuple[Dict[str, Any], in
     except ValueError:
         log_event("decompose", user_id=user_id, success=False, reason="NOT_FOUND", rank=int(user.get("rank", 1) or 1))
         return {"success": False, "code": "NOT_FOUND", "message": "装备不存在"}, 404
+    except Exception as exc:
+        logger.exception("decompose unexpected error user_id=%s item_db_id=%s", user_id, item_db_id, exc_info=exc)
+        log_event("decompose", user_id=user_id, success=False, reason="SERVER_ERROR", rank=int(user.get("rank", 1) or 1))
+        return {"success": False, "code": "DECOMPOSE_SERVER_ERROR", "message": "分解服务异常，请稍后重试"}, 500
     try:
         from core.services.codex_service import ensure_item
         ensure_item(user_id, reward_mat.get("item_id"), reward_mat.get("quantity", 1))

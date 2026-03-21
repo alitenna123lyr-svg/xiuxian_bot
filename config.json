@@ -1,7 +1,7 @@
 {
   "adapters": {
-    "telegram": true,
-    "aiogram": false
+    "telegram": false,
+    "aiogram": true
   },
   "admin_panel": {
     "api_password": "change_me",

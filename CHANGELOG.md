@@ -1,8 +1,44 @@
 # 项目变更日志（Changelog）
 
-- 最后更新：2026-03-20 12:38 (UTC+8)
-- 本轮修复完成时间：2026-03-20 12:38 (UTC+8)
+- 最后更新：2026-03-21 02:07 (UTC+8)
+- 本轮修复完成时间：2026-03-21 02:07 (UTC+8)
 - 维护规则：新记录写在最前；每条记录必须包含“记录时间、影响范围、修改摘要”。
+
+## 2026-03-21
+
+### [29] 商店支持输入数量批量购买
+- 记录时间：2026-03-21 02:07 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`。
+- 修改摘要：
+  - 商店点击商品后不再直接购买 1 个，改为弹出输入框让玩家输入购买数量（1-999）。
+  - 新增购买数量输入状态处理，支持“取消购买”、非法数量重试、下单后返回商店分类。
+  - 增加商店分类记忆，批量购买后“返回商店”保持当前分类视图。
+
+### [28] 炼丹/锻造 Internal Server Error 修复（结构自检 + 异常兜底）
+- 记录时间：2026-03-21 01:55 (UTC+8)
+- 影响范围：`core/services/alchemy_service.py`、`core/services/forge_service.py`。
+- 修改摘要：
+  - 炼丹与锻造服务新增数据库结构自检（缺表/缺列自动补齐），降低历史库结构不一致导致的 500。
+  - 炼丹新增异常兜底，返回业务错误码 `ALCHEMY_SERVER_ERROR`，避免直接抛出通用内部错误。
+  - 锻造/定向锻造/分解新增异常兜底，分别返回 `FORGE_SERVER_ERROR`、`FORGE_TARGETED_SERVER_ERROR`、`DECOMPOSE_SERVER_ERROR`。
+  - 锻造图鉴查询新增保护，异常时返回空列表，避免面板链路因单点异常中断。
+
+### [27] 背包与装备面板拆分优化 + 成就奖励展示补全
+- 记录时间：2026-03-21 01:22 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`。
+- 修改摘要：
+  - 背包中非装备物品按同类合并显示数量；装备独立为“装备背包”分页展示。
+  - 装备不合并，单件保留“装备/强化/分解”按钮，且操作后可直接回到装备背包。
+  - 已装备面板与背包跳转链路调整为“物品背包/装备背包”双入口。
+  - 成就面板补充每条成就奖励显示；领取成就后新增奖励明细回显。
+
+### [26] aiogram 适配器切换与兼容桥接接入
+- 记录时间：2026-03-21 00:40 (UTC+8)
+- 影响范围：`config.json`、`adapters/aiogram/bot.py`、`adapters/aiogram/legacy_bridge.py`、`adapters/aiogram/__init__.py`、`adapters/aiogram/ui.py`、`adapters/aiogram/services/api_client.py`、`adapters/aiogram/handlers/p1.py`、`adapters/aiogram/states/p1.py` 及对应 `__init__.py`。
+- 修改摘要：
+  - 适配器开关切换为 `aiogram=true`、`telegram=false`，避免双轮询抢占同一 Token。
+  - aiogram 主入口改为加载 legacy bridge 路由，以兼容承接原 Telegram 逻辑。
+  - 新增 aiogram 目录结构与基础模块（服务层、状态机、UI、P1 handlers）作为后续原生 FSM 迁移基底。
 
 ## 2026-03-20
 

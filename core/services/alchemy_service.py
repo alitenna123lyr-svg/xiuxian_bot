@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+import logging
 import random
+import threading
 import time
 from typing import Any, Dict, Optional, Tuple
 
 from core.database.connection import (
     fetch_one,
-    fetch_all,
     db_transaction,
+    get_sqlite,
     get_user_by_id,
     refresh_user_stamina,
     spend_user_stamina_tx,
@@ -20,6 +22,58 @@ from core.game.items import generate_pill, get_item_by_id
 from core.services.metrics_service import log_event, log_economy_ledger
 from core.utils.number import format_stamina_value
 from core.config import config
+
+logger = logging.getLogger("AlchemyService")
+_ALCHEMY_SCHEMA_READY = False
+_ALCHEMY_SCHEMA_LOCK = threading.Lock()
+
+
+def _ensure_alchemy_schema() -> None:
+    conn = get_sqlite()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS alchemy_logs (
+            id SERIAL PRIMARY KEY,
+            user_id TEXT,
+            recipe_id TEXT,
+            success INTEGER,
+            created_at INTEGER,
+            result_item_id TEXT,
+            quantity INTEGER DEFAULT 1
+        )
+        """
+    )
+
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND table_schema = 'public'")
+    user_columns = {row[0] for row in cur.fetchall()}
+    if "alchemy_output_score" not in user_columns:
+        cur.execute("ALTER TABLE users ADD COLUMN alchemy_output_score INTEGER DEFAULT 0")
+
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'items' AND table_schema = 'public'")
+    item_columns = {row[0] for row in cur.fetchall()}
+    for col_name, sql in [
+        ("mp_bonus", "ALTER TABLE items ADD COLUMN mp_bonus INTEGER DEFAULT 0"),
+        ("first_round_reduction_pct", "ALTER TABLE items ADD COLUMN first_round_reduction_pct REAL DEFAULT 0"),
+        ("crit_heal_pct", "ALTER TABLE items ADD COLUMN crit_heal_pct REAL DEFAULT 0"),
+        ("element_damage_pct", "ALTER TABLE items ADD COLUMN element_damage_pct REAL DEFAULT 0"),
+        ("low_hp_shield_pct", "ALTER TABLE items ADD COLUMN low_hp_shield_pct REAL DEFAULT 0"),
+    ]:
+        if col_name not in item_columns:
+            cur.execute(sql)
+
+    conn.commit()
+
+
+def _ensure_alchemy_schema_once() -> None:
+    global _ALCHEMY_SCHEMA_READY
+    if _ALCHEMY_SCHEMA_READY:
+        return
+    with _ALCHEMY_SCHEMA_LOCK:
+        if _ALCHEMY_SCHEMA_READY:
+            return
+        _ensure_alchemy_schema()
+        _ALCHEMY_SCHEMA_READY = True
 
 
 def _alchemy_mastery_profile(user: Dict[str, Any], recipe: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -52,6 +106,7 @@ def _alchemy_mastery_profile(user: Dict[str, Any], recipe: Optional[Dict[str, An
 
 
 def get_recipes_for_user(user_id: Optional[str] = None) -> Dict[str, Any]:
+    _ensure_alchemy_schema_once()
     if not user_id:
         return {"success": True, "recipes": list_recipes(1), "featured_recipe_ids": get_featured_recipe_ids(1), "category_labels": ALCHEMY_CATEGORY_LABELS}
     user = get_user_by_id(user_id)
@@ -117,6 +172,7 @@ def _deduct_material(cur, user_id: str, item_id: str, quantity: int) -> None:
 
 
 def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) -> Tuple[Dict[str, Any], int]:
+    _ensure_alchemy_schema_once()
     if request_id:
         status, cached = reserve_request(request_id, user_id=user_id, action="alchemy_brew")
         if status == "cached" and cached:
@@ -308,6 +364,31 @@ def brew_pill(user_id: str, recipe_id: str, request_id: Optional[str] = None) ->
             meta={"recipe_id": recipe_id},
         )
         return _dedup_return({"success": False, "code": "INSUFFICIENT", "message": "下品灵石不足"}, 400)
+    except Exception as exc:
+        logger.exception(
+            "brew_pill unexpected error user_id=%s recipe_id=%s request_id=%s",
+            user_id,
+            recipe_id,
+            request_id,
+            exc_info=exc,
+        )
+        log_event(
+            "alchemy_brew",
+            user_id=user_id,
+            success=False,
+            request_id=request_id,
+            rank=rank,
+            reason="SERVER_ERROR",
+            meta={"recipe_id": recipe_id},
+        )
+        return _dedup_return(
+            {
+                "success": False,
+                "code": "ALCHEMY_SERVER_ERROR",
+                "message": "炼丹服务异常，请稍后重试",
+            },
+            500,
+        )
 
     resp = {
         "success": True,
