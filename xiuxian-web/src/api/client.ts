@@ -259,16 +259,6 @@ export function brew(userId: string, recipeId: string) {
   return post('/api/alchemy/brew', { user_id: userId, recipe_id: recipeId })
 }
 
-// ── Gacha ───────────────────────────────────────
-
-export function getGachaBanners() {
-  return get('/api/gacha/banners')
-}
-
-export function gachaPull(userId: string, bannerId: string, count = 1) {
-  return post('/api/gacha/pull', { user_id: userId, banner_id: bannerId, count })
-}
-
 // ── Signin ──────────────────────────────────────
 
 export function signin(userId: string) {
