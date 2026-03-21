@@ -155,3 +155,47 @@ Traceback (most recent call last):
   File "/root/xiuxian_bot/core/game/story_volumes.py", line 15, in <module>
     import yaml
 ModuleNotFoundError: No module named 'yaml'
+2026-03-21 11:43:52,686 - core - ERROR - Unhandled core exception path=/api/sect/daily_claim method=POST
+Traceback (most recent call last):
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/root/xiuxian_bot/core/routes/sect.py", line 331, in sect_daily_claim
+    member = fetch_one(
+        "SELECT sect_id, role, daily_claimed FROM sect_members WHERE player_id = %s",
+        (user_id,)
+    )
+  File "/root/xiuxian_bot/core/database/connection.py", line 200, in fetch_one
+    cur.execute(_normalize_query_placeholders(query), params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column "daily_claimed" does not exist
+LINE 1: SELECT sect_id, role, daily_claimed FROM sect_members WHERE ...
+                              ^
+
+2026-03-21 15:29:44,260 - core - ERROR - Unhandled core exception path=/api/travel/map/1000001 method=GET
+Traceback (most recent call last):
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/root/xiuxian_bot/core/routes/travel.py", line 125, in travel_map
+    user = fetch_one(
+        "SELECT user_id, current_map, rank, stamina, dao_heng, dao_ni, dao_yan, visited_maps FROM users WHERE user_id = %s",
+        (user_id,),
+    )
+  File "/root/xiuxian_bot/core/database/connection.py", line 200, in fetch_one
+    cur.execute(_normalize_query_placeholders(query), params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/xiuxian_bot/.venv/lib/python3.13/site-packages/psycopg2/extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column "dao_heng" does not exist
+LINE 1: SELECT user_id, current_map, rank, stamina, dao_heng, dao_ni...
+                                                    ^
+

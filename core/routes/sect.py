@@ -1,6 +1,8 @@
 """Sect (guild) routes."""
 
 from flask import Blueprint, request, jsonify
+from pathlib import Path
+from typing import Any, Dict, List
 
 from core.routes._helpers import (
     error,
@@ -10,6 +12,11 @@ from core.routes._helpers import (
     resolve_actor_path_user_id,
     resolve_actor_user_id,
 )
+try:
+    import yaml  # type: ignore
+except Exception:
+    yaml = None
+
 from core.services.sect_service import (
     create_sect,
     create_branch_request,
@@ -32,6 +39,145 @@ from core.services.sect_service import (
 
 
 sect_bp = Blueprint("sect", __name__)
+
+
+STORY_SECTS_FALLBACK: List[Dict[str, Any]] = [
+    {
+        "sect_id": "tianyuan_sect",
+        "name": "天元宗",
+        "alignment": "正道",
+        "specialty": "综合型宗门，传承完整",
+        "leader": "宗主（化神后期）",
+        "notable": "主角所在宗门，陈长老为主角恩师",
+        "display_order": 1,
+    },
+    {
+        "sect_id": "taiching_sect",
+        "name": "太清宗",
+        "alignment": "正道",
+        "specialty": "恒道传承，底蕴深厚",
+        "leader": "太清掌教（大乘期）",
+        "notable": "柳清竹叛逃处，太初曾潜伏于此",
+        "display_order": 2,
+    },
+    {
+        "sect_id": "tianjian_sect",
+        "name": "天剑门",
+        "alignment": "正道",
+        "specialty": "剑道极致",
+        "leader": "剑主（大乘期）",
+        "notable": "楚千殇所属，万剑峰为标志性区域",
+        "display_order": 3,
+    },
+    {
+        "sect_id": "danding_pavilion",
+        "name": "丹鼎阁",
+        "alignment": "中立",
+        "specialty": "丹道至尊",
+        "leader": "丹圣（化神圆满）",
+        "notable": "天下丹药三成出自此处",
+        "display_order": 4,
+    },
+    {
+        "sect_id": "nixian_temple",
+        "name": "逆天殿",
+        "alignment": "邪道（后转中立）",
+        "specialty": "逆道修行，逆天改命",
+        "leader": "殿主（大乘期）",
+        "notable": "王逆为少主，天元盟约后转型为中立势力",
+        "display_order": 5,
+    },
+    {
+        "sect_id": "xingchen_pavilion",
+        "name": "星辰阁",
+        "alignment": "中立",
+        "specialty": "星象占卜，天道感知",
+        "leader": "星璇（万年星辰意志）",
+        "notable": "隐世势力，极少参与世俗纷争",
+        "display_order": 6,
+    },
+    {
+        "sect_id": "xuesha_sect",
+        "name": "血煞宗（已覆灭）",
+        "alignment": "邪道",
+        "specialty": "血道修行，以战养战",
+        "leader": "已阵亡",
+        "notable": "卷三被正道联盟剿灭",
+        "display_order": 7,
+    },
+]
+
+
+def _story_volume_path() -> Path:
+    return Path(__file__).resolve().parents[2] / "texts" / "story" / "volumes" / "volume_10_encyclopedia.yaml"
+
+
+def _load_story_fixed_sects() -> List[Dict[str, Any]]:
+    if yaml is None:
+        return [dict(row) for row in STORY_SECTS_FALLBACK]
+
+    try:
+        raw = yaml.safe_load(_story_volume_path().read_text(encoding="utf-8"))
+    except Exception:
+        return [dict(row) for row in STORY_SECTS_FALLBACK]
+
+    volume = (raw or {}).get("volume_10") if isinstance(raw, dict) else None
+    sects = (volume or {}).get("sects", {}) if isinstance(volume, dict) else {}
+    entries = sects.get("entries", {}) if isinstance(sects, dict) else {}
+    if not isinstance(entries, dict) or not entries:
+        return [dict(row) for row in STORY_SECTS_FALLBACK]
+
+    result: List[Dict[str, Any]] = []
+    for idx, (sect_id, item) in enumerate(entries.items(), start=1):
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name") or sect_id)
+        alignment = str(item.get("alignment") or "中立")
+        specialty = str(item.get("specialty") or "")
+        leader = str(item.get("leader") or "")
+        notable = str(item.get("notable") or "")
+        desc = "｜".join(x for x in (alignment, specialty, notable) if x)
+        result.append({
+            "sect_id": str(sect_id),
+            "name": name,
+            "alignment": alignment,
+            "specialty": specialty,
+            "leader": leader,
+            "notable": notable,
+            "description": desc,
+            "display_order": idx,
+        })
+
+    return result or [dict(row) for row in STORY_SECTS_FALLBACK]
+
+
+def _merge_story_with_runtime(story_rows: List[Dict[str, Any]], runtime_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    runtime_by_name = {str(row.get("name") or ""): row for row in runtime_rows}
+
+    merged: List[Dict[str, Any]] = []
+    for row in story_rows:
+        name = str(row.get("name") or "")
+        runtime = runtime_by_name.get(name)
+
+        item = dict(row)
+        item["is_story_fixed"] = True
+        item.setdefault("description", "｜".join(x for x in (item.get("alignment"), item.get("specialty"), item.get("notable")) if x))
+
+        if runtime:
+            item["runtime_sect_id"] = runtime.get("sect_id")
+            item["level"] = int(runtime.get("level", runtime.get("sect_level", 1)) or 1)
+            item["exp"] = int(runtime.get("exp", 0) or 0)
+            item["max_members"] = int(runtime.get("max_members", 0) or 0)
+            item["branch_count"] = int(runtime.get("branch_count", 0) or 0)
+        else:
+            item.setdefault("level", 1)
+            item.setdefault("exp", 0)
+            item.setdefault("max_members", 0)
+            item.setdefault("branch_count", 0)
+
+        merged.append(item)
+
+    return merged
 
 
 def _parse_bool_strict(value, *, default: bool = False):
@@ -72,10 +218,33 @@ def sect_create():
 
 @sect_bp.route("/api/sect/list", methods=["GET"])
 def sect_list():
-    limit = request.args.get("limit", 20)
-    keyword = request.args.get("keyword")
-    entries = list_sects(limit=limit, keyword=keyword)
-    return success(sects=entries)
+    raw_limit = request.args.get("limit", 20)
+    keyword = (request.args.get("keyword") or "").strip()
+    fixed_only = (request.args.get("fixed_only", "1") or "1").strip().lower() in ("1", "true", "yes", "on")
+
+    try:
+        limit = max(1, min(int(raw_limit or 20), 100))
+    except (TypeError, ValueError):
+        limit = 20
+
+    runtime_entries = list_sects(limit=max(limit, 50), keyword=keyword or None)
+    story_entries = _load_story_fixed_sects()
+    merged_story = _merge_story_with_runtime(story_entries, runtime_entries)
+
+    if keyword:
+        k = keyword.lower()
+
+        def _match_story(row: Dict[str, Any]) -> bool:
+            return any(k in str(row.get(field, "")).lower() for field in ("name", "alignment", "specialty", "leader", "notable", "description"))
+
+        merged_story = [row for row in merged_story if _match_story(row)]
+
+    if fixed_only:
+        return success(sects=merged_story[:limit], source="story_fixed")
+
+    story_names = {str(row.get("name") or "") for row in merged_story}
+    extras = [row for row in runtime_entries if str(row.get("name") or "") not in story_names]
+    return success(sects=(merged_story + extras)[:limit], source="story_plus_runtime")
 
 
 @sect_bp.route("/api/sect/<sect_id>", methods=["GET"])

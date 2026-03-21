@@ -4290,3 +4290,1371 @@ Original description: Too Many Requests: retry after 24
 2026-03-21 11:41:57,942 - aiogram.event - INFO - Update id=261501481 is handled. Duration 673 ms by bot id=8749053931
 2026-03-21 11:42:06,515 - aiogram.event - INFO - Update id=261501482 is handled. Duration 677 ms by bot id=8749053931
 2026-03-21 11:42:06,515 - aiogram.event - INFO - Update id=261501482 is handled. Duration 677 ms by bot id=8749053931
+2026-03-21 11:42:16,384 - aiogram.event - INFO - Update id=261501483 is handled. Duration 673 ms by bot id=8749053931
+2026-03-21 11:42:16,384 - aiogram.event - INFO - Update id=261501483 is handled. Duration 673 ms by bot id=8749053931
+2026-03-21 11:42:27,020 - aiogram.event - INFO - Update id=261501484 is handled. Duration 662 ms by bot id=8749053931
+2026-03-21 11:42:27,020 - aiogram.event - INFO - Update id=261501484 is handled. Duration 662 ms by bot id=8749053931
+2026-03-21 11:42:34,558 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 11:42:34,558 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 11:42:34,558 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 11:42:34,558 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 11:42:34,559 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 11:42:34,559 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 11:42:34,809 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 11:42:34,809 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 11:42:36,599 - telegram - INFO - runtime_logging_enabled pid=48281 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:36,602 - aiogram - INFO - runtime_logging_enabled pid=48281 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:36,602 - aiogram - INFO - runtime_logging_enabled pid=48281 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:36,611 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 11:42:36,611 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 11:42:36,611 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 11:42:36,611 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 11:42:36,680 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 11:42:36,680 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 11:42:47,320 - aiogram.event - INFO - Update id=261501485 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 11:42:47,320 - aiogram.event - INFO - Update id=261501485 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 11:42:52,483 - aiogram.event - INFO - Update id=261501487 is handled. Duration 645 ms by bot id=8749053931
+2026-03-21 11:42:52,483 - aiogram.event - INFO - Update id=261501487 is handled. Duration 645 ms by bot id=8749053931
+2026-03-21 11:42:52,489 - aiogram.event - INFO - Update id=261501486 is handled. Duration 671 ms by bot id=8749053931
+2026-03-21 11:42:52,489 - aiogram.event - INFO - Update id=261501486 is handled. Duration 671 ms by bot id=8749053931
+2026-03-21 11:42:56,160 - aiogram.event - INFO - Update id=261501488 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 11:42:56,160 - aiogram.event - INFO - Update id=261501488 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 11:43:00,586 - aiogram.event - INFO - Update id=261501489 is handled. Duration 677 ms by bot id=8749053931
+2026-03-21 11:43:00,586 - aiogram.event - INFO - Update id=261501489 is handled. Duration 677 ms by bot id=8749053931
+2026-03-21 11:43:05,989 - aiogram.event - INFO - Update id=261501490 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 11:43:05,989 - aiogram.event - INFO - Update id=261501490 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 11:43:14,609 - aiogram.event - INFO - Update id=261501491 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:43:14,609 - aiogram.event - INFO - Update id=261501491 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:43:18,711 - aiogram.event - INFO - Update id=261501492 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:43:18,711 - aiogram.event - INFO - Update id=261501492 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:43:19,369 - aiogram.event - INFO - Update id=261501493 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:43:19,369 - aiogram.event - INFO - Update id=261501493 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:43:22,850 - aiogram.event - INFO - Update id=261501494 is handled. Duration 521 ms by bot id=8749053931
+2026-03-21 11:43:22,850 - aiogram.event - INFO - Update id=261501494 is handled. Duration 521 ms by bot id=8749053931
+2026-03-21 11:43:25,196 - aiogram.event - INFO - Update id=261501495 is handled. Duration 539 ms by bot id=8749053931
+2026-03-21 11:43:25,196 - aiogram.event - INFO - Update id=261501495 is handled. Duration 539 ms by bot id=8749053931
+2026-03-21 11:43:39,162 - aiogram.event - INFO - Update id=261501496 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:43:39,162 - aiogram.event - INFO - Update id=261501496 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:43:41,323 - aiogram.event - INFO - Update id=261501497 is handled. Duration 536 ms by bot id=8749053931
+2026-03-21 11:43:41,323 - aiogram.event - INFO - Update id=261501497 is handled. Duration 536 ms by bot id=8749053931
+2026-03-21 11:43:45,780 - aiogram.event - INFO - Update id=261501498 is handled. Duration 143 ms by bot id=8749053931
+2026-03-21 11:43:45,780 - aiogram.event - INFO - Update id=261501498 is handled. Duration 143 ms by bot id=8749053931
+2026-03-21 11:43:49,662 - aiogram.event - INFO - Update id=261501499 is handled. Duration 639 ms by bot id=8749053931
+2026-03-21 11:43:49,662 - aiogram.event - INFO - Update id=261501499 is handled. Duration 639 ms by bot id=8749053931
+2026-03-21 11:43:50,791 - aiogram.event - INFO - Update id=261501500 is handled. Duration 650 ms by bot id=8749053931
+2026-03-21 11:43:50,791 - aiogram.event - INFO - Update id=261501500 is handled. Duration 650 ms by bot id=8749053931
+2026-03-21 11:43:53,085 - aiogram.event - INFO - Update id=261501501 is handled. Duration 594 ms by bot id=8749053931
+2026-03-21 11:43:53,085 - aiogram.event - INFO - Update id=261501501 is handled. Duration 594 ms by bot id=8749053931
+2026-03-21 11:43:55,452 - aiogram.event - INFO - Update id=261501502 is handled. Duration 523 ms by bot id=8749053931
+2026-03-21 11:43:55,452 - aiogram.event - INFO - Update id=261501502 is handled. Duration 523 ms by bot id=8749053931
+2026-03-21 11:43:59,406 - aiogram.event - INFO - Update id=261501503 is handled. Duration 666 ms by bot id=8749053931
+2026-03-21 11:43:59,406 - aiogram.event - INFO - Update id=261501503 is handled. Duration 666 ms by bot id=8749053931
+2026-03-21 11:44:04,519 - aiogram.event - INFO - Update id=261501504 is handled. Duration 531 ms by bot id=8749053931
+2026-03-21 11:44:04,519 - aiogram.event - INFO - Update id=261501504 is handled. Duration 531 ms by bot id=8749053931
+2026-03-21 11:44:06,350 - aiogram.event - INFO - Update id=261501505 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 11:44:06,350 - aiogram.event - INFO - Update id=261501505 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 11:44:12,075 - aiogram.event - INFO - Update id=261501506 is handled. Duration 538 ms by bot id=8749053931
+2026-03-21 11:44:12,075 - aiogram.event - INFO - Update id=261501506 is handled. Duration 538 ms by bot id=8749053931
+2026-03-21 11:44:16,887 - aiogram.event - INFO - Update id=261501507 is handled. Duration 522 ms by bot id=8749053931
+2026-03-21 11:44:16,887 - aiogram.event - INFO - Update id=261501507 is handled. Duration 522 ms by bot id=8749053931
+2026-03-21 11:44:19,659 - aiogram.event - INFO - Update id=261501508 is handled. Duration 537 ms by bot id=8749053931
+2026-03-21 11:44:19,659 - aiogram.event - INFO - Update id=261501508 is handled. Duration 537 ms by bot id=8749053931
+2026-03-21 11:44:24,645 - aiogram.event - INFO - Update id=261501509 is handled. Duration 523 ms by bot id=8749053931
+2026-03-21 11:44:24,645 - aiogram.event - INFO - Update id=261501509 is handled. Duration 523 ms by bot id=8749053931
+2026-03-21 11:44:28,575 - aiogram.event - INFO - Update id=261501510 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 11:44:28,575 - aiogram.event - INFO - Update id=261501510 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 11:44:36,599 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 11:44:36,599 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 11:44:36,602 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 11:44:36,602 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 11:44:38,067 - aiogram.event - INFO - Update id=261501511 is handled. Duration 524 ms by bot id=8749053931
+2026-03-21 11:44:38,067 - aiogram.event - INFO - Update id=261501511 is handled. Duration 524 ms by bot id=8749053931
+2026-03-21 11:44:40,499 - aiogram.event - INFO - Update id=261501512 is handled. Duration 619 ms by bot id=8749053931
+2026-03-21 11:44:40,499 - aiogram.event - INFO - Update id=261501512 is handled. Duration 619 ms by bot id=8749053931
+2026-03-21 11:44:44,274 - aiogram.event - INFO - Update id=261501513 is handled. Duration 659 ms by bot id=8749053931
+2026-03-21 11:44:44,274 - aiogram.event - INFO - Update id=261501513 is handled. Duration 659 ms by bot id=8749053931
+2026-03-21 11:44:47,126 - aiogram.event - INFO - Update id=261501514 is handled. Duration 543 ms by bot id=8749053931
+2026-03-21 11:44:47,126 - aiogram.event - INFO - Update id=261501514 is handled. Duration 543 ms by bot id=8749053931
+2026-03-21 11:44:51,491 - aiogram.event - INFO - Update id=261501515 is handled. Duration 550 ms by bot id=8749053931
+2026-03-21 11:44:51,491 - aiogram.event - INFO - Update id=261501515 is handled. Duration 550 ms by bot id=8749053931
+2026-03-21 11:44:53,431 - aiogram.event - INFO - Update id=261501516 is handled. Duration 609 ms by bot id=8749053931
+2026-03-21 11:44:53,431 - aiogram.event - INFO - Update id=261501516 is handled. Duration 609 ms by bot id=8749053931
+2026-03-21 11:44:53,684 - aiogram.event - INFO - Update id=261501517 is handled. Duration 610 ms by bot id=8749053931
+2026-03-21 11:44:53,684 - aiogram.event - INFO - Update id=261501517 is handled. Duration 610 ms by bot id=8749053931
+2026-03-21 11:44:56,648 - aiogram.event - INFO - Update id=261501518 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:44:56,648 - aiogram.event - INFO - Update id=261501518 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:44:58,960 - aiogram.event - INFO - Update id=261501519 is handled. Duration 534 ms by bot id=8749053931
+2026-03-21 11:44:58,960 - aiogram.event - INFO - Update id=261501519 is handled. Duration 534 ms by bot id=8749053931
+2026-03-21 11:45:00,946 - aiogram.event - INFO - Update id=261501520 is handled. Duration 551 ms by bot id=8749053931
+2026-03-21 11:45:00,946 - aiogram.event - INFO - Update id=261501520 is handled. Duration 551 ms by bot id=8749053931
+2026-03-21 11:45:03,830 - aiogram.event - INFO - Update id=261501521 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:45:03,830 - aiogram.event - INFO - Update id=261501521 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:45:06,140 - aiogram.event - INFO - Update id=261501522 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:45:06,140 - aiogram.event - INFO - Update id=261501522 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:45:09,702 - aiogram.event - INFO - Update id=261501523 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 11:45:09,702 - aiogram.event - INFO - Update id=261501523 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 11:45:11,314 - aiogram.event - INFO - Update id=261501524 is handled. Duration 526 ms by bot id=8749053931
+2026-03-21 11:45:11,314 - aiogram.event - INFO - Update id=261501524 is handled. Duration 526 ms by bot id=8749053931
+2026-03-21 11:45:13,443 - aiogram.event - INFO - Update id=261501525 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 11:45:13,443 - aiogram.event - INFO - Update id=261501525 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 11:45:14,496 - aiogram.event - INFO - Update id=261501526 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 11:45:14,496 - aiogram.event - INFO - Update id=261501526 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 11:45:17,386 - aiogram.event - INFO - Update id=261501527 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:45:17,386 - aiogram.event - INFO - Update id=261501527 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:45:19,994 - aiogram.event - INFO - Update id=261501528 is handled. Duration 442 ms by bot id=8749053931
+2026-03-21 11:45:19,994 - aiogram.event - INFO - Update id=261501528 is handled. Duration 442 ms by bot id=8749053931
+2026-03-21 11:45:21,266 - aiogram.event - INFO - Update id=261501529 is handled. Duration 953 ms by bot id=8749053931
+2026-03-21 11:45:21,266 - aiogram.event - INFO - Update id=261501529 is handled. Duration 953 ms by bot id=8749053931
+2026-03-21 11:45:22,822 - aiogram.event - INFO - Update id=261501530 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:45:22,822 - aiogram.event - INFO - Update id=261501530 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:45:23,136 - aiogram.event - INFO - Update id=261501531 is handled. Duration 572 ms by bot id=8749053931
+2026-03-21 11:45:23,136 - aiogram.event - INFO - Update id=261501531 is handled. Duration 572 ms by bot id=8749053931
+2026-03-21 11:45:25,610 - aiogram.event - INFO - Update id=261501532 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:45:25,610 - aiogram.event - INFO - Update id=261501532 is handled. Duration 533 ms by bot id=8749053931
+2026-03-21 11:45:30,436 - aiogram.event - INFO - Update id=261501533 is handled. Duration 545 ms by bot id=8749053931
+2026-03-21 11:45:30,436 - aiogram.event - INFO - Update id=261501533 is handled. Duration 545 ms by bot id=8749053931
+2026-03-21 11:45:31,427 - aiogram.event - INFO - Update id=261501534 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 11:45:31,427 - aiogram.event - INFO - Update id=261501534 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 11:45:34,827 - aiogram.event - INFO - Update id=261501535 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 11:45:34,827 - aiogram.event - INFO - Update id=261501535 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 11:45:35,104 - aiogram.event - INFO - Update id=261501536 is handled. Duration 737 ms by bot id=8749053931
+2026-03-21 11:45:35,104 - aiogram.event - INFO - Update id=261501536 is handled. Duration 737 ms by bot id=8749053931
+2026-03-21 11:45:41,118 - aiogram.event - INFO - Update id=261501537 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 11:45:41,118 - aiogram.event - INFO - Update id=261501537 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 11:45:44,340 - aiogram.event - INFO - Update id=261501538 is handled. Duration 528 ms by bot id=8749053931
+2026-03-21 11:45:44,340 - aiogram.event - INFO - Update id=261501538 is handled. Duration 528 ms by bot id=8749053931
+2026-03-21 11:45:47,473 - aiogram.event - INFO - Update id=261501539 is handled. Duration 540 ms by bot id=8749053931
+2026-03-21 11:45:47,473 - aiogram.event - INFO - Update id=261501539 is handled. Duration 540 ms by bot id=8749053931
+2026-03-21 11:45:50,879 - aiogram.event - INFO - Update id=261501540 is handled. Duration 534 ms by bot id=8749053931
+2026-03-21 11:45:50,879 - aiogram.event - INFO - Update id=261501540 is handled. Duration 534 ms by bot id=8749053931
+2026-03-21 11:45:52,956 - aiogram.event - INFO - Update id=261501541 is handled. Duration 569 ms by bot id=8749053931
+2026-03-21 11:45:52,956 - aiogram.event - INFO - Update id=261501541 is handled. Duration 569 ms by bot id=8749053931
+2026-03-21 11:45:55,199 - aiogram.event - INFO - Update id=261501542 is handled. Duration 584 ms by bot id=8749053931
+2026-03-21 11:45:55,199 - aiogram.event - INFO - Update id=261501542 is handled. Duration 584 ms by bot id=8749053931
+2026-03-21 11:45:58,528 - aiogram.event - INFO - Update id=261501543 is handled. Duration 553 ms by bot id=8749053931
+2026-03-21 11:45:58,528 - aiogram.event - INFO - Update id=261501543 is handled. Duration 553 ms by bot id=8749053931
+2026-03-21 11:46:04,062 - aiogram.event - INFO - Update id=261501544 is handled. Duration 527 ms by bot id=8749053931
+2026-03-21 11:46:04,062 - aiogram.event - INFO - Update id=261501544 is handled. Duration 527 ms by bot id=8749053931
+2026-03-21 11:46:06,267 - aiogram.event - INFO - Update id=261501545 is handled. Duration 528 ms by bot id=8749053931
+2026-03-21 11:46:06,267 - aiogram.event - INFO - Update id=261501545 is handled. Duration 528 ms by bot id=8749053931
+2026-03-21 11:46:09,146 - aiogram.event - INFO - Update id=261501546 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:46:09,146 - aiogram.event - INFO - Update id=261501546 is handled. Duration 542 ms by bot id=8749053931
+2026-03-21 11:46:12,417 - aiogram.event - INFO - Update id=261501547 is handled. Duration 444 ms by bot id=8749053931
+2026-03-21 11:46:12,417 - aiogram.event - INFO - Update id=261501547 is handled. Duration 444 ms by bot id=8749053931
+2026-03-21 11:46:13,102 - aiogram.event - INFO - Update id=261501548 is handled. Duration 567 ms by bot id=8749053931
+2026-03-21 11:46:13,102 - aiogram.event - INFO - Update id=261501548 is handled. Duration 567 ms by bot id=8749053931
+2026-03-21 11:46:20,453 - aiogram.event - INFO - Update id=261501549 is handled. Duration 4669 ms by bot id=8749053931
+2026-03-21 11:46:20,453 - aiogram.event - INFO - Update id=261501549 is handled. Duration 4669 ms by bot id=8749053931
+2026-03-21 11:46:23,944 - aiogram.event - INFO - Update id=261501550 is handled. Duration 6851 ms by bot id=8749053931
+2026-03-21 11:46:23,944 - aiogram.event - INFO - Update id=261501550 is handled. Duration 6851 ms by bot id=8749053931
+2026-03-21 11:46:24,315 - aiogram.event - INFO - Update id=261501551 is handled. Duration 2039 ms by bot id=8749053931
+2026-03-21 11:46:24,315 - aiogram.event - INFO - Update id=261501551 is handled. Duration 2039 ms by bot id=8749053931
+2026-03-21 11:46:28,471 - aiogram.event - INFO - Update id=261501553 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 11:46:28,471 - aiogram.event - INFO - Update id=261501553 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 11:46:28,862 - aiogram.event - INFO - Update id=261501552 is handled. Duration 1249 ms by bot id=8749053931
+2026-03-21 11:46:28,862 - aiogram.event - INFO - Update id=261501552 is handled. Duration 1249 ms by bot id=8749053931
+2026-03-21 11:46:33,590 - aiogram.event - INFO - Update id=261501554 is handled. Duration 1070 ms by bot id=8749053931
+2026-03-21 11:46:33,590 - aiogram.event - INFO - Update id=261501554 is handled. Duration 1070 ms by bot id=8749053931
+2026-03-21 11:46:36,601 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 11:46:36,601 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 11:46:36,602 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 11:46:36,602 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 11:46:36,895 - aiogram.event - INFO - Update id=261501555 is handled. Duration 545 ms by bot id=8749053931
+2026-03-21 11:46:36,895 - aiogram.event - INFO - Update id=261501555 is handled. Duration 545 ms by bot id=8749053931
+2026-03-21 11:46:40,238 - aiogram.event - INFO - Update id=261501556 is handled. Duration 1016 ms by bot id=8749053931
+2026-03-21 11:46:40,238 - aiogram.event - INFO - Update id=261501556 is handled. Duration 1016 ms by bot id=8749053931
+2026-03-21 11:46:41,719 - aiogram.event - INFO - Update id=261501557 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:46:41,719 - aiogram.event - INFO - Update id=261501557 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:46:43,798 - aiogram.event - INFO - Update id=261501558 is handled. Duration 530 ms by bot id=8749053931
+2026-03-21 11:46:43,798 - aiogram.event - INFO - Update id=261501558 is handled. Duration 530 ms by bot id=8749053931
+2026-03-21 11:46:44,101 - aiogram.event - INFO - Update id=261501559 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 11:46:44,101 - aiogram.event - INFO - Update id=261501559 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 11:46:49,088 - aiogram.event - INFO - Update id=261501560 is handled. Duration 655 ms by bot id=8749053931
+2026-03-21 11:46:49,088 - aiogram.event - INFO - Update id=261501560 is handled. Duration 655 ms by bot id=8749053931
+2026-03-21 11:46:50,831 - aiogram.event - INFO - Update id=261501561 is handled. Duration 520 ms by bot id=8749053931
+2026-03-21 11:46:50,831 - aiogram.event - INFO - Update id=261501561 is handled. Duration 520 ms by bot id=8749053931
+2026-03-21 11:46:58,040 - aiogram.event - INFO - Update id=261501562 is handled. Duration 529 ms by bot id=8749053931
+2026-03-21 11:46:58,040 - aiogram.event - INFO - Update id=261501562 is handled. Duration 529 ms by bot id=8749053931
+2026-03-21 11:46:59,820 - aiogram.event - INFO - Update id=261501563 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:46:59,820 - aiogram.event - INFO - Update id=261501563 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 11:47:00,142 - aiogram.event - INFO - Update id=261501564 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:47:00,142 - aiogram.event - INFO - Update id=261501564 is handled. Duration 535 ms by bot id=8749053931
+2026-03-21 11:47:04,555 - aiogram.event - INFO - Update id=261501565 is handled. Duration 572 ms by bot id=8749053931
+2026-03-21 11:47:04,555 - aiogram.event - INFO - Update id=261501565 is handled. Duration 572 ms by bot id=8749053931
+2026-03-21 11:47:06,673 - aiogram.event - INFO - Update id=261501566 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 11:47:06,673 - aiogram.event - INFO - Update id=261501566 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 11:47:06,973 - telegram - WARNING - callback edit fallback throttled: Telegram server says - Flood control exceeded on method 'SendMessage' in chat -1003757376633. Retry in 17 seconds.
+Original description: Too Many Requests: retry after 17
+(background on this error at: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+2026-03-21 11:47:06,973 - telegram - WARNING - callback edit fallback throttled: Telegram server says - Flood control exceeded on method 'SendMessage' in chat -1003757376633. Retry in 17 seconds.
+Original description: Too Many Requests: retry after 17
+(background on this error at: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+2026-03-21 11:47:06,973 - aiogram.event - INFO - Update id=261501567 is handled. Duration 669 ms by bot id=8749053931
+2026-03-21 11:47:06,973 - aiogram.event - INFO - Update id=261501567 is handled. Duration 669 ms by bot id=8749053931
+2026-03-21 11:47:10,978 - telegram - WARNING - callback edit fallback throttled: Telegram server says - Flood control exceeded on method 'SendMessage' in chat -1003757376633. Retry in 13 seconds.
+Original description: Too Many Requests: retry after 13
+(background on this error at: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+2026-03-21 11:47:10,978 - telegram - WARNING - callback edit fallback throttled: Telegram server says - Flood control exceeded on method 'SendMessage' in chat -1003757376633. Retry in 13 seconds.
+Original description: Too Many Requests: retry after 13
+(background on this error at: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+2026-03-21 11:47:10,978 - aiogram.event - INFO - Update id=261501568 is handled. Duration 586 ms by bot id=8749053931
+2026-03-21 11:47:10,978 - aiogram.event - INFO - Update id=261501568 is handled. Duration 586 ms by bot id=8749053931
+2026-03-21 11:48:36,602 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=95 total_exceptions=0 levels={'INFO': 93, 'WARNING': 2}
+2026-03-21 11:48:36,602 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=95 total_exceptions=0 levels={'INFO': 93, 'WARNING': 2}
+2026-03-21 11:48:36,603 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=94 total_exceptions=0 levels={'INFO': 92, 'WARNING': 2}
+2026-03-21 11:48:36,603 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=94 total_exceptions=0 levels={'INFO': 92, 'WARNING': 2}
+2026-03-21 11:50:36,603 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=97 total_exceptions=0 levels={'INFO': 95, 'WARNING': 2}
+2026-03-21 11:50:36,603 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=96 total_exceptions=0 levels={'INFO': 94, 'WARNING': 2}
+2026-03-21 11:50:36,603 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=97 total_exceptions=0 levels={'INFO': 95, 'WARNING': 2}
+2026-03-21 11:50:36,603 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=96 total_exceptions=0 levels={'INFO': 94, 'WARNING': 2}
+2026-03-21 11:52:36,604 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=99 total_exceptions=0 levels={'INFO': 97, 'WARNING': 2}
+2026-03-21 11:52:36,604 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=98 total_exceptions=0 levels={'INFO': 96, 'WARNING': 2}
+2026-03-21 11:52:36,604 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=99 total_exceptions=0 levels={'INFO': 97, 'WARNING': 2}
+2026-03-21 11:52:36,604 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=98 total_exceptions=0 levels={'INFO': 96, 'WARNING': 2}
+2026-03-21 11:54:36,604 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=101 total_exceptions=0 levels={'INFO': 99, 'WARNING': 2}
+2026-03-21 11:54:36,604 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=100 total_exceptions=0 levels={'INFO': 98, 'WARNING': 2}
+2026-03-21 11:54:36,604 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=101 total_exceptions=0 levels={'INFO': 99, 'WARNING': 2}
+2026-03-21 11:54:36,604 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=100 total_exceptions=0 levels={'INFO': 98, 'WARNING': 2}
+2026-03-21 11:56:36,605 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=103 total_exceptions=0 levels={'INFO': 101, 'WARNING': 2}
+2026-03-21 11:56:36,605 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=103 total_exceptions=0 levels={'INFO': 101, 'WARNING': 2}
+2026-03-21 11:56:36,605 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=102 total_exceptions=0 levels={'INFO': 100, 'WARNING': 2}
+2026-03-21 11:56:36,605 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=102 total_exceptions=0 levels={'INFO': 100, 'WARNING': 2}
+2026-03-21 11:58:36,606 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=105 total_exceptions=0 levels={'INFO': 103, 'WARNING': 2}
+2026-03-21 11:58:36,606 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=105 total_exceptions=0 levels={'INFO': 103, 'WARNING': 2}
+2026-03-21 11:58:36,606 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=104 total_exceptions=0 levels={'INFO': 102, 'WARNING': 2}
+2026-03-21 11:58:36,606 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=104 total_exceptions=0 levels={'INFO': 102, 'WARNING': 2}
+2026-03-21 12:00:36,606 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=107 total_exceptions=0 levels={'INFO': 105, 'WARNING': 2}
+2026-03-21 12:00:36,606 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=106 total_exceptions=0 levels={'INFO': 104, 'WARNING': 2}
+2026-03-21 12:00:36,606 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=107 total_exceptions=0 levels={'INFO': 105, 'WARNING': 2}
+2026-03-21 12:00:36,606 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=106 total_exceptions=0 levels={'INFO': 104, 'WARNING': 2}
+2026-03-21 12:01:43,838 - aiogram.event - INFO - Update id=261501569 is handled. Duration 495 ms by bot id=8749053931
+2026-03-21 12:01:43,838 - aiogram.event - INFO - Update id=261501569 is handled. Duration 495 ms by bot id=8749053931
+2026-03-21 12:02:36,607 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=110 total_exceptions=0 levels={'INFO': 108, 'WARNING': 2}
+2026-03-21 12:02:36,607 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=109 total_exceptions=0 levels={'INFO': 107, 'WARNING': 2}
+2026-03-21 12:02:36,607 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=110 total_exceptions=0 levels={'INFO': 108, 'WARNING': 2}
+2026-03-21 12:02:36,607 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=109 total_exceptions=0 levels={'INFO': 107, 'WARNING': 2}
+2026-03-21 12:04:36,607 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=112 total_exceptions=0 levels={'INFO': 110, 'WARNING': 2}
+2026-03-21 12:04:36,608 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=111 total_exceptions=0 levels={'INFO': 109, 'WARNING': 2}
+2026-03-21 12:04:36,607 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=112 total_exceptions=0 levels={'INFO': 110, 'WARNING': 2}
+2026-03-21 12:04:36,608 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=111 total_exceptions=0 levels={'INFO': 109, 'WARNING': 2}
+2026-03-21 12:06:26,765 - aiogram.event - INFO - Update id=261501570 is handled. Duration 392 ms by bot id=8749053931
+2026-03-21 12:06:26,765 - aiogram.event - INFO - Update id=261501570 is handled. Duration 392 ms by bot id=8749053931
+2026-03-21 12:06:36,608 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=115 total_exceptions=0 levels={'INFO': 113, 'WARNING': 2}
+2026-03-21 12:06:36,608 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=114 total_exceptions=0 levels={'INFO': 112, 'WARNING': 2}
+2026-03-21 12:06:36,608 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=115 total_exceptions=0 levels={'INFO': 113, 'WARNING': 2}
+2026-03-21 12:06:36,608 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=114 total_exceptions=0 levels={'INFO': 112, 'WARNING': 2}
+2026-03-21 12:08:36,608 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=117 total_exceptions=0 levels={'INFO': 115, 'WARNING': 2}
+2026-03-21 12:08:36,609 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=116 total_exceptions=0 levels={'INFO': 114, 'WARNING': 2}
+2026-03-21 12:08:36,608 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=117 total_exceptions=0 levels={'INFO': 115, 'WARNING': 2}
+2026-03-21 12:08:36,609 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=116 total_exceptions=0 levels={'INFO': 114, 'WARNING': 2}
+2026-03-21 12:10:36,609 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=119 total_exceptions=0 levels={'INFO': 117, 'WARNING': 2}
+2026-03-21 12:10:36,609 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=118 total_exceptions=0 levels={'INFO': 116, 'WARNING': 2}
+2026-03-21 12:10:36,609 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=119 total_exceptions=0 levels={'INFO': 117, 'WARNING': 2}
+2026-03-21 12:10:36,609 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=118 total_exceptions=0 levels={'INFO': 116, 'WARNING': 2}
+2026-03-21 12:12:36,610 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=121 total_exceptions=0 levels={'INFO': 119, 'WARNING': 2}
+2026-03-21 12:12:36,610 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=120 total_exceptions=0 levels={'INFO': 118, 'WARNING': 2}
+2026-03-21 12:12:36,610 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=121 total_exceptions=0 levels={'INFO': 119, 'WARNING': 2}
+2026-03-21 12:12:36,610 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=120 total_exceptions=0 levels={'INFO': 118, 'WARNING': 2}
+2026-03-21 12:12:58,596 - aiogram.event - INFO - Update id=261501571 is handled. Duration 348 ms by bot id=8749053931
+2026-03-21 12:12:58,596 - aiogram.event - INFO - Update id=261501571 is handled. Duration 348 ms by bot id=8749053931
+2026-03-21 12:13:03,339 - aiogram.event - INFO - Update id=261501572 is handled. Duration 295 ms by bot id=8749053931
+2026-03-21 12:13:03,339 - aiogram.event - INFO - Update id=261501572 is handled. Duration 295 ms by bot id=8749053931
+2026-03-21 12:13:05,130 - aiogram.event - INFO - Update id=261501573 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 12:13:05,130 - aiogram.event - INFO - Update id=261501573 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 12:13:14,785 - aiogram.event - INFO - Update id=261501574 is handled. Duration 294 ms by bot id=8749053931
+2026-03-21 12:13:14,785 - aiogram.event - INFO - Update id=261501574 is handled. Duration 294 ms by bot id=8749053931
+2026-03-21 12:13:16,505 - aiogram.event - INFO - Update id=261501575 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 12:13:16,505 - aiogram.event - INFO - Update id=261501575 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 12:13:19,705 - aiogram.event - INFO - Update id=261501576 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 12:13:19,705 - aiogram.event - INFO - Update id=261501576 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 12:13:21,228 - aiogram.event - INFO - Update id=261501577 is handled. Duration 326 ms by bot id=8749053931
+2026-03-21 12:13:21,228 - aiogram.event - INFO - Update id=261501577 is handled. Duration 326 ms by bot id=8749053931
+2026-03-21 12:13:25,313 - aiogram.event - INFO - Update id=261501578 is handled. Duration 302 ms by bot id=8749053931
+2026-03-21 12:13:25,313 - aiogram.event - INFO - Update id=261501578 is handled. Duration 302 ms by bot id=8749053931
+2026-03-21 12:13:27,280 - aiogram.event - INFO - Update id=261501579 is handled. Duration 324 ms by bot id=8749053931
+2026-03-21 12:13:27,280 - aiogram.event - INFO - Update id=261501579 is handled. Duration 324 ms by bot id=8749053931
+2026-03-21 12:13:28,942 - aiogram.event - INFO - Update id=261501580 is handled. Duration 313 ms by bot id=8749053931
+2026-03-21 12:13:28,942 - aiogram.event - INFO - Update id=261501580 is handled. Duration 313 ms by bot id=8749053931
+2026-03-21 12:13:30,202 - aiogram.event - INFO - Update id=261501581 is handled. Duration 348 ms by bot id=8749053931
+2026-03-21 12:13:30,202 - aiogram.event - INFO - Update id=261501581 is handled. Duration 348 ms by bot id=8749053931
+2026-03-21 12:13:32,359 - aiogram.event - INFO - Update id=261501582 is handled. Duration 322 ms by bot id=8749053931
+2026-03-21 12:13:32,359 - aiogram.event - INFO - Update id=261501582 is handled. Duration 322 ms by bot id=8749053931
+2026-03-21 12:13:44,316 - aiogram.event - INFO - Update id=261501583 is handled. Duration 140 ms by bot id=8749053931
+2026-03-21 12:13:44,316 - aiogram.event - INFO - Update id=261501583 is handled. Duration 140 ms by bot id=8749053931
+2026-03-21 12:13:45,345 - aiogram.event - INFO - Update id=261501584 is handled. Duration 315 ms by bot id=8749053931
+2026-03-21 12:13:45,345 - aiogram.event - INFO - Update id=261501584 is handled. Duration 315 ms by bot id=8749053931
+2026-03-21 12:13:47,292 - aiogram.event - INFO - Update id=261501585 is handled. Duration 396 ms by bot id=8749053931
+2026-03-21 12:13:47,292 - aiogram.event - INFO - Update id=261501585 is handled. Duration 396 ms by bot id=8749053931
+2026-03-21 12:13:53,606 - aiogram.event - INFO - Update id=261501586 is handled. Duration 313 ms by bot id=8749053931
+2026-03-21 12:13:53,606 - aiogram.event - INFO - Update id=261501586 is handled. Duration 313 ms by bot id=8749053931
+2026-03-21 12:13:55,128 - aiogram.event - INFO - Update id=261501587 is handled. Duration 311 ms by bot id=8749053931
+2026-03-21 12:13:55,128 - aiogram.event - INFO - Update id=261501587 is handled. Duration 311 ms by bot id=8749053931
+2026-03-21 12:14:03,357 - aiogram.event - INFO - Update id=261501588 is handled. Duration 164 ms by bot id=8749053931
+2026-03-21 12:14:03,357 - aiogram.event - INFO - Update id=261501588 is handled. Duration 164 ms by bot id=8749053931
+2026-03-21 12:14:15,016 - aiogram.event - INFO - Update id=261501589 is handled. Duration 166 ms by bot id=8749053931
+2026-03-21 12:14:15,016 - aiogram.event - INFO - Update id=261501589 is handled. Duration 166 ms by bot id=8749053931
+2026-03-21 12:14:22,649 - aiogram.event - INFO - Update id=261501590 is handled. Duration 160 ms by bot id=8749053931
+2026-03-21 12:14:22,649 - aiogram.event - INFO - Update id=261501590 is handled. Duration 160 ms by bot id=8749053931
+2026-03-21 12:14:36,610 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=143 total_exceptions=0 levels={'INFO': 141, 'WARNING': 2}
+2026-03-21 12:14:36,611 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=142 total_exceptions=0 levels={'INFO': 140, 'WARNING': 2}
+2026-03-21 12:14:36,610 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=143 total_exceptions=0 levels={'INFO': 141, 'WARNING': 2}
+2026-03-21 12:14:36,611 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=142 total_exceptions=0 levels={'INFO': 140, 'WARNING': 2}
+2026-03-21 12:14:36,871 - aiogram.event - INFO - Update id=261501591 is handled. Duration 173 ms by bot id=8749053931
+2026-03-21 12:14:36,871 - aiogram.event - INFO - Update id=261501591 is handled. Duration 173 ms by bot id=8749053931
+2026-03-21 12:14:52,215 - aiogram.event - INFO - Update id=261501592 is handled. Duration 158 ms by bot id=8749053931
+2026-03-21 12:14:52,215 - aiogram.event - INFO - Update id=261501592 is handled. Duration 158 ms by bot id=8749053931
+2026-03-21 12:15:12,374 - aiogram.event - INFO - Update id=261501593 is handled. Duration 196 ms by bot id=8749053931
+2026-03-21 12:15:12,374 - aiogram.event - INFO - Update id=261501593 is handled. Duration 196 ms by bot id=8749053931
+2026-03-21 12:16:36,611 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=148 total_exceptions=0 levels={'INFO': 146, 'WARNING': 2}
+2026-03-21 12:16:36,611 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=148 total_exceptions=0 levels={'INFO': 146, 'WARNING': 2}
+2026-03-21 12:16:36,612 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=148 total_exceptions=0 levels={'INFO': 146, 'WARNING': 2}
+2026-03-21 12:16:36,612 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=148 total_exceptions=0 levels={'INFO': 146, 'WARNING': 2}
+2026-03-21 12:18:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=150 total_exceptions=0 levels={'INFO': 148, 'WARNING': 2}
+2026-03-21 12:18:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=150 total_exceptions=0 levels={'INFO': 148, 'WARNING': 2}
+2026-03-21 12:18:36,613 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=150 total_exceptions=0 levels={'INFO': 148, 'WARNING': 2}
+2026-03-21 12:18:36,613 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=150 total_exceptions=0 levels={'INFO': 148, 'WARNING': 2}
+2026-03-21 12:20:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=152 total_exceptions=0 levels={'INFO': 150, 'WARNING': 2}
+2026-03-21 12:20:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=152 total_exceptions=0 levels={'INFO': 150, 'WARNING': 2}
+2026-03-21 12:20:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=152 total_exceptions=0 levels={'INFO': 150, 'WARNING': 2}
+2026-03-21 12:20:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=152 total_exceptions=0 levels={'INFO': 150, 'WARNING': 2}
+2026-03-21 12:22:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=154 total_exceptions=0 levels={'INFO': 152, 'WARNING': 2}
+2026-03-21 12:22:36,612 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=154 total_exceptions=0 levels={'INFO': 152, 'WARNING': 2}
+2026-03-21 12:22:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=154 total_exceptions=0 levels={'INFO': 152, 'WARNING': 2}
+2026-03-21 12:22:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=154 total_exceptions=0 levels={'INFO': 152, 'WARNING': 2}
+2026-03-21 12:24:36,613 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=156 total_exceptions=0 levels={'INFO': 154, 'WARNING': 2}
+2026-03-21 12:24:36,613 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=156 total_exceptions=0 levels={'INFO': 154, 'WARNING': 2}
+2026-03-21 12:24:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=156 total_exceptions=0 levels={'INFO': 154, 'WARNING': 2}
+2026-03-21 12:24:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=156 total_exceptions=0 levels={'INFO': 154, 'WARNING': 2}
+2026-03-21 12:26:36,425 - aiogram.event - INFO - Update id=261501594 is handled. Duration 687 ms by bot id=8749053931
+2026-03-21 12:26:36,425 - aiogram.event - INFO - Update id=261501594 is handled. Duration 687 ms by bot id=8749053931
+2026-03-21 12:26:36,614 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=159 total_exceptions=0 levels={'INFO': 157, 'WARNING': 2}
+2026-03-21 12:26:36,614 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=159 total_exceptions=0 levels={'INFO': 157, 'WARNING': 2}
+2026-03-21 12:26:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=159 total_exceptions=0 levels={'INFO': 157, 'WARNING': 2}
+2026-03-21 12:26:36,614 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=159 total_exceptions=0 levels={'INFO': 157, 'WARNING': 2}
+2026-03-21 12:26:57,482 - aiogram.event - INFO - Update id=261501595 is handled. Duration 719 ms by bot id=8749053931
+2026-03-21 12:26:57,482 - aiogram.event - INFO - Update id=261501595 is handled. Duration 719 ms by bot id=8749053931
+2026-03-21 12:27:14,099 - aiogram.event - INFO - Update id=261501596 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 12:27:14,099 - aiogram.event - INFO - Update id=261501596 is handled. Duration 681 ms by bot id=8749053931
+2026-03-21 12:28:06,680 - aiogram.event - INFO - Update id=261501597 is handled. Duration 617 ms by bot id=8749053931
+2026-03-21 12:28:06,680 - aiogram.event - INFO - Update id=261501597 is handled. Duration 617 ms by bot id=8749053931
+2026-03-21 12:28:36,614 - telegram.runtime - INFO - runtime_stats uptime_s=2760 total_records=164 total_exceptions=0 levels={'INFO': 162, 'WARNING': 2}
+2026-03-21 12:28:36,615 - aiogram.runtime - INFO - runtime_stats uptime_s=2760 total_records=163 total_exceptions=0 levels={'INFO': 161, 'WARNING': 2}
+2026-03-21 12:28:36,614 - telegram.runtime - INFO - runtime_stats uptime_s=2760 total_records=164 total_exceptions=0 levels={'INFO': 162, 'WARNING': 2}
+2026-03-21 12:28:36,615 - aiogram.runtime - INFO - runtime_stats uptime_s=2760 total_records=163 total_exceptions=0 levels={'INFO': 161, 'WARNING': 2}
+2026-03-21 12:30:36,615 - telegram.runtime - INFO - runtime_stats uptime_s=2880 total_records=166 total_exceptions=0 levels={'INFO': 164, 'WARNING': 2}
+2026-03-21 12:30:36,615 - aiogram.runtime - INFO - runtime_stats uptime_s=2880 total_records=165 total_exceptions=0 levels={'INFO': 163, 'WARNING': 2}
+2026-03-21 12:30:36,615 - telegram.runtime - INFO - runtime_stats uptime_s=2880 total_records=166 total_exceptions=0 levels={'INFO': 164, 'WARNING': 2}
+2026-03-21 12:30:36,615 - aiogram.runtime - INFO - runtime_stats uptime_s=2880 total_records=165 total_exceptions=0 levels={'INFO': 163, 'WARNING': 2}
+2026-03-21 12:32:36,615 - telegram.runtime - INFO - runtime_stats uptime_s=3000 total_records=168 total_exceptions=0 levels={'INFO': 166, 'WARNING': 2}
+2026-03-21 12:32:36,615 - telegram.runtime - INFO - runtime_stats uptime_s=3000 total_records=168 total_exceptions=0 levels={'INFO': 166, 'WARNING': 2}
+2026-03-21 12:32:36,618 - aiogram.runtime - INFO - runtime_stats uptime_s=3000 total_records=168 total_exceptions=0 levels={'INFO': 166, 'WARNING': 2}
+2026-03-21 12:32:36,618 - aiogram.runtime - INFO - runtime_stats uptime_s=3000 total_records=168 total_exceptions=0 levels={'INFO': 166, 'WARNING': 2}
+2026-03-21 12:34:36,616 - telegram.runtime - INFO - runtime_stats uptime_s=3120 total_records=170 total_exceptions=0 levels={'INFO': 168, 'WARNING': 2}
+2026-03-21 12:34:36,616 - telegram.runtime - INFO - runtime_stats uptime_s=3120 total_records=170 total_exceptions=0 levels={'INFO': 168, 'WARNING': 2}
+2026-03-21 12:34:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3120 total_records=170 total_exceptions=0 levels={'INFO': 168, 'WARNING': 2}
+2026-03-21 12:34:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3120 total_records=170 total_exceptions=0 levels={'INFO': 168, 'WARNING': 2}
+2026-03-21 12:36:36,617 - telegram.runtime - INFO - runtime_stats uptime_s=3240 total_records=172 total_exceptions=0 levels={'INFO': 170, 'WARNING': 2}
+2026-03-21 12:36:36,617 - telegram.runtime - INFO - runtime_stats uptime_s=3240 total_records=172 total_exceptions=0 levels={'INFO': 170, 'WARNING': 2}
+2026-03-21 12:36:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3240 total_records=172 total_exceptions=0 levels={'INFO': 170, 'WARNING': 2}
+2026-03-21 12:36:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3240 total_records=172 total_exceptions=0 levels={'INFO': 170, 'WARNING': 2}
+2026-03-21 12:38:36,617 - telegram.runtime - INFO - runtime_stats uptime_s=3360 total_records=174 total_exceptions=0 levels={'INFO': 172, 'WARNING': 2}
+2026-03-21 12:38:36,617 - telegram.runtime - INFO - runtime_stats uptime_s=3360 total_records=174 total_exceptions=0 levels={'INFO': 172, 'WARNING': 2}
+2026-03-21 12:38:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3360 total_records=174 total_exceptions=0 levels={'INFO': 172, 'WARNING': 2}
+2026-03-21 12:38:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3360 total_records=174 total_exceptions=0 levels={'INFO': 172, 'WARNING': 2}
+2026-03-21 12:40:36,618 - telegram.runtime - INFO - runtime_stats uptime_s=3480 total_records=176 total_exceptions=0 levels={'INFO': 174, 'WARNING': 2}
+2026-03-21 12:40:36,618 - telegram.runtime - INFO - runtime_stats uptime_s=3480 total_records=176 total_exceptions=0 levels={'INFO': 174, 'WARNING': 2}
+2026-03-21 12:40:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3480 total_records=176 total_exceptions=0 levels={'INFO': 174, 'WARNING': 2}
+2026-03-21 12:40:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3480 total_records=176 total_exceptions=0 levels={'INFO': 174, 'WARNING': 2}
+2026-03-21 12:42:36,618 - telegram.runtime - INFO - runtime_stats uptime_s=3600 total_records=178 total_exceptions=0 levels={'INFO': 176, 'WARNING': 2}
+2026-03-21 12:42:36,618 - telegram.runtime - INFO - runtime_stats uptime_s=3600 total_records=178 total_exceptions=0 levels={'INFO': 176, 'WARNING': 2}
+2026-03-21 12:42:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3600 total_records=178 total_exceptions=0 levels={'INFO': 176, 'WARNING': 2}
+2026-03-21 12:42:36,619 - aiogram.runtime - INFO - runtime_stats uptime_s=3600 total_records=178 total_exceptions=0 levels={'INFO': 176, 'WARNING': 2}
+2026-03-21 12:44:36,619 - telegram.runtime - INFO - runtime_stats uptime_s=3720 total_records=180 total_exceptions=0 levels={'INFO': 178, 'WARNING': 2}
+2026-03-21 12:44:36,619 - telegram.runtime - INFO - runtime_stats uptime_s=3720 total_records=180 total_exceptions=0 levels={'INFO': 178, 'WARNING': 2}
+2026-03-21 12:44:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3720 total_records=180 total_exceptions=0 levels={'INFO': 178, 'WARNING': 2}
+2026-03-21 12:44:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3720 total_records=180 total_exceptions=0 levels={'INFO': 178, 'WARNING': 2}
+2026-03-21 12:46:36,619 - telegram.runtime - INFO - runtime_stats uptime_s=3840 total_records=182 total_exceptions=0 levels={'INFO': 180, 'WARNING': 2}
+2026-03-21 12:46:36,619 - telegram.runtime - INFO - runtime_stats uptime_s=3840 total_records=182 total_exceptions=0 levels={'INFO': 180, 'WARNING': 2}
+2026-03-21 12:46:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3840 total_records=182 total_exceptions=0 levels={'INFO': 180, 'WARNING': 2}
+2026-03-21 12:46:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3840 total_records=182 total_exceptions=0 levels={'INFO': 180, 'WARNING': 2}
+2026-03-21 12:48:36,620 - telegram.runtime - INFO - runtime_stats uptime_s=3960 total_records=184 total_exceptions=0 levels={'INFO': 182, 'WARNING': 2}
+2026-03-21 12:48:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3960 total_records=183 total_exceptions=0 levels={'INFO': 181, 'WARNING': 2}
+2026-03-21 12:48:36,620 - telegram.runtime - INFO - runtime_stats uptime_s=3960 total_records=184 total_exceptions=0 levels={'INFO': 182, 'WARNING': 2}
+2026-03-21 12:48:36,620 - aiogram.runtime - INFO - runtime_stats uptime_s=3960 total_records=183 total_exceptions=0 levels={'INFO': 181, 'WARNING': 2}
+2026-03-21 12:50:36,621 - telegram.runtime - INFO - runtime_stats uptime_s=4080 total_records=186 total_exceptions=0 levels={'INFO': 184, 'WARNING': 2}
+2026-03-21 12:50:36,621 - aiogram.runtime - INFO - runtime_stats uptime_s=4080 total_records=185 total_exceptions=0 levels={'INFO': 183, 'WARNING': 2}
+2026-03-21 12:50:36,621 - telegram.runtime - INFO - runtime_stats uptime_s=4080 total_records=186 total_exceptions=0 levels={'INFO': 184, 'WARNING': 2}
+2026-03-21 12:50:36,621 - aiogram.runtime - INFO - runtime_stats uptime_s=4080 total_records=185 total_exceptions=0 levels={'INFO': 183, 'WARNING': 2}
+2026-03-21 12:52:36,621 - telegram.runtime - INFO - runtime_stats uptime_s=4200 total_records=188 total_exceptions=0 levels={'INFO': 186, 'WARNING': 2}
+2026-03-21 12:52:36,621 - telegram.runtime - INFO - runtime_stats uptime_s=4200 total_records=188 total_exceptions=0 levels={'INFO': 186, 'WARNING': 2}
+2026-03-21 12:52:36,622 - aiogram.runtime - INFO - runtime_stats uptime_s=4200 total_records=188 total_exceptions=0 levels={'INFO': 186, 'WARNING': 2}
+2026-03-21 12:52:36,622 - aiogram.runtime - INFO - runtime_stats uptime_s=4200 total_records=188 total_exceptions=0 levels={'INFO': 186, 'WARNING': 2}
+2026-03-21 12:54:36,622 - telegram.runtime - INFO - runtime_stats uptime_s=4320 total_records=190 total_exceptions=0 levels={'INFO': 188, 'WARNING': 2}
+2026-03-21 12:54:36,622 - aiogram.runtime - INFO - runtime_stats uptime_s=4320 total_records=189 total_exceptions=0 levels={'INFO': 187, 'WARNING': 2}
+2026-03-21 12:54:36,622 - telegram.runtime - INFO - runtime_stats uptime_s=4320 total_records=190 total_exceptions=0 levels={'INFO': 188, 'WARNING': 2}
+2026-03-21 12:54:36,622 - aiogram.runtime - INFO - runtime_stats uptime_s=4320 total_records=189 total_exceptions=0 levels={'INFO': 187, 'WARNING': 2}
+2026-03-21 12:56:36,623 - telegram.runtime - INFO - runtime_stats uptime_s=4440 total_records=192 total_exceptions=0 levels={'INFO': 190, 'WARNING': 2}
+2026-03-21 12:56:36,623 - telegram.runtime - INFO - runtime_stats uptime_s=4440 total_records=192 total_exceptions=0 levels={'INFO': 190, 'WARNING': 2}
+2026-03-21 12:56:36,624 - aiogram.runtime - INFO - runtime_stats uptime_s=4440 total_records=192 total_exceptions=0 levels={'INFO': 190, 'WARNING': 2}
+2026-03-21 12:56:36,624 - aiogram.runtime - INFO - runtime_stats uptime_s=4440 total_records=192 total_exceptions=0 levels={'INFO': 190, 'WARNING': 2}
+2026-03-21 12:58:36,624 - telegram.runtime - INFO - runtime_stats uptime_s=4560 total_records=194 total_exceptions=0 levels={'INFO': 192, 'WARNING': 2}
+2026-03-21 12:58:36,624 - aiogram.runtime - INFO - runtime_stats uptime_s=4560 total_records=193 total_exceptions=0 levels={'INFO': 191, 'WARNING': 2}
+2026-03-21 12:58:36,624 - telegram.runtime - INFO - runtime_stats uptime_s=4560 total_records=194 total_exceptions=0 levels={'INFO': 192, 'WARNING': 2}
+2026-03-21 12:58:36,624 - aiogram.runtime - INFO - runtime_stats uptime_s=4560 total_records=193 total_exceptions=0 levels={'INFO': 191, 'WARNING': 2}
+2026-03-21 13:00:36,625 - telegram.runtime - INFO - runtime_stats uptime_s=4680 total_records=196 total_exceptions=0 levels={'INFO': 194, 'WARNING': 2}
+2026-03-21 13:00:36,625 - telegram.runtime - INFO - runtime_stats uptime_s=4680 total_records=196 total_exceptions=0 levels={'INFO': 194, 'WARNING': 2}
+2026-03-21 13:00:36,626 - aiogram.runtime - INFO - runtime_stats uptime_s=4680 total_records=195 total_exceptions=0 levels={'INFO': 193, 'WARNING': 2}
+2026-03-21 13:00:36,626 - aiogram.runtime - INFO - runtime_stats uptime_s=4680 total_records=195 total_exceptions=0 levels={'INFO': 193, 'WARNING': 2}
+2026-03-21 13:02:36,626 - telegram.runtime - INFO - runtime_stats uptime_s=4800 total_records=198 total_exceptions=0 levels={'INFO': 196, 'WARNING': 2}
+2026-03-21 13:02:36,626 - aiogram.runtime - INFO - runtime_stats uptime_s=4800 total_records=197 total_exceptions=0 levels={'INFO': 195, 'WARNING': 2}
+2026-03-21 13:02:36,626 - telegram.runtime - INFO - runtime_stats uptime_s=4800 total_records=198 total_exceptions=0 levels={'INFO': 196, 'WARNING': 2}
+2026-03-21 13:02:36,626 - aiogram.runtime - INFO - runtime_stats uptime_s=4800 total_records=197 total_exceptions=0 levels={'INFO': 195, 'WARNING': 2}
+2026-03-21 13:04:36,626 - telegram.runtime - INFO - runtime_stats uptime_s=4920 total_records=200 total_exceptions=0 levels={'INFO': 198, 'WARNING': 2}
+2026-03-21 13:04:36,627 - aiogram.runtime - INFO - runtime_stats uptime_s=4920 total_records=199 total_exceptions=0 levels={'INFO': 197, 'WARNING': 2}
+2026-03-21 13:04:36,626 - telegram.runtime - INFO - runtime_stats uptime_s=4920 total_records=200 total_exceptions=0 levels={'INFO': 198, 'WARNING': 2}
+2026-03-21 13:04:36,627 - aiogram.runtime - INFO - runtime_stats uptime_s=4920 total_records=199 total_exceptions=0 levels={'INFO': 197, 'WARNING': 2}
+2026-03-21 13:06:36,627 - telegram.runtime - INFO - runtime_stats uptime_s=5040 total_records=202 total_exceptions=0 levels={'INFO': 200, 'WARNING': 2}
+2026-03-21 13:06:36,627 - aiogram.runtime - INFO - runtime_stats uptime_s=5040 total_records=201 total_exceptions=0 levels={'INFO': 199, 'WARNING': 2}
+2026-03-21 13:06:36,627 - telegram.runtime - INFO - runtime_stats uptime_s=5040 total_records=202 total_exceptions=0 levels={'INFO': 200, 'WARNING': 2}
+2026-03-21 13:06:36,627 - aiogram.runtime - INFO - runtime_stats uptime_s=5040 total_records=201 total_exceptions=0 levels={'INFO': 199, 'WARNING': 2}
+2026-03-21 13:08:36,628 - telegram.runtime - INFO - runtime_stats uptime_s=5160 total_records=204 total_exceptions=0 levels={'INFO': 202, 'WARNING': 2}
+2026-03-21 13:08:36,628 - aiogram.runtime - INFO - runtime_stats uptime_s=5160 total_records=203 total_exceptions=0 levels={'INFO': 201, 'WARNING': 2}
+2026-03-21 13:08:36,628 - telegram.runtime - INFO - runtime_stats uptime_s=5160 total_records=204 total_exceptions=0 levels={'INFO': 202, 'WARNING': 2}
+2026-03-21 13:08:36,628 - aiogram.runtime - INFO - runtime_stats uptime_s=5160 total_records=203 total_exceptions=0 levels={'INFO': 201, 'WARNING': 2}
+2026-03-21 13:10:36,629 - telegram.runtime - INFO - runtime_stats uptime_s=5280 total_records=206 total_exceptions=0 levels={'INFO': 204, 'WARNING': 2}
+2026-03-21 13:10:36,629 - aiogram.runtime - INFO - runtime_stats uptime_s=5280 total_records=205 total_exceptions=0 levels={'INFO': 203, 'WARNING': 2}
+2026-03-21 13:10:36,629 - telegram.runtime - INFO - runtime_stats uptime_s=5280 total_records=206 total_exceptions=0 levels={'INFO': 204, 'WARNING': 2}
+2026-03-21 13:10:36,629 - aiogram.runtime - INFO - runtime_stats uptime_s=5280 total_records=205 total_exceptions=0 levels={'INFO': 203, 'WARNING': 2}
+2026-03-21 13:12:36,630 - telegram.runtime - INFO - runtime_stats uptime_s=5400 total_records=208 total_exceptions=0 levels={'INFO': 206, 'WARNING': 2}
+2026-03-21 13:12:36,630 - aiogram.runtime - INFO - runtime_stats uptime_s=5400 total_records=207 total_exceptions=0 levels={'INFO': 205, 'WARNING': 2}
+2026-03-21 13:12:36,630 - telegram.runtime - INFO - runtime_stats uptime_s=5400 total_records=208 total_exceptions=0 levels={'INFO': 206, 'WARNING': 2}
+2026-03-21 13:12:36,630 - aiogram.runtime - INFO - runtime_stats uptime_s=5400 total_records=207 total_exceptions=0 levels={'INFO': 205, 'WARNING': 2}
+2026-03-21 13:14:36,631 - aiogram.runtime - INFO - runtime_stats uptime_s=5520 total_records=209 total_exceptions=0 levels={'INFO': 207, 'WARNING': 2}
+2026-03-21 13:14:36,631 - aiogram.runtime - INFO - runtime_stats uptime_s=5520 total_records=209 total_exceptions=0 levels={'INFO': 207, 'WARNING': 2}
+2026-03-21 13:14:36,631 - telegram.runtime - INFO - runtime_stats uptime_s=5520 total_records=211 total_exceptions=0 levels={'INFO': 209, 'WARNING': 2}
+2026-03-21 13:14:36,631 - telegram.runtime - INFO - runtime_stats uptime_s=5520 total_records=211 total_exceptions=0 levels={'INFO': 209, 'WARNING': 2}
+2026-03-21 13:16:36,631 - aiogram.runtime - INFO - runtime_stats uptime_s=5640 total_records=211 total_exceptions=0 levels={'INFO': 209, 'WARNING': 2}
+2026-03-21 13:16:36,631 - telegram.runtime - INFO - runtime_stats uptime_s=5640 total_records=212 total_exceptions=0 levels={'INFO': 210, 'WARNING': 2}
+2026-03-21 13:16:36,631 - aiogram.runtime - INFO - runtime_stats uptime_s=5640 total_records=211 total_exceptions=0 levels={'INFO': 209, 'WARNING': 2}
+2026-03-21 13:16:36,631 - telegram.runtime - INFO - runtime_stats uptime_s=5640 total_records=212 total_exceptions=0 levels={'INFO': 210, 'WARNING': 2}
+2026-03-21 13:17:06,479 - aiogram.event - INFO - Update id=261501598 is handled. Duration 720 ms by bot id=8749053931
+2026-03-21 13:17:06,479 - aiogram.event - INFO - Update id=261501598 is handled. Duration 720 ms by bot id=8749053931
+2026-03-21 13:17:08,816 - aiogram.event - INFO - Update id=261501599 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 13:17:08,816 - aiogram.event - INFO - Update id=261501599 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 13:17:10,440 - aiogram.event - INFO - Update id=261501600 is handled. Duration 548 ms by bot id=8749053931
+2026-03-21 13:17:10,440 - aiogram.event - INFO - Update id=261501600 is handled. Duration 548 ms by bot id=8749053931
+2026-03-21 13:17:12,027 - aiogram.event - INFO - Update id=261501601 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 13:17:12,027 - aiogram.event - INFO - Update id=261501601 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 13:18:09,589 - aiogram.event - INFO - Update id=261501602 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 13:18:09,589 - aiogram.event - INFO - Update id=261501602 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 13:18:14,989 - aiogram.event - INFO - Update id=261501603 is handled. Duration 695 ms by bot id=8749053931
+2026-03-21 13:18:14,989 - aiogram.event - INFO - Update id=261501603 is handled. Duration 695 ms by bot id=8749053931
+2026-03-21 13:18:22,556 - aiogram.event - INFO - Update id=261501604 is handled. Duration 678 ms by bot id=8749053931
+2026-03-21 13:18:22,556 - aiogram.event - INFO - Update id=261501604 is handled. Duration 678 ms by bot id=8749053931
+2026-03-21 13:18:29,482 - aiogram.event - INFO - Update id=261501605 is handled. Duration 607 ms by bot id=8749053931
+2026-03-21 13:18:29,482 - aiogram.event - INFO - Update id=261501605 is handled. Duration 607 ms by bot id=8749053931
+2026-03-21 13:18:36,632 - aiogram.runtime - INFO - runtime_stats uptime_s=5760 total_records=221 total_exceptions=0 levels={'INFO': 219, 'WARNING': 2}
+2026-03-21 13:18:36,632 - telegram.runtime - INFO - runtime_stats uptime_s=5760 total_records=222 total_exceptions=0 levels={'INFO': 220, 'WARNING': 2}
+2026-03-21 13:18:36,632 - aiogram.runtime - INFO - runtime_stats uptime_s=5760 total_records=221 total_exceptions=0 levels={'INFO': 219, 'WARNING': 2}
+2026-03-21 13:18:36,632 - telegram.runtime - INFO - runtime_stats uptime_s=5760 total_records=222 total_exceptions=0 levels={'INFO': 220, 'WARNING': 2}
+2026-03-21 13:18:45,701 - aiogram.event - INFO - Update id=261501606 is handled. Duration 555 ms by bot id=8749053931
+2026-03-21 13:18:45,701 - aiogram.event - INFO - Update id=261501606 is handled. Duration 555 ms by bot id=8749053931
+2026-03-21 13:18:49,224 - aiogram.event - INFO - Update id=261501607 is handled. Duration 595 ms by bot id=8749053931
+2026-03-21 13:18:49,224 - aiogram.event - INFO - Update id=261501607 is handled. Duration 595 ms by bot id=8749053931
+2026-03-21 13:18:55,619 - aiogram.event - INFO - Update id=261501608 is handled. Duration 693 ms by bot id=8749053931
+2026-03-21 13:18:55,619 - aiogram.event - INFO - Update id=261501608 is handled. Duration 693 ms by bot id=8749053931
+2026-03-21 13:19:00,617 - aiogram.event - INFO - Update id=261501609 is handled. Duration 554 ms by bot id=8749053931
+2026-03-21 13:19:00,617 - aiogram.event - INFO - Update id=261501609 is handled. Duration 554 ms by bot id=8749053931
+2026-03-21 13:19:02,447 - aiogram.event - INFO - Update id=261501610 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 13:19:02,447 - aiogram.event - INFO - Update id=261501610 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 13:19:05,467 - aiogram.event - INFO - Update id=261501611 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 13:19:05,467 - aiogram.event - INFO - Update id=261501611 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 13:19:12,213 - aiogram.event - INFO - Update id=261501612 is handled. Duration 722 ms by bot id=8749053931
+2026-03-21 13:19:12,213 - aiogram.event - INFO - Update id=261501612 is handled. Duration 722 ms by bot id=8749053931
+2026-03-21 13:19:18,195 - aiogram.event - INFO - Update id=261501613 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 13:19:18,195 - aiogram.event - INFO - Update id=261501613 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 13:19:21,138 - aiogram.event - INFO - Update id=261501614 is handled. Duration 612 ms by bot id=8749053931
+2026-03-21 13:19:21,138 - aiogram.event - INFO - Update id=261501614 is handled. Duration 612 ms by bot id=8749053931
+2026-03-21 13:19:32,740 - aiogram.event - INFO - Update id=261501615 is handled. Duration 549 ms by bot id=8749053931
+2026-03-21 13:19:32,740 - aiogram.event - INFO - Update id=261501615 is handled. Duration 549 ms by bot id=8749053931
+2026-03-21 13:19:38,586 - aiogram.event - INFO - Update id=261501616 is handled. Duration 715 ms by bot id=8749053931
+2026-03-21 13:19:38,586 - aiogram.event - INFO - Update id=261501616 is handled. Duration 715 ms by bot id=8749053931
+2026-03-21 13:19:43,168 - aiogram.event - INFO - Update id=261501617 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:19:43,168 - aiogram.event - INFO - Update id=261501617 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:19:46,297 - aiogram.event - INFO - Update id=261501618 is handled. Duration 556 ms by bot id=8749053931
+2026-03-21 13:19:46,297 - aiogram.event - INFO - Update id=261501618 is handled. Duration 556 ms by bot id=8749053931
+2026-03-21 13:19:48,057 - aiogram.event - INFO - Update id=261501619 is handled. Duration 568 ms by bot id=8749053931
+2026-03-21 13:19:48,057 - aiogram.event - INFO - Update id=261501619 is handled. Duration 568 ms by bot id=8749053931
+2026-03-21 13:19:50,910 - aiogram.event - INFO - Update id=261501620 is handled. Duration 586 ms by bot id=8749053931
+2026-03-21 13:19:50,910 - aiogram.event - INFO - Update id=261501620 is handled. Duration 586 ms by bot id=8749053931
+2026-03-21 13:19:53,772 - aiogram.event - INFO - Update id=261501621 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:19:53,772 - aiogram.event - INFO - Update id=261501621 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:20:03,703 - aiogram.event - INFO - Update id=261501622 is handled. Duration 676 ms by bot id=8749053931
+2026-03-21 13:20:03,703 - aiogram.event - INFO - Update id=261501622 is handled. Duration 676 ms by bot id=8749053931
+2026-03-21 13:20:05,953 - aiogram.event - INFO - Update id=261501623 is handled. Duration 575 ms by bot id=8749053931
+2026-03-21 13:20:05,953 - aiogram.event - INFO - Update id=261501623 is handled. Duration 575 ms by bot id=8749053931
+2026-03-21 13:20:07,569 - aiogram.event - INFO - Update id=261501624 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:20:07,569 - aiogram.event - INFO - Update id=261501624 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 13:20:09,551 - aiogram.event - INFO - Update id=261501625 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 13:20:09,551 - aiogram.event - INFO - Update id=261501625 is handled. Duration 566 ms by bot id=8749053931
+2026-03-21 13:20:18,236 - aiogram.event - INFO - Update id=261501626 is handled. Duration 661 ms by bot id=8749053931
+2026-03-21 13:20:18,236 - aiogram.event - INFO - Update id=261501626 is handled. Duration 661 ms by bot id=8749053931
+2026-03-21 13:20:21,012 - aiogram.event - INFO - Update id=261501627 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 13:20:21,012 - aiogram.event - INFO - Update id=261501627 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 13:20:23,503 - aiogram.event - INFO - Update id=261501628 is handled. Duration 682 ms by bot id=8749053931
+2026-03-21 13:20:23,503 - aiogram.event - INFO - Update id=261501628 is handled. Duration 682 ms by bot id=8749053931
+2026-03-21 13:20:26,164 - aiogram.event - INFO - Update id=261501629 is handled. Duration 538 ms by bot id=8749053931
+2026-03-21 13:20:26,164 - aiogram.event - INFO - Update id=261501629 is handled. Duration 538 ms by bot id=8749053931
+2026-03-21 13:20:28,470 - aiogram.event - INFO - Update id=261501630 is handled. Duration 593 ms by bot id=8749053931
+2026-03-21 13:20:28,470 - aiogram.event - INFO - Update id=261501630 is handled. Duration 593 ms by bot id=8749053931
+2026-03-21 13:20:36,628 - aiogram.event - INFO - Update id=261501631 is handled. Duration 687 ms by bot id=8749053931
+2026-03-21 13:20:36,628 - aiogram.event - INFO - Update id=261501631 is handled. Duration 687 ms by bot id=8749053931
+2026-03-21 13:20:36,632 - telegram.runtime - INFO - runtime_stats uptime_s=5880 total_records=250 total_exceptions=0 levels={'INFO': 248, 'WARNING': 2}
+2026-03-21 13:20:36,632 - aiogram.runtime - INFO - runtime_stats uptime_s=5880 total_records=249 total_exceptions=0 levels={'INFO': 247, 'WARNING': 2}
+2026-03-21 13:20:36,632 - telegram.runtime - INFO - runtime_stats uptime_s=5880 total_records=250 total_exceptions=0 levels={'INFO': 248, 'WARNING': 2}
+2026-03-21 13:20:36,632 - aiogram.runtime - INFO - runtime_stats uptime_s=5880 total_records=249 total_exceptions=0 levels={'INFO': 247, 'WARNING': 2}
+2026-03-21 13:21:02,536 - aiogram.event - INFO - Update id=261501632 is handled. Duration 694 ms by bot id=8749053931
+2026-03-21 13:21:02,536 - aiogram.event - INFO - Update id=261501632 is handled. Duration 694 ms by bot id=8749053931
+2026-03-21 13:22:36,633 - telegram.runtime - INFO - runtime_stats uptime_s=6000 total_records=253 total_exceptions=0 levels={'INFO': 251, 'WARNING': 2}
+2026-03-21 13:22:36,633 - telegram.runtime - INFO - runtime_stats uptime_s=6000 total_records=253 total_exceptions=0 levels={'INFO': 251, 'WARNING': 2}
+2026-03-21 13:22:36,633 - aiogram.runtime - INFO - runtime_stats uptime_s=6000 total_records=253 total_exceptions=0 levels={'INFO': 251, 'WARNING': 2}
+2026-03-21 13:22:36,633 - aiogram.runtime - INFO - runtime_stats uptime_s=6000 total_records=253 total_exceptions=0 levels={'INFO': 251, 'WARNING': 2}
+2026-03-21 13:22:49,065 - aiogram.event - INFO - Update id=261501633 is handled. Duration 0 ms by bot id=8749053931
+2026-03-21 13:22:49,065 - aiogram.event - INFO - Update id=261501633 is handled. Duration 0 ms by bot id=8749053931
+2026-03-21 13:24:36,633 - telegram.runtime - INFO - runtime_stats uptime_s=6120 total_records=256 total_exceptions=0 levels={'INFO': 254, 'WARNING': 2}
+2026-03-21 13:24:36,633 - telegram.runtime - INFO - runtime_stats uptime_s=6120 total_records=256 total_exceptions=0 levels={'INFO': 254, 'WARNING': 2}
+2026-03-21 13:24:36,633 - aiogram.runtime - INFO - runtime_stats uptime_s=6120 total_records=255 total_exceptions=0 levels={'INFO': 253, 'WARNING': 2}
+2026-03-21 13:24:36,633 - aiogram.runtime - INFO - runtime_stats uptime_s=6120 total_records=255 total_exceptions=0 levels={'INFO': 253, 'WARNING': 2}
+2026-03-21 13:26:36,634 - telegram.runtime - INFO - runtime_stats uptime_s=6240 total_records=258 total_exceptions=0 levels={'INFO': 256, 'WARNING': 2}
+2026-03-21 13:26:36,634 - telegram.runtime - INFO - runtime_stats uptime_s=6240 total_records=258 total_exceptions=0 levels={'INFO': 256, 'WARNING': 2}
+2026-03-21 13:26:36,634 - aiogram.runtime - INFO - runtime_stats uptime_s=6240 total_records=257 total_exceptions=0 levels={'INFO': 255, 'WARNING': 2}
+2026-03-21 13:26:36,634 - aiogram.runtime - INFO - runtime_stats uptime_s=6240 total_records=257 total_exceptions=0 levels={'INFO': 255, 'WARNING': 2}
+2026-03-21 13:28:36,635 - telegram.runtime - INFO - runtime_stats uptime_s=6360 total_records=260 total_exceptions=0 levels={'INFO': 258, 'WARNING': 2}
+2026-03-21 13:28:36,635 - aiogram.runtime - INFO - runtime_stats uptime_s=6360 total_records=259 total_exceptions=0 levels={'INFO': 257, 'WARNING': 2}
+2026-03-21 13:28:36,635 - telegram.runtime - INFO - runtime_stats uptime_s=6360 total_records=260 total_exceptions=0 levels={'INFO': 258, 'WARNING': 2}
+2026-03-21 13:28:36,635 - aiogram.runtime - INFO - runtime_stats uptime_s=6360 total_records=259 total_exceptions=0 levels={'INFO': 257, 'WARNING': 2}
+2026-03-21 13:30:36,636 - telegram.runtime - INFO - runtime_stats uptime_s=6480 total_records=262 total_exceptions=0 levels={'INFO': 260, 'WARNING': 2}
+2026-03-21 13:30:36,636 - aiogram.runtime - INFO - runtime_stats uptime_s=6480 total_records=261 total_exceptions=0 levels={'INFO': 259, 'WARNING': 2}
+2026-03-21 13:30:36,636 - telegram.runtime - INFO - runtime_stats uptime_s=6480 total_records=262 total_exceptions=0 levels={'INFO': 260, 'WARNING': 2}
+2026-03-21 13:30:36,636 - aiogram.runtime - INFO - runtime_stats uptime_s=6480 total_records=261 total_exceptions=0 levels={'INFO': 259, 'WARNING': 2}
+2026-03-21 13:32:36,636 - telegram.runtime - INFO - runtime_stats uptime_s=6600 total_records=264 total_exceptions=0 levels={'INFO': 262, 'WARNING': 2}
+2026-03-21 13:32:36,636 - telegram.runtime - INFO - runtime_stats uptime_s=6600 total_records=264 total_exceptions=0 levels={'INFO': 262, 'WARNING': 2}
+2026-03-21 13:32:36,637 - aiogram.runtime - INFO - runtime_stats uptime_s=6600 total_records=264 total_exceptions=0 levels={'INFO': 262, 'WARNING': 2}
+2026-03-21 13:32:36,637 - aiogram.runtime - INFO - runtime_stats uptime_s=6600 total_records=264 total_exceptions=0 levels={'INFO': 262, 'WARNING': 2}
+2026-03-21 13:34:36,637 - telegram.runtime - INFO - runtime_stats uptime_s=6720 total_records=266 total_exceptions=0 levels={'INFO': 264, 'WARNING': 2}
+2026-03-21 13:34:36,639 - aiogram.runtime - INFO - runtime_stats uptime_s=6720 total_records=265 total_exceptions=0 levels={'INFO': 263, 'WARNING': 2}
+2026-03-21 13:34:36,637 - telegram.runtime - INFO - runtime_stats uptime_s=6720 total_records=266 total_exceptions=0 levels={'INFO': 264, 'WARNING': 2}
+2026-03-21 13:34:36,639 - aiogram.runtime - INFO - runtime_stats uptime_s=6720 total_records=265 total_exceptions=0 levels={'INFO': 263, 'WARNING': 2}
+2026-03-21 13:36:36,640 - telegram.runtime - INFO - runtime_stats uptime_s=6840 total_records=268 total_exceptions=0 levels={'INFO': 266, 'WARNING': 2}
+2026-03-21 13:36:36,640 - aiogram.runtime - INFO - runtime_stats uptime_s=6840 total_records=267 total_exceptions=0 levels={'INFO': 265, 'WARNING': 2}
+2026-03-21 13:36:36,640 - telegram.runtime - INFO - runtime_stats uptime_s=6840 total_records=268 total_exceptions=0 levels={'INFO': 266, 'WARNING': 2}
+2026-03-21 13:36:36,640 - aiogram.runtime - INFO - runtime_stats uptime_s=6840 total_records=267 total_exceptions=0 levels={'INFO': 265, 'WARNING': 2}
+2026-03-21 13:38:36,640 - telegram.runtime - INFO - runtime_stats uptime_s=6960 total_records=270 total_exceptions=0 levels={'INFO': 268, 'WARNING': 2}
+2026-03-21 13:38:36,640 - aiogram.runtime - INFO - runtime_stats uptime_s=6960 total_records=269 total_exceptions=0 levels={'INFO': 267, 'WARNING': 2}
+2026-03-21 13:38:36,640 - telegram.runtime - INFO - runtime_stats uptime_s=6960 total_records=270 total_exceptions=0 levels={'INFO': 268, 'WARNING': 2}
+2026-03-21 13:38:36,640 - aiogram.runtime - INFO - runtime_stats uptime_s=6960 total_records=269 total_exceptions=0 levels={'INFO': 267, 'WARNING': 2}
+2026-03-21 13:40:36,641 - aiogram.runtime - INFO - runtime_stats uptime_s=7080 total_records=271 total_exceptions=0 levels={'INFO': 269, 'WARNING': 2}
+2026-03-21 13:40:36,641 - telegram.runtime - INFO - runtime_stats uptime_s=7080 total_records=272 total_exceptions=0 levels={'INFO': 270, 'WARNING': 2}
+2026-03-21 13:40:36,641 - aiogram.runtime - INFO - runtime_stats uptime_s=7080 total_records=271 total_exceptions=0 levels={'INFO': 269, 'WARNING': 2}
+2026-03-21 13:40:36,641 - telegram.runtime - INFO - runtime_stats uptime_s=7080 total_records=272 total_exceptions=0 levels={'INFO': 270, 'WARNING': 2}
+2026-03-21 13:42:36,641 - aiogram.runtime - INFO - runtime_stats uptime_s=7200 total_records=273 total_exceptions=0 levels={'INFO': 271, 'WARNING': 2}
+2026-03-21 13:42:36,641 - telegram.runtime - INFO - runtime_stats uptime_s=7200 total_records=274 total_exceptions=0 levels={'INFO': 272, 'WARNING': 2}
+2026-03-21 13:42:36,641 - aiogram.runtime - INFO - runtime_stats uptime_s=7200 total_records=273 total_exceptions=0 levels={'INFO': 271, 'WARNING': 2}
+2026-03-21 13:42:36,641 - telegram.runtime - INFO - runtime_stats uptime_s=7200 total_records=274 total_exceptions=0 levels={'INFO': 272, 'WARNING': 2}
+2026-03-21 13:44:36,642 - aiogram.runtime - INFO - runtime_stats uptime_s=7320 total_records=275 total_exceptions=0 levels={'INFO': 273, 'WARNING': 2}
+2026-03-21 13:44:36,642 - aiogram.runtime - INFO - runtime_stats uptime_s=7320 total_records=275 total_exceptions=0 levels={'INFO': 273, 'WARNING': 2}
+2026-03-21 13:44:36,642 - telegram.runtime - INFO - runtime_stats uptime_s=7320 total_records=276 total_exceptions=0 levels={'INFO': 274, 'WARNING': 2}
+2026-03-21 13:44:36,642 - telegram.runtime - INFO - runtime_stats uptime_s=7320 total_records=276 total_exceptions=0 levels={'INFO': 274, 'WARNING': 2}
+2026-03-21 13:46:36,643 - aiogram.runtime - INFO - runtime_stats uptime_s=7440 total_records=277 total_exceptions=0 levels={'INFO': 275, 'WARNING': 2}
+2026-03-21 13:46:36,643 - telegram.runtime - INFO - runtime_stats uptime_s=7440 total_records=278 total_exceptions=0 levels={'INFO': 276, 'WARNING': 2}
+2026-03-21 13:46:36,643 - aiogram.runtime - INFO - runtime_stats uptime_s=7440 total_records=277 total_exceptions=0 levels={'INFO': 275, 'WARNING': 2}
+2026-03-21 13:46:36,643 - telegram.runtime - INFO - runtime_stats uptime_s=7440 total_records=278 total_exceptions=0 levels={'INFO': 276, 'WARNING': 2}
+2026-03-21 13:48:36,643 - aiogram.runtime - INFO - runtime_stats uptime_s=7560 total_records=279 total_exceptions=0 levels={'INFO': 277, 'WARNING': 2}
+2026-03-21 13:48:36,643 - telegram.runtime - INFO - runtime_stats uptime_s=7560 total_records=280 total_exceptions=0 levels={'INFO': 278, 'WARNING': 2}
+2026-03-21 13:48:36,643 - aiogram.runtime - INFO - runtime_stats uptime_s=7560 total_records=279 total_exceptions=0 levels={'INFO': 277, 'WARNING': 2}
+2026-03-21 13:48:36,643 - telegram.runtime - INFO - runtime_stats uptime_s=7560 total_records=280 total_exceptions=0 levels={'INFO': 278, 'WARNING': 2}
+2026-03-21 13:50:36,644 - aiogram.runtime - INFO - runtime_stats uptime_s=7680 total_records=281 total_exceptions=0 levels={'INFO': 279, 'WARNING': 2}
+2026-03-21 13:50:36,644 - telegram.runtime - INFO - runtime_stats uptime_s=7680 total_records=282 total_exceptions=0 levels={'INFO': 280, 'WARNING': 2}
+2026-03-21 13:50:36,644 - aiogram.runtime - INFO - runtime_stats uptime_s=7680 total_records=281 total_exceptions=0 levels={'INFO': 279, 'WARNING': 2}
+2026-03-21 13:50:36,644 - telegram.runtime - INFO - runtime_stats uptime_s=7680 total_records=282 total_exceptions=0 levels={'INFO': 280, 'WARNING': 2}
+2026-03-21 13:52:36,644 - aiogram.runtime - INFO - runtime_stats uptime_s=7800 total_records=283 total_exceptions=0 levels={'INFO': 281, 'WARNING': 2}
+2026-03-21 13:52:36,644 - aiogram.runtime - INFO - runtime_stats uptime_s=7800 total_records=283 total_exceptions=0 levels={'INFO': 281, 'WARNING': 2}
+2026-03-21 13:52:36,645 - telegram.runtime - INFO - runtime_stats uptime_s=7800 total_records=285 total_exceptions=0 levels={'INFO': 283, 'WARNING': 2}
+2026-03-21 13:52:36,645 - telegram.runtime - INFO - runtime_stats uptime_s=7800 total_records=285 total_exceptions=0 levels={'INFO': 283, 'WARNING': 2}
+2026-03-21 13:54:36,645 - aiogram.runtime - INFO - runtime_stats uptime_s=7920 total_records=285 total_exceptions=0 levels={'INFO': 283, 'WARNING': 2}
+2026-03-21 13:54:36,645 - aiogram.runtime - INFO - runtime_stats uptime_s=7920 total_records=285 total_exceptions=0 levels={'INFO': 283, 'WARNING': 2}
+2026-03-21 13:54:36,646 - telegram.runtime - INFO - runtime_stats uptime_s=7920 total_records=287 total_exceptions=0 levels={'INFO': 285, 'WARNING': 2}
+2026-03-21 13:54:36,646 - telegram.runtime - INFO - runtime_stats uptime_s=7920 total_records=287 total_exceptions=0 levels={'INFO': 285, 'WARNING': 2}
+2026-03-21 13:56:36,645 - aiogram.runtime - INFO - runtime_stats uptime_s=8040 total_records=287 total_exceptions=0 levels={'INFO': 285, 'WARNING': 2}
+2026-03-21 13:56:36,646 - telegram.runtime - INFO - runtime_stats uptime_s=8040 total_records=288 total_exceptions=0 levels={'INFO': 286, 'WARNING': 2}
+2026-03-21 13:56:36,645 - aiogram.runtime - INFO - runtime_stats uptime_s=8040 total_records=287 total_exceptions=0 levels={'INFO': 285, 'WARNING': 2}
+2026-03-21 13:56:36,646 - telegram.runtime - INFO - runtime_stats uptime_s=8040 total_records=288 total_exceptions=0 levels={'INFO': 286, 'WARNING': 2}
+2026-03-21 13:58:36,646 - aiogram.runtime - INFO - runtime_stats uptime_s=8160 total_records=289 total_exceptions=0 levels={'INFO': 287, 'WARNING': 2}
+2026-03-21 13:58:36,646 - aiogram.runtime - INFO - runtime_stats uptime_s=8160 total_records=289 total_exceptions=0 levels={'INFO': 287, 'WARNING': 2}
+2026-03-21 13:58:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8160 total_records=291 total_exceptions=0 levels={'INFO': 289, 'WARNING': 2}
+2026-03-21 13:58:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8160 total_records=291 total_exceptions=0 levels={'INFO': 289, 'WARNING': 2}
+2026-03-21 14:00:36,647 - aiogram.runtime - INFO - runtime_stats uptime_s=8280 total_records=291 total_exceptions=0 levels={'INFO': 289, 'WARNING': 2}
+2026-03-21 14:00:36,647 - aiogram.runtime - INFO - runtime_stats uptime_s=8280 total_records=291 total_exceptions=0 levels={'INFO': 289, 'WARNING': 2}
+2026-03-21 14:00:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8280 total_records=293 total_exceptions=0 levels={'INFO': 291, 'WARNING': 2}
+2026-03-21 14:00:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8280 total_records=293 total_exceptions=0 levels={'INFO': 291, 'WARNING': 2}
+2026-03-21 14:02:36,647 - aiogram.runtime - INFO - runtime_stats uptime_s=8400 total_records=293 total_exceptions=0 levels={'INFO': 291, 'WARNING': 2}
+2026-03-21 14:02:36,647 - aiogram.runtime - INFO - runtime_stats uptime_s=8400 total_records=293 total_exceptions=0 levels={'INFO': 291, 'WARNING': 2}
+2026-03-21 14:02:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8400 total_records=295 total_exceptions=0 levels={'INFO': 293, 'WARNING': 2}
+2026-03-21 14:02:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8400 total_records=295 total_exceptions=0 levels={'INFO': 293, 'WARNING': 2}
+2026-03-21 14:04:36,648 - aiogram.runtime - INFO - runtime_stats uptime_s=8520 total_records=295 total_exceptions=0 levels={'INFO': 293, 'WARNING': 2}
+2026-03-21 14:04:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8520 total_records=296 total_exceptions=0 levels={'INFO': 294, 'WARNING': 2}
+2026-03-21 14:04:36,648 - aiogram.runtime - INFO - runtime_stats uptime_s=8520 total_records=295 total_exceptions=0 levels={'INFO': 293, 'WARNING': 2}
+2026-03-21 14:04:36,648 - telegram.runtime - INFO - runtime_stats uptime_s=8520 total_records=296 total_exceptions=0 levels={'INFO': 294, 'WARNING': 2}
+2026-03-21 14:06:36,649 - aiogram.runtime - INFO - runtime_stats uptime_s=8640 total_records=297 total_exceptions=0 levels={'INFO': 295, 'WARNING': 2}
+2026-03-21 14:06:36,649 - telegram.runtime - INFO - runtime_stats uptime_s=8640 total_records=298 total_exceptions=0 levels={'INFO': 296, 'WARNING': 2}
+2026-03-21 14:06:36,649 - aiogram.runtime - INFO - runtime_stats uptime_s=8640 total_records=297 total_exceptions=0 levels={'INFO': 295, 'WARNING': 2}
+2026-03-21 14:06:36,649 - telegram.runtime - INFO - runtime_stats uptime_s=8640 total_records=298 total_exceptions=0 levels={'INFO': 296, 'WARNING': 2}
+2026-03-21 14:08:36,649 - aiogram.runtime - INFO - runtime_stats uptime_s=8760 total_records=299 total_exceptions=0 levels={'INFO': 297, 'WARNING': 2}
+2026-03-21 14:08:36,649 - telegram.runtime - INFO - runtime_stats uptime_s=8760 total_records=300 total_exceptions=0 levels={'INFO': 298, 'WARNING': 2}
+2026-03-21 14:08:36,649 - aiogram.runtime - INFO - runtime_stats uptime_s=8760 total_records=299 total_exceptions=0 levels={'INFO': 297, 'WARNING': 2}
+2026-03-21 14:08:36,649 - telegram.runtime - INFO - runtime_stats uptime_s=8760 total_records=300 total_exceptions=0 levels={'INFO': 298, 'WARNING': 2}
+2026-03-21 14:10:36,650 - aiogram.runtime - INFO - runtime_stats uptime_s=8880 total_records=301 total_exceptions=0 levels={'INFO': 299, 'WARNING': 2}
+2026-03-21 14:10:36,650 - telegram.runtime - INFO - runtime_stats uptime_s=8880 total_records=302 total_exceptions=0 levels={'INFO': 300, 'WARNING': 2}
+2026-03-21 14:10:36,650 - aiogram.runtime - INFO - runtime_stats uptime_s=8880 total_records=301 total_exceptions=0 levels={'INFO': 299, 'WARNING': 2}
+2026-03-21 14:10:36,650 - telegram.runtime - INFO - runtime_stats uptime_s=8880 total_records=302 total_exceptions=0 levels={'INFO': 300, 'WARNING': 2}
+2026-03-21 14:12:36,650 - aiogram.runtime - INFO - runtime_stats uptime_s=9000 total_records=303 total_exceptions=0 levels={'INFO': 301, 'WARNING': 2}
+2026-03-21 14:12:36,651 - telegram.runtime - INFO - runtime_stats uptime_s=9000 total_records=304 total_exceptions=0 levels={'INFO': 302, 'WARNING': 2}
+2026-03-21 14:12:36,650 - aiogram.runtime - INFO - runtime_stats uptime_s=9000 total_records=303 total_exceptions=0 levels={'INFO': 301, 'WARNING': 2}
+2026-03-21 14:12:36,651 - telegram.runtime - INFO - runtime_stats uptime_s=9000 total_records=304 total_exceptions=0 levels={'INFO': 302, 'WARNING': 2}
+2026-03-21 14:14:36,651 - aiogram.runtime - INFO - runtime_stats uptime_s=9120 total_records=305 total_exceptions=0 levels={'INFO': 303, 'WARNING': 2}
+2026-03-21 14:14:36,651 - telegram.runtime - INFO - runtime_stats uptime_s=9120 total_records=306 total_exceptions=0 levels={'INFO': 304, 'WARNING': 2}
+2026-03-21 14:14:36,651 - aiogram.runtime - INFO - runtime_stats uptime_s=9120 total_records=305 total_exceptions=0 levels={'INFO': 303, 'WARNING': 2}
+2026-03-21 14:14:36,651 - telegram.runtime - INFO - runtime_stats uptime_s=9120 total_records=306 total_exceptions=0 levels={'INFO': 304, 'WARNING': 2}
+2026-03-21 14:16:36,652 - aiogram.runtime - INFO - runtime_stats uptime_s=9240 total_records=307 total_exceptions=0 levels={'INFO': 305, 'WARNING': 2}
+2026-03-21 14:16:36,652 - telegram.runtime - INFO - runtime_stats uptime_s=9240 total_records=308 total_exceptions=0 levels={'INFO': 306, 'WARNING': 2}
+2026-03-21 14:16:36,652 - aiogram.runtime - INFO - runtime_stats uptime_s=9240 total_records=307 total_exceptions=0 levels={'INFO': 305, 'WARNING': 2}
+2026-03-21 14:16:36,652 - telegram.runtime - INFO - runtime_stats uptime_s=9240 total_records=308 total_exceptions=0 levels={'INFO': 306, 'WARNING': 2}
+2026-03-21 14:18:36,652 - aiogram.runtime - INFO - runtime_stats uptime_s=9360 total_records=309 total_exceptions=0 levels={'INFO': 307, 'WARNING': 2}
+2026-03-21 14:18:36,653 - telegram.runtime - INFO - runtime_stats uptime_s=9360 total_records=310 total_exceptions=0 levels={'INFO': 308, 'WARNING': 2}
+2026-03-21 14:18:36,652 - aiogram.runtime - INFO - runtime_stats uptime_s=9360 total_records=309 total_exceptions=0 levels={'INFO': 307, 'WARNING': 2}
+2026-03-21 14:18:36,653 - telegram.runtime - INFO - runtime_stats uptime_s=9360 total_records=310 total_exceptions=0 levels={'INFO': 308, 'WARNING': 2}
+2026-03-21 14:20:36,653 - aiogram.runtime - INFO - runtime_stats uptime_s=9480 total_records=311 total_exceptions=0 levels={'INFO': 309, 'WARNING': 2}
+2026-03-21 14:20:36,653 - telegram.runtime - INFO - runtime_stats uptime_s=9480 total_records=312 total_exceptions=0 levels={'INFO': 310, 'WARNING': 2}
+2026-03-21 14:20:36,653 - aiogram.runtime - INFO - runtime_stats uptime_s=9480 total_records=311 total_exceptions=0 levels={'INFO': 309, 'WARNING': 2}
+2026-03-21 14:20:36,653 - telegram.runtime - INFO - runtime_stats uptime_s=9480 total_records=312 total_exceptions=0 levels={'INFO': 310, 'WARNING': 2}
+2026-03-21 14:22:36,654 - aiogram.runtime - INFO - runtime_stats uptime_s=9600 total_records=313 total_exceptions=0 levels={'INFO': 311, 'WARNING': 2}
+2026-03-21 14:22:36,654 - telegram.runtime - INFO - runtime_stats uptime_s=9600 total_records=314 total_exceptions=0 levels={'INFO': 312, 'WARNING': 2}
+2026-03-21 14:22:36,654 - aiogram.runtime - INFO - runtime_stats uptime_s=9600 total_records=313 total_exceptions=0 levels={'INFO': 311, 'WARNING': 2}
+2026-03-21 14:22:36,654 - telegram.runtime - INFO - runtime_stats uptime_s=9600 total_records=314 total_exceptions=0 levels={'INFO': 312, 'WARNING': 2}
+2026-03-21 14:24:36,655 - aiogram.runtime - INFO - runtime_stats uptime_s=9720 total_records=315 total_exceptions=0 levels={'INFO': 313, 'WARNING': 2}
+2026-03-21 14:24:36,655 - telegram.runtime - INFO - runtime_stats uptime_s=9720 total_records=316 total_exceptions=0 levels={'INFO': 314, 'WARNING': 2}
+2026-03-21 14:24:36,655 - aiogram.runtime - INFO - runtime_stats uptime_s=9720 total_records=315 total_exceptions=0 levels={'INFO': 313, 'WARNING': 2}
+2026-03-21 14:24:36,655 - telegram.runtime - INFO - runtime_stats uptime_s=9720 total_records=316 total_exceptions=0 levels={'INFO': 314, 'WARNING': 2}
+2026-03-21 14:26:36,655 - aiogram.runtime - INFO - runtime_stats uptime_s=9840 total_records=317 total_exceptions=0 levels={'INFO': 315, 'WARNING': 2}
+2026-03-21 14:26:36,655 - telegram.runtime - INFO - runtime_stats uptime_s=9840 total_records=318 total_exceptions=0 levels={'INFO': 316, 'WARNING': 2}
+2026-03-21 14:26:36,655 - aiogram.runtime - INFO - runtime_stats uptime_s=9840 total_records=317 total_exceptions=0 levels={'INFO': 315, 'WARNING': 2}
+2026-03-21 14:26:36,655 - telegram.runtime - INFO - runtime_stats uptime_s=9840 total_records=318 total_exceptions=0 levels={'INFO': 316, 'WARNING': 2}
+2026-03-21 14:28:36,656 - aiogram.runtime - INFO - runtime_stats uptime_s=9960 total_records=319 total_exceptions=0 levels={'INFO': 317, 'WARNING': 2}
+2026-03-21 14:28:36,656 - aiogram.runtime - INFO - runtime_stats uptime_s=9960 total_records=319 total_exceptions=0 levels={'INFO': 317, 'WARNING': 2}
+2026-03-21 14:28:36,656 - telegram.runtime - INFO - runtime_stats uptime_s=9960 total_records=321 total_exceptions=0 levels={'INFO': 319, 'WARNING': 2}
+2026-03-21 14:28:36,656 - telegram.runtime - INFO - runtime_stats uptime_s=9960 total_records=321 total_exceptions=0 levels={'INFO': 319, 'WARNING': 2}
+2026-03-21 14:30:36,656 - aiogram.runtime - INFO - runtime_stats uptime_s=10080 total_records=321 total_exceptions=0 levels={'INFO': 319, 'WARNING': 2}
+2026-03-21 14:30:36,657 - telegram.runtime - INFO - runtime_stats uptime_s=10080 total_records=322 total_exceptions=0 levels={'INFO': 320, 'WARNING': 2}
+2026-03-21 14:30:36,656 - aiogram.runtime - INFO - runtime_stats uptime_s=10080 total_records=321 total_exceptions=0 levels={'INFO': 319, 'WARNING': 2}
+2026-03-21 14:30:36,657 - telegram.runtime - INFO - runtime_stats uptime_s=10080 total_records=322 total_exceptions=0 levels={'INFO': 320, 'WARNING': 2}
+2026-03-21 14:32:36,658 - aiogram.runtime - INFO - runtime_stats uptime_s=10200 total_records=323 total_exceptions=0 levels={'INFO': 321, 'WARNING': 2}
+2026-03-21 14:32:36,658 - telegram.runtime - INFO - runtime_stats uptime_s=10200 total_records=324 total_exceptions=0 levels={'INFO': 322, 'WARNING': 2}
+2026-03-21 14:32:36,658 - aiogram.runtime - INFO - runtime_stats uptime_s=10200 total_records=323 total_exceptions=0 levels={'INFO': 321, 'WARNING': 2}
+2026-03-21 14:32:36,658 - telegram.runtime - INFO - runtime_stats uptime_s=10200 total_records=324 total_exceptions=0 levels={'INFO': 322, 'WARNING': 2}
+2026-03-21 14:34:36,658 - aiogram.runtime - INFO - runtime_stats uptime_s=10320 total_records=325 total_exceptions=0 levels={'INFO': 323, 'WARNING': 2}
+2026-03-21 14:34:36,659 - telegram.runtime - INFO - runtime_stats uptime_s=10320 total_records=326 total_exceptions=0 levels={'INFO': 324, 'WARNING': 2}
+2026-03-21 14:34:36,658 - aiogram.runtime - INFO - runtime_stats uptime_s=10320 total_records=325 total_exceptions=0 levels={'INFO': 323, 'WARNING': 2}
+2026-03-21 14:34:36,659 - telegram.runtime - INFO - runtime_stats uptime_s=10320 total_records=326 total_exceptions=0 levels={'INFO': 324, 'WARNING': 2}
+2026-03-21 14:36:36,659 - aiogram.runtime - INFO - runtime_stats uptime_s=10440 total_records=327 total_exceptions=0 levels={'INFO': 325, 'WARNING': 2}
+2026-03-21 14:36:36,660 - telegram.runtime - INFO - runtime_stats uptime_s=10440 total_records=328 total_exceptions=0 levels={'INFO': 326, 'WARNING': 2}
+2026-03-21 14:36:36,659 - aiogram.runtime - INFO - runtime_stats uptime_s=10440 total_records=327 total_exceptions=0 levels={'INFO': 325, 'WARNING': 2}
+2026-03-21 14:36:36,660 - telegram.runtime - INFO - runtime_stats uptime_s=10440 total_records=328 total_exceptions=0 levels={'INFO': 326, 'WARNING': 2}
+2026-03-21 14:38:36,660 - telegram.runtime - INFO - runtime_stats uptime_s=10560 total_records=330 total_exceptions=0 levels={'INFO': 328, 'WARNING': 2}
+2026-03-21 14:38:36,660 - aiogram.runtime - INFO - runtime_stats uptime_s=10560 total_records=329 total_exceptions=0 levels={'INFO': 327, 'WARNING': 2}
+2026-03-21 14:38:36,660 - telegram.runtime - INFO - runtime_stats uptime_s=10560 total_records=330 total_exceptions=0 levels={'INFO': 328, 'WARNING': 2}
+2026-03-21 14:38:36,660 - aiogram.runtime - INFO - runtime_stats uptime_s=10560 total_records=329 total_exceptions=0 levels={'INFO': 327, 'WARNING': 2}
+2026-03-21 14:40:36,661 - telegram.runtime - INFO - runtime_stats uptime_s=10680 total_records=332 total_exceptions=0 levels={'INFO': 330, 'WARNING': 2}
+2026-03-21 14:40:36,661 - aiogram.runtime - INFO - runtime_stats uptime_s=10680 total_records=331 total_exceptions=0 levels={'INFO': 329, 'WARNING': 2}
+2026-03-21 14:40:36,661 - telegram.runtime - INFO - runtime_stats uptime_s=10680 total_records=332 total_exceptions=0 levels={'INFO': 330, 'WARNING': 2}
+2026-03-21 14:40:36,661 - aiogram.runtime - INFO - runtime_stats uptime_s=10680 total_records=331 total_exceptions=0 levels={'INFO': 329, 'WARNING': 2}
+2026-03-21 14:42:36,662 - telegram.runtime - INFO - runtime_stats uptime_s=10800 total_records=334 total_exceptions=0 levels={'INFO': 332, 'WARNING': 2}
+2026-03-21 14:42:36,662 - telegram.runtime - INFO - runtime_stats uptime_s=10800 total_records=334 total_exceptions=0 levels={'INFO': 332, 'WARNING': 2}
+2026-03-21 14:42:36,664 - aiogram.runtime - INFO - runtime_stats uptime_s=10800 total_records=334 total_exceptions=0 levels={'INFO': 332, 'WARNING': 2}
+2026-03-21 14:42:36,664 - aiogram.runtime - INFO - runtime_stats uptime_s=10800 total_records=334 total_exceptions=0 levels={'INFO': 332, 'WARNING': 2}
+2026-03-21 14:44:36,662 - telegram.runtime - INFO - runtime_stats uptime_s=10920 total_records=336 total_exceptions=0 levels={'INFO': 334, 'WARNING': 2}
+2026-03-21 14:44:36,662 - telegram.runtime - INFO - runtime_stats uptime_s=10920 total_records=336 total_exceptions=0 levels={'INFO': 334, 'WARNING': 2}
+2026-03-21 14:44:36,665 - aiogram.runtime - INFO - runtime_stats uptime_s=10920 total_records=336 total_exceptions=0 levels={'INFO': 334, 'WARNING': 2}
+2026-03-21 14:44:36,665 - aiogram.runtime - INFO - runtime_stats uptime_s=10920 total_records=336 total_exceptions=0 levels={'INFO': 334, 'WARNING': 2}
+2026-03-21 14:46:36,663 - telegram.runtime - INFO - runtime_stats uptime_s=11040 total_records=338 total_exceptions=0 levels={'INFO': 336, 'WARNING': 2}
+2026-03-21 14:46:36,663 - telegram.runtime - INFO - runtime_stats uptime_s=11040 total_records=338 total_exceptions=0 levels={'INFO': 336, 'WARNING': 2}
+2026-03-21 14:46:36,667 - aiogram.runtime - INFO - runtime_stats uptime_s=11040 total_records=338 total_exceptions=0 levels={'INFO': 336, 'WARNING': 2}
+2026-03-21 14:46:36,667 - aiogram.runtime - INFO - runtime_stats uptime_s=11040 total_records=338 total_exceptions=0 levels={'INFO': 336, 'WARNING': 2}
+2026-03-21 14:48:36,665 - telegram.runtime - INFO - runtime_stats uptime_s=11160 total_records=340 total_exceptions=0 levels={'INFO': 338, 'WARNING': 2}
+2026-03-21 14:48:36,665 - telegram.runtime - INFO - runtime_stats uptime_s=11160 total_records=340 total_exceptions=0 levels={'INFO': 338, 'WARNING': 2}
+2026-03-21 14:48:36,667 - aiogram.runtime - INFO - runtime_stats uptime_s=11160 total_records=340 total_exceptions=0 levels={'INFO': 338, 'WARNING': 2}
+2026-03-21 14:48:36,667 - aiogram.runtime - INFO - runtime_stats uptime_s=11160 total_records=340 total_exceptions=0 levels={'INFO': 338, 'WARNING': 2}
+2026-03-21 14:50:36,665 - telegram.runtime - INFO - runtime_stats uptime_s=11280 total_records=342 total_exceptions=0 levels={'INFO': 340, 'WARNING': 2}
+2026-03-21 14:50:36,665 - telegram.runtime - INFO - runtime_stats uptime_s=11280 total_records=342 total_exceptions=0 levels={'INFO': 340, 'WARNING': 2}
+2026-03-21 14:50:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11280 total_records=342 total_exceptions=0 levels={'INFO': 340, 'WARNING': 2}
+2026-03-21 14:50:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11280 total_records=342 total_exceptions=0 levels={'INFO': 340, 'WARNING': 2}
+2026-03-21 14:52:36,666 - telegram.runtime - INFO - runtime_stats uptime_s=11400 total_records=344 total_exceptions=0 levels={'INFO': 342, 'WARNING': 2}
+2026-03-21 14:52:36,666 - telegram.runtime - INFO - runtime_stats uptime_s=11400 total_records=344 total_exceptions=0 levels={'INFO': 342, 'WARNING': 2}
+2026-03-21 14:52:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11400 total_records=344 total_exceptions=0 levels={'INFO': 342, 'WARNING': 2}
+2026-03-21 14:52:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11400 total_records=344 total_exceptions=0 levels={'INFO': 342, 'WARNING': 2}
+2026-03-21 14:54:36,667 - telegram.runtime - INFO - runtime_stats uptime_s=11520 total_records=346 total_exceptions=0 levels={'INFO': 344, 'WARNING': 2}
+2026-03-21 14:54:36,667 - telegram.runtime - INFO - runtime_stats uptime_s=11520 total_records=346 total_exceptions=0 levels={'INFO': 344, 'WARNING': 2}
+2026-03-21 14:54:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11520 total_records=346 total_exceptions=0 levels={'INFO': 344, 'WARNING': 2}
+2026-03-21 14:54:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11520 total_records=346 total_exceptions=0 levels={'INFO': 344, 'WARNING': 2}
+2026-03-21 14:55:37,118 - aiogram.event - INFO - Update id=261501634 is handled. Duration 194 ms by bot id=8749053931
+2026-03-21 14:55:37,118 - aiogram.event - INFO - Update id=261501634 is handled. Duration 194 ms by bot id=8749053931
+2026-03-21 14:55:43,570 - aiogram.event - INFO - Update id=261501635 is handled. Duration 154 ms by bot id=8749053931
+2026-03-21 14:55:43,570 - aiogram.event - INFO - Update id=261501635 is handled. Duration 154 ms by bot id=8749053931
+2026-03-21 14:56:36,667 - telegram.runtime - INFO - runtime_stats uptime_s=11640 total_records=350 total_exceptions=0 levels={'INFO': 348, 'WARNING': 2}
+2026-03-21 14:56:36,667 - telegram.runtime - INFO - runtime_stats uptime_s=11640 total_records=350 total_exceptions=0 levels={'INFO': 348, 'WARNING': 2}
+2026-03-21 14:56:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11640 total_records=350 total_exceptions=0 levels={'INFO': 348, 'WARNING': 2}
+2026-03-21 14:56:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11640 total_records=350 total_exceptions=0 levels={'INFO': 348, 'WARNING': 2}
+2026-03-21 14:57:54,710 - aiogram.event - INFO - Update id=261501636 is handled. Duration 787 ms by bot id=8749053931
+2026-03-21 14:57:54,710 - aiogram.event - INFO - Update id=261501636 is handled. Duration 787 ms by bot id=8749053931
+2026-03-21 14:58:36,668 - telegram.runtime - INFO - runtime_stats uptime_s=11760 total_records=353 total_exceptions=0 levels={'INFO': 351, 'WARNING': 2}
+2026-03-21 14:58:36,668 - telegram.runtime - INFO - runtime_stats uptime_s=11760 total_records=353 total_exceptions=0 levels={'INFO': 351, 'WARNING': 2}
+2026-03-21 14:58:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11760 total_records=353 total_exceptions=0 levels={'INFO': 351, 'WARNING': 2}
+2026-03-21 14:58:36,668 - aiogram.runtime - INFO - runtime_stats uptime_s=11760 total_records=353 total_exceptions=0 levels={'INFO': 351, 'WARNING': 2}
+2026-03-21 14:58:58,103 - aiogram.event - INFO - Update id=261501637 is handled. Duration 151 ms by bot id=8749053931
+2026-03-21 14:58:58,103 - aiogram.event - INFO - Update id=261501637 is handled. Duration 151 ms by bot id=8749053931
+2026-03-21 14:59:05,766 - aiogram.event - INFO - Update id=261501638 is handled. Duration 166 ms by bot id=8749053931
+2026-03-21 14:59:05,766 - aiogram.event - INFO - Update id=261501638 is handled. Duration 166 ms by bot id=8749053931
+2026-03-21 14:59:25,713 - aiogram.event - INFO - Update id=261501639 is handled. Duration 154 ms by bot id=8749053931
+2026-03-21 14:59:25,713 - aiogram.event - INFO - Update id=261501639 is handled. Duration 154 ms by bot id=8749053931
+2026-03-21 14:59:53,346 - aiogram.event - INFO - Update id=261501640 is handled. Duration 0 ms by bot id=8749053931
+2026-03-21 14:59:53,346 - aiogram.event - INFO - Update id=261501640 is handled. Duration 0 ms by bot id=8749053931
+2026-03-21 15:00:36,668 - telegram.runtime - INFO - runtime_stats uptime_s=11880 total_records=359 total_exceptions=0 levels={'INFO': 357, 'WARNING': 2}
+2026-03-21 15:00:36,668 - telegram.runtime - INFO - runtime_stats uptime_s=11880 total_records=359 total_exceptions=0 levels={'INFO': 357, 'WARNING': 2}
+2026-03-21 15:00:36,669 - aiogram.runtime - INFO - runtime_stats uptime_s=11880 total_records=359 total_exceptions=0 levels={'INFO': 357, 'WARNING': 2}
+2026-03-21 15:00:36,669 - aiogram.runtime - INFO - runtime_stats uptime_s=11880 total_records=359 total_exceptions=0 levels={'INFO': 357, 'WARNING': 2}
+2026-03-21 15:02:36,669 - telegram.runtime - INFO - runtime_stats uptime_s=12000 total_records=361 total_exceptions=0 levels={'INFO': 359, 'WARNING': 2}
+2026-03-21 15:02:36,669 - telegram.runtime - INFO - runtime_stats uptime_s=12000 total_records=361 total_exceptions=0 levels={'INFO': 359, 'WARNING': 2}
+2026-03-21 15:02:36,669 - aiogram.runtime - INFO - runtime_stats uptime_s=12000 total_records=361 total_exceptions=0 levels={'INFO': 359, 'WARNING': 2}
+2026-03-21 15:02:36,669 - aiogram.runtime - INFO - runtime_stats uptime_s=12000 total_records=361 total_exceptions=0 levels={'INFO': 359, 'WARNING': 2}
+2026-03-21 15:04:05,740 - aiogram.event - INFO - Update id=261501641 is handled. Duration 170 ms by bot id=8749053931
+2026-03-21 15:04:05,740 - aiogram.event - INFO - Update id=261501641 is handled. Duration 170 ms by bot id=8749053931
+2026-03-21 15:04:36,669 - telegram.runtime - INFO - runtime_stats uptime_s=12120 total_records=364 total_exceptions=0 levels={'INFO': 362, 'WARNING': 2}
+2026-03-21 15:04:36,669 - telegram.runtime - INFO - runtime_stats uptime_s=12120 total_records=364 total_exceptions=0 levels={'INFO': 362, 'WARNING': 2}
+2026-03-21 15:04:36,670 - aiogram.runtime - INFO - runtime_stats uptime_s=12120 total_records=363 total_exceptions=0 levels={'INFO': 361, 'WARNING': 2}
+2026-03-21 15:04:36,670 - aiogram.runtime - INFO - runtime_stats uptime_s=12120 total_records=363 total_exceptions=0 levels={'INFO': 361, 'WARNING': 2}
+2026-03-21 15:06:36,670 - telegram.runtime - INFO - runtime_stats uptime_s=12240 total_records=366 total_exceptions=0 levels={'INFO': 364, 'WARNING': 2}
+2026-03-21 15:06:36,670 - aiogram.runtime - INFO - runtime_stats uptime_s=12240 total_records=365 total_exceptions=0 levels={'INFO': 363, 'WARNING': 2}
+2026-03-21 15:06:36,670 - telegram.runtime - INFO - runtime_stats uptime_s=12240 total_records=366 total_exceptions=0 levels={'INFO': 364, 'WARNING': 2}
+2026-03-21 15:06:36,670 - aiogram.runtime - INFO - runtime_stats uptime_s=12240 total_records=365 total_exceptions=0 levels={'INFO': 363, 'WARNING': 2}
+2026-03-21 15:08:36,671 - telegram.runtime - INFO - runtime_stats uptime_s=12360 total_records=368 total_exceptions=0 levels={'INFO': 366, 'WARNING': 2}
+2026-03-21 15:08:36,671 - aiogram.runtime - INFO - runtime_stats uptime_s=12360 total_records=367 total_exceptions=0 levels={'INFO': 365, 'WARNING': 2}
+2026-03-21 15:08:36,671 - telegram.runtime - INFO - runtime_stats uptime_s=12360 total_records=368 total_exceptions=0 levels={'INFO': 366, 'WARNING': 2}
+2026-03-21 15:08:36,671 - aiogram.runtime - INFO - runtime_stats uptime_s=12360 total_records=367 total_exceptions=0 levels={'INFO': 365, 'WARNING': 2}
+2026-03-21 15:10:36,672 - telegram.runtime - INFO - runtime_stats uptime_s=12480 total_records=370 total_exceptions=0 levels={'INFO': 368, 'WARNING': 2}
+2026-03-21 15:10:36,672 - telegram.runtime - INFO - runtime_stats uptime_s=12480 total_records=370 total_exceptions=0 levels={'INFO': 368, 'WARNING': 2}
+2026-03-21 15:10:36,672 - aiogram.runtime - INFO - runtime_stats uptime_s=12480 total_records=370 total_exceptions=0 levels={'INFO': 368, 'WARNING': 2}
+2026-03-21 15:10:36,672 - aiogram.runtime - INFO - runtime_stats uptime_s=12480 total_records=370 total_exceptions=0 levels={'INFO': 368, 'WARNING': 2}
+2026-03-21 15:12:36,673 - telegram.runtime - INFO - runtime_stats uptime_s=12600 total_records=372 total_exceptions=0 levels={'INFO': 370, 'WARNING': 2}
+2026-03-21 15:12:36,673 - aiogram.runtime - INFO - runtime_stats uptime_s=12600 total_records=371 total_exceptions=0 levels={'INFO': 369, 'WARNING': 2}
+2026-03-21 15:12:36,673 - telegram.runtime - INFO - runtime_stats uptime_s=12600 total_records=372 total_exceptions=0 levels={'INFO': 370, 'WARNING': 2}
+2026-03-21 15:12:36,673 - aiogram.runtime - INFO - runtime_stats uptime_s=12600 total_records=371 total_exceptions=0 levels={'INFO': 369, 'WARNING': 2}
+2026-03-21 15:14:36,673 - telegram.runtime - INFO - runtime_stats uptime_s=12720 total_records=374 total_exceptions=0 levels={'INFO': 372, 'WARNING': 2}
+2026-03-21 15:14:36,673 - aiogram.runtime - INFO - runtime_stats uptime_s=12720 total_records=373 total_exceptions=0 levels={'INFO': 371, 'WARNING': 2}
+2026-03-21 15:14:36,673 - telegram.runtime - INFO - runtime_stats uptime_s=12720 total_records=374 total_exceptions=0 levels={'INFO': 372, 'WARNING': 2}
+2026-03-21 15:14:36,673 - aiogram.runtime - INFO - runtime_stats uptime_s=12720 total_records=373 total_exceptions=0 levels={'INFO': 371, 'WARNING': 2}
+2026-03-21 15:16:36,674 - telegram.runtime - INFO - runtime_stats uptime_s=12840 total_records=376 total_exceptions=0 levels={'INFO': 374, 'WARNING': 2}
+2026-03-21 15:16:36,674 - telegram.runtime - INFO - runtime_stats uptime_s=12840 total_records=376 total_exceptions=0 levels={'INFO': 374, 'WARNING': 2}
+2026-03-21 15:16:36,674 - aiogram.runtime - INFO - runtime_stats uptime_s=12840 total_records=376 total_exceptions=0 levels={'INFO': 374, 'WARNING': 2}
+2026-03-21 15:16:36,674 - aiogram.runtime - INFO - runtime_stats uptime_s=12840 total_records=376 total_exceptions=0 levels={'INFO': 374, 'WARNING': 2}
+2026-03-21 15:18:36,675 - telegram.runtime - INFO - runtime_stats uptime_s=12960 total_records=378 total_exceptions=0 levels={'INFO': 376, 'WARNING': 2}
+2026-03-21 15:18:36,675 - telegram.runtime - INFO - runtime_stats uptime_s=12960 total_records=378 total_exceptions=0 levels={'INFO': 376, 'WARNING': 2}
+2026-03-21 15:18:36,675 - aiogram.runtime - INFO - runtime_stats uptime_s=12960 total_records=377 total_exceptions=0 levels={'INFO': 375, 'WARNING': 2}
+2026-03-21 15:18:36,675 - aiogram.runtime - INFO - runtime_stats uptime_s=12960 total_records=377 total_exceptions=0 levels={'INFO': 375, 'WARNING': 2}
+2026-03-21 15:20:36,676 - telegram.runtime - INFO - runtime_stats uptime_s=13080 total_records=380 total_exceptions=0 levels={'INFO': 378, 'WARNING': 2}
+2026-03-21 15:20:36,676 - telegram.runtime - INFO - runtime_stats uptime_s=13080 total_records=380 total_exceptions=0 levels={'INFO': 378, 'WARNING': 2}
+2026-03-21 15:20:36,684 - aiogram.runtime - INFO - runtime_stats uptime_s=13080 total_records=380 total_exceptions=0 levels={'INFO': 378, 'WARNING': 2}
+2026-03-21 15:20:36,684 - aiogram.runtime - INFO - runtime_stats uptime_s=13080 total_records=380 total_exceptions=0 levels={'INFO': 378, 'WARNING': 2}
+2026-03-21 15:22:36,677 - telegram.runtime - INFO - runtime_stats uptime_s=13200 total_records=382 total_exceptions=0 levels={'INFO': 380, 'WARNING': 2}
+2026-03-21 15:22:36,677 - telegram.runtime - INFO - runtime_stats uptime_s=13200 total_records=382 total_exceptions=0 levels={'INFO': 380, 'WARNING': 2}
+2026-03-21 15:22:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13200 total_records=382 total_exceptions=0 levels={'INFO': 380, 'WARNING': 2}
+2026-03-21 15:22:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13200 total_records=382 total_exceptions=0 levels={'INFO': 380, 'WARNING': 2}
+2026-03-21 15:24:36,677 - telegram.runtime - INFO - runtime_stats uptime_s=13320 total_records=384 total_exceptions=0 levels={'INFO': 382, 'WARNING': 2}
+2026-03-21 15:24:36,677 - telegram.runtime - INFO - runtime_stats uptime_s=13320 total_records=384 total_exceptions=0 levels={'INFO': 382, 'WARNING': 2}
+2026-03-21 15:24:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13320 total_records=384 total_exceptions=0 levels={'INFO': 382, 'WARNING': 2}
+2026-03-21 15:24:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13320 total_records=384 total_exceptions=0 levels={'INFO': 382, 'WARNING': 2}
+2026-03-21 15:26:36,678 - telegram.runtime - INFO - runtime_stats uptime_s=13440 total_records=386 total_exceptions=0 levels={'INFO': 384, 'WARNING': 2}
+2026-03-21 15:26:36,678 - telegram.runtime - INFO - runtime_stats uptime_s=13440 total_records=386 total_exceptions=0 levels={'INFO': 384, 'WARNING': 2}
+2026-03-21 15:26:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13440 total_records=386 total_exceptions=0 levels={'INFO': 384, 'WARNING': 2}
+2026-03-21 15:26:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13440 total_records=386 total_exceptions=0 levels={'INFO': 384, 'WARNING': 2}
+2026-03-21 15:28:36,678 - telegram.runtime - INFO - runtime_stats uptime_s=13560 total_records=388 total_exceptions=0 levels={'INFO': 386, 'WARNING': 2}
+2026-03-21 15:28:36,678 - telegram.runtime - INFO - runtime_stats uptime_s=13560 total_records=388 total_exceptions=0 levels={'INFO': 386, 'WARNING': 2}
+2026-03-21 15:28:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13560 total_records=388 total_exceptions=0 levels={'INFO': 386, 'WARNING': 2}
+2026-03-21 15:28:36,685 - aiogram.runtime - INFO - runtime_stats uptime_s=13560 total_records=388 total_exceptions=0 levels={'INFO': 386, 'WARNING': 2}
+2026-03-21 15:29:27,038 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 15:29:27,038 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 15:29:27,039 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:29:27,039 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:29:27,039 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 15:29:27,039 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 15:29:27,291 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 15:29:27,291 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 15:29:29,562 - telegram - INFO - runtime_logging_enabled pid=52372 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:29,565 - aiogram - INFO - runtime_logging_enabled pid=52372 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:29,565 - aiogram - INFO - runtime_logging_enabled pid=52372 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:29,576 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 15:29:29,576 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 15:29:29,576 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 15:29:29,576 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 15:29:29,639 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:29:29,639 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:31:29,562 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:31:29,562 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:31:29,565 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:31:29,565 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:32:32,395 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 15:32:32,395 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 15:32:32,398 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:32:32,398 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:32:32,398 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 15:32:32,398 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 15:32:32,648 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 15:32:32,648 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 15:32:34,796 - telegram - INFO - runtime_logging_enabled pid=52585 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:34,804 - aiogram - INFO - runtime_logging_enabled pid=52585 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:34,804 - aiogram - INFO - runtime_logging_enabled pid=52585 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:34,815 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 15:32:34,815 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 15:32:34,815 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 15:32:34,815 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 15:32:34,883 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:32:34,883 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 15:34:34,796 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:34:34,796 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:34:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:34:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 15:36:34,797 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 15:36:34,797 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 15:36:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 15:36:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 15:38:11,250 - aiogram.event - INFO - Update id=261501642 is handled. Duration 692 ms by bot id=8749053931
+2026-03-21 15:38:11,250 - aiogram.event - INFO - Update id=261501642 is handled. Duration 692 ms by bot id=8749053931
+2026-03-21 15:38:17,320 - aiogram.event - INFO - Update id=261501643 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 15:38:17,320 - aiogram.event - INFO - Update id=261501643 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 15:38:24,550 - aiogram.event - INFO - Update id=261501644 is handled. Duration 570 ms by bot id=8749053931
+2026-03-21 15:38:24,550 - aiogram.event - INFO - Update id=261501644 is handled. Duration 570 ms by bot id=8749053931
+2026-03-21 15:38:26,716 - aiogram.event - INFO - Update id=261501645 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 15:38:26,716 - aiogram.event - INFO - Update id=261501645 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 15:38:29,413 - aiogram.event - INFO - Update id=261501646 is handled. Duration 714 ms by bot id=8749053931
+2026-03-21 15:38:29,413 - aiogram.event - INFO - Update id=261501646 is handled. Duration 714 ms by bot id=8749053931
+2026-03-21 15:38:34,797 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:38:34,797 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:38:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:38:34,804 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:40:34,798 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=16 total_exceptions=0 levels={'INFO': 16}
+2026-03-21 15:40:34,798 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=16 total_exceptions=0 levels={'INFO': 16}
+2026-03-21 15:40:34,806 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=16 total_exceptions=0 levels={'INFO': 16}
+2026-03-21 15:40:34,806 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=16 total_exceptions=0 levels={'INFO': 16}
+2026-03-21 15:42:34,799 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 15:42:34,799 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 15:42:34,806 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 15:42:34,806 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 15:44:34,799 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 15:44:34,799 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 15:44:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 15:44:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 15:44:36,682 - aiogram.event - INFO - Update id=261501647 is handled. Duration 169 ms by bot id=8749053931
+2026-03-21 15:44:36,682 - aiogram.event - INFO - Update id=261501647 is handled. Duration 169 ms by bot id=8749053931
+2026-03-21 15:46:34,800 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 15:46:34,800 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 15:46:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 15:46:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 15:48:08,572 - aiogram.event - INFO - Update id=261501648 is handled. Duration 717 ms by bot id=8749053931
+2026-03-21 15:48:08,572 - aiogram.event - INFO - Update id=261501648 is handled. Duration 717 ms by bot id=8749053931
+2026-03-21 15:48:11,732 - aiogram.event - INFO - Update id=261501649 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:48:11,732 - aiogram.event - INFO - Update id=261501649 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:48:14,126 - aiogram.event - INFO - Update id=261501650 is handled. Duration 600 ms by bot id=8749053931
+2026-03-21 15:48:14,126 - aiogram.event - INFO - Update id=261501650 is handled. Duration 600 ms by bot id=8749053931
+2026-03-21 15:48:17,342 - aiogram.event - INFO - Update id=261501651 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:48:17,342 - aiogram.event - INFO - Update id=261501651 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:48:19,558 - aiogram.event - INFO - Update id=261501652 is handled. Duration 614 ms by bot id=8749053931
+2026-03-21 15:48:19,558 - aiogram.event - INFO - Update id=261501652 is handled. Duration 614 ms by bot id=8749053931
+2026-03-21 15:48:28,662 - aiogram.event - INFO - Update id=261501653 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:48:28,662 - aiogram.event - INFO - Update id=261501653 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:48:34,800 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 15:48:34,800 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 15:48:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 15:48:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 15:48:41,227 - aiogram.event - INFO - Update id=261501654 is handled. Duration 565 ms by bot id=8749053931
+2026-03-21 15:48:41,227 - aiogram.event - INFO - Update id=261501654 is handled. Duration 565 ms by bot id=8749053931
+2026-03-21 15:49:22,822 - aiogram.event - INFO - Update id=261501655 is handled. Duration 814 ms by bot id=8749053931
+2026-03-21 15:49:22,822 - aiogram.event - INFO - Update id=261501655 is handled. Duration 814 ms by bot id=8749053931
+2026-03-21 15:49:26,483 - aiogram.event - INFO - Update id=261501656 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:49:26,483 - aiogram.event - INFO - Update id=261501656 is handled. Duration 547 ms by bot id=8749053931
+2026-03-21 15:49:27,711 - aiogram.event - INFO - Update id=261501657 is handled. Duration 567 ms by bot id=8749053931
+2026-03-21 15:49:27,711 - aiogram.event - INFO - Update id=261501657 is handled. Duration 567 ms by bot id=8749053931
+2026-03-21 15:49:33,163 - aiogram.event - INFO - Update id=261501658 is handled. Duration 552 ms by bot id=8749053931
+2026-03-21 15:49:33,163 - aiogram.event - INFO - Update id=261501658 is handled. Duration 552 ms by bot id=8749053931
+2026-03-21 15:49:36,416 - aiogram.event - INFO - Update id=261501659 is handled. Duration 1106 ms by bot id=8749053931
+2026-03-21 15:49:36,416 - aiogram.event - INFO - Update id=261501659 is handled. Duration 1106 ms by bot id=8749053931
+2026-03-21 15:49:40,310 - aiogram.event - INFO - Update id=261501660 is handled. Duration 654 ms by bot id=8749053931
+2026-03-21 15:49:40,310 - aiogram.event - INFO - Update id=261501660 is handled. Duration 654 ms by bot id=8749053931
+2026-03-21 15:49:42,254 - aiogram.event - INFO - Update id=261501661 is handled. Duration 575 ms by bot id=8749053931
+2026-03-21 15:49:42,254 - aiogram.event - INFO - Update id=261501661 is handled. Duration 575 ms by bot id=8749053931
+2026-03-21 15:49:53,911 - aiogram.event - INFO - Update id=261501662 is handled. Duration 565 ms by bot id=8749053931
+2026-03-21 15:49:53,911 - aiogram.event - INFO - Update id=261501662 is handled. Duration 565 ms by bot id=8749053931
+2026-03-21 15:50:03,536 - aiogram.event - INFO - Update id=261501663 is handled. Duration 619 ms by bot id=8749053931
+2026-03-21 15:50:03,536 - aiogram.event - INFO - Update id=261501663 is handled. Duration 619 ms by bot id=8749053931
+2026-03-21 15:50:09,947 - aiogram.event - INFO - Update id=261501664 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:50:09,947 - aiogram.event - INFO - Update id=261501664 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:50:14,555 - aiogram.event - INFO - Update id=261501665 is handled. Duration 563 ms by bot id=8749053931
+2026-03-21 15:50:14,555 - aiogram.event - INFO - Update id=261501665 is handled. Duration 563 ms by bot id=8749053931
+2026-03-21 15:50:25,683 - aiogram.event - INFO - Update id=261501666 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 15:50:25,683 - aiogram.event - INFO - Update id=261501666 is handled. Duration 561 ms by bot id=8749053931
+2026-03-21 15:50:30,833 - aiogram.event - INFO - Update id=261501667 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 15:50:30,833 - aiogram.event - INFO - Update id=261501667 is handled. Duration 544 ms by bot id=8749053931
+2026-03-21 15:50:34,786 - aiogram.event - INFO - Update id=261501668 is handled. Duration 688 ms by bot id=8749053931
+2026-03-21 15:50:34,786 - aiogram.event - INFO - Update id=261501668 is handled. Duration 688 ms by bot id=8749053931
+2026-03-21 15:50:34,801 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 15:50:34,801 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 15:50:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 15:50:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 15:50:37,746 - aiogram.event - INFO - Update id=261501669 is handled. Duration 571 ms by bot id=8749053931
+2026-03-21 15:50:37,746 - aiogram.event - INFO - Update id=261501669 is handled. Duration 571 ms by bot id=8749053931
+2026-03-21 15:50:40,073 - aiogram.event - INFO - Update id=261501670 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:50:40,073 - aiogram.event - INFO - Update id=261501670 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:50:45,393 - aiogram.event - INFO - Update id=261501671 is handled. Duration 587 ms by bot id=8749053931
+2026-03-21 15:50:45,393 - aiogram.event - INFO - Update id=261501671 is handled. Duration 587 ms by bot id=8749053931
+2026-03-21 15:51:15,030 - aiogram.event - INFO - Update id=261501672 is handled. Duration 725 ms by bot id=8749053931
+2026-03-21 15:51:15,030 - aiogram.event - INFO - Update id=261501672 is handled. Duration 725 ms by bot id=8749053931
+2026-03-21 15:51:15,155 - aiogram.event - INFO - Update id=261501673 is handled. Duration 829 ms by bot id=8749053931
+2026-03-21 15:51:15,155 - aiogram.event - INFO - Update id=261501673 is handled. Duration 829 ms by bot id=8749053931
+2026-03-21 15:51:21,441 - aiogram.event - INFO - Update id=261501674 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 15:51:21,441 - aiogram.event - INFO - Update id=261501674 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 15:51:27,546 - aiogram.event - INFO - Update id=261501675 is handled. Duration 550 ms by bot id=8749053931
+2026-03-21 15:51:27,546 - aiogram.event - INFO - Update id=261501675 is handled. Duration 550 ms by bot id=8749053931
+2026-03-21 15:51:30,543 - aiogram.event - INFO - Update id=261501676 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 15:51:30,543 - aiogram.event - INFO - Update id=261501676 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 15:51:34,989 - aiogram.event - INFO - Update id=261501677 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:51:34,989 - aiogram.event - INFO - Update id=261501677 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:51:49,693 - aiogram.event - INFO - Update id=261501678 is handled. Duration 558 ms by bot id=8749053931
+2026-03-21 15:51:49,693 - aiogram.event - INFO - Update id=261501678 is handled. Duration 558 ms by bot id=8749053931
+2026-03-21 15:51:54,757 - aiogram.event - INFO - Update id=261501679 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 15:51:54,757 - aiogram.event - INFO - Update id=261501679 is handled. Duration 557 ms by bot id=8749053931
+2026-03-21 15:51:56,558 - aiogram.event - INFO - Update id=261501680 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:51:56,558 - aiogram.event - INFO - Update id=261501680 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:51:58,884 - aiogram.event - INFO - Update id=261501681 is handled. Duration 146 ms by bot id=8749053931
+2026-03-21 15:51:58,884 - aiogram.event - INFO - Update id=261501681 is handled. Duration 146 ms by bot id=8749053931
+2026-03-21 15:52:03,022 - aiogram.event - INFO - Update id=261501682 is handled. Duration 549 ms by bot id=8749053931
+2026-03-21 15:52:03,022 - aiogram.event - INFO - Update id=261501682 is handled. Duration 549 ms by bot id=8749053931
+2026-03-21 15:52:07,092 - aiogram.event - INFO - Update id=261501683 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 15:52:07,092 - aiogram.event - INFO - Update id=261501683 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 15:52:10,696 - aiogram.event - INFO - Update id=261501684 is handled. Duration 569 ms by bot id=8749053931
+2026-03-21 15:52:10,696 - aiogram.event - INFO - Update id=261501684 is handled. Duration 569 ms by bot id=8749053931
+2026-03-21 15:52:34,801 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=66 total_exceptions=0 levels={'INFO': 66}
+2026-03-21 15:52:34,801 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=66 total_exceptions=0 levels={'INFO': 66}
+2026-03-21 15:52:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=66 total_exceptions=0 levels={'INFO': 66}
+2026-03-21 15:52:34,807 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=66 total_exceptions=0 levels={'INFO': 66}
+2026-03-21 15:52:40,023 - aiogram.event - INFO - Update id=261501685 is handled. Duration 705 ms by bot id=8749053931
+2026-03-21 15:52:40,023 - aiogram.event - INFO - Update id=261501685 is handled. Duration 705 ms by bot id=8749053931
+2026-03-21 15:52:44,678 - aiogram.event - INFO - Update id=261501686 is handled. Duration 580 ms by bot id=8749053931
+2026-03-21 15:52:44,678 - aiogram.event - INFO - Update id=261501686 is handled. Duration 580 ms by bot id=8749053931
+2026-03-21 15:52:48,115 - aiogram.event - INFO - Update id=261501687 is handled. Duration 1132 ms by bot id=8749053931
+2026-03-21 15:52:48,115 - aiogram.event - INFO - Update id=261501687 is handled. Duration 1132 ms by bot id=8749053931
+2026-03-21 15:52:50,674 - aiogram.event - INFO - Update id=261501688 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:52:50,674 - aiogram.event - INFO - Update id=261501688 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:52:53,393 - aiogram.event - INFO - Update id=261501689 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 15:52:53,393 - aiogram.event - INFO - Update id=261501689 is handled. Duration 546 ms by bot id=8749053931
+2026-03-21 15:53:02,627 - aiogram.event - INFO - Update id=261501690 is handled. Duration 650 ms by bot id=8749053931
+2026-03-21 15:53:02,627 - aiogram.event - INFO - Update id=261501690 is handled. Duration 650 ms by bot id=8749053931
+2026-03-21 15:53:06,728 - aiogram.event - INFO - Update id=261501691 is handled. Duration 555 ms by bot id=8749053931
+2026-03-21 15:53:06,728 - aiogram.event - INFO - Update id=261501691 is handled. Duration 555 ms by bot id=8749053931
+2026-03-21 15:53:14,235 - aiogram.event - INFO - Update id=261501692 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 15:53:14,235 - aiogram.event - INFO - Update id=261501692 is handled. Duration 564 ms by bot id=8749053931
+2026-03-21 15:53:16,808 - aiogram.event - INFO - Update id=261501693 is handled. Duration 1010 ms by bot id=8749053931
+2026-03-21 15:53:16,808 - aiogram.event - INFO - Update id=261501693 is handled. Duration 1010 ms by bot id=8749053931
+2026-03-21 15:53:23,689 - aiogram.event - INFO - Update id=261501694 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 15:53:23,689 - aiogram.event - INFO - Update id=261501694 is handled. Duration 562 ms by bot id=8749053931
+2026-03-21 15:53:27,858 - aiogram.event - INFO - Update id=261501695 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:53:27,858 - aiogram.event - INFO - Update id=261501695 is handled. Duration 578 ms by bot id=8749053931
+2026-03-21 15:53:57,226 - aiogram.event - INFO - Update id=261501696 is handled. Duration 588 ms by bot id=8749053931
+2026-03-21 15:53:57,226 - aiogram.event - INFO - Update id=261501696 is handled. Duration 588 ms by bot id=8749053931
+2026-03-21 15:54:03,529 - aiogram.event - INFO - Update id=261501697 is handled. Duration 558 ms by bot id=8749053931
+2026-03-21 15:54:03,529 - aiogram.event - INFO - Update id=261501697 is handled. Duration 558 ms by bot id=8749053931
+2026-03-21 15:54:05,803 - aiogram.event - INFO - Update id=261501698 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 15:54:05,803 - aiogram.event - INFO - Update id=261501698 is handled. Duration 590 ms by bot id=8749053931
+2026-03-21 15:54:10,910 - aiogram.event - INFO - Update id=261501699 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:54:10,910 - aiogram.event - INFO - Update id=261501699 is handled. Duration 573 ms by bot id=8749053931
+2026-03-21 15:54:13,260 - aiogram.event - INFO - Update id=261501700 is handled. Duration 780 ms by bot id=8749053931
+2026-03-21 15:54:13,260 - aiogram.event - INFO - Update id=261501700 is handled. Duration 780 ms by bot id=8749053931
+2026-03-21 15:54:15,096 - aiogram.event - INFO - Update id=261501701 is handled. Duration 570 ms by bot id=8749053931
+2026-03-21 15:54:15,096 - aiogram.event - INFO - Update id=261501701 is handled. Duration 570 ms by bot id=8749053931
+2026-03-21 15:54:19,790 - aiogram.event - INFO - Update id=261501702 is handled. Duration 553 ms by bot id=8749053931
+2026-03-21 15:54:19,790 - aiogram.event - INFO - Update id=261501702 is handled. Duration 553 ms by bot id=8749053931
+2026-03-21 15:54:22,272 - aiogram.event - INFO - Update id=261501703 is handled. Duration 554 ms by bot id=8749053931
+2026-03-21 15:54:22,272 - aiogram.event - INFO - Update id=261501703 is handled. Duration 554 ms by bot id=8749053931
+2026-03-21 15:54:24,160 - aiogram.event - INFO - Update id=261501704 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 15:54:24,160 - aiogram.event - INFO - Update id=261501704 is handled. Duration 560 ms by bot id=8749053931
+2026-03-21 15:54:26,145 - aiogram.event - INFO - Update id=261501705 is handled. Duration 551 ms by bot id=8749053931
+2026-03-21 15:54:26,145 - aiogram.event - INFO - Update id=261501705 is handled. Duration 551 ms by bot id=8749053931
+2026-03-21 15:54:28,407 - aiogram.event - INFO - Update id=261501706 is handled. Duration 917 ms by bot id=8749053931
+2026-03-21 15:54:28,407 - aiogram.event - INFO - Update id=261501706 is handled. Duration 917 ms by bot id=8749053931
+2026-03-21 15:54:34,802 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=90 total_exceptions=0 levels={'INFO': 90}
+2026-03-21 15:54:34,802 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=90 total_exceptions=0 levels={'INFO': 90}
+2026-03-21 15:54:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=90 total_exceptions=0 levels={'INFO': 90}
+2026-03-21 15:54:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=90 total_exceptions=0 levels={'INFO': 90}
+2026-03-21 15:54:39,485 - aiogram.event - INFO - Update id=261501707 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 15:54:39,485 - aiogram.event - INFO - Update id=261501707 is handled. Duration 559 ms by bot id=8749053931
+2026-03-21 15:54:41,363 - aiogram.event - INFO - Update id=261501708 is handled. Duration 577 ms by bot id=8749053931
+2026-03-21 15:54:41,363 - aiogram.event - INFO - Update id=261501708 is handled. Duration 577 ms by bot id=8749053931
+2026-03-21 15:54:44,021 - aiogram.event - INFO - Update id=261501709 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:54:44,021 - aiogram.event - INFO - Update id=261501709 is handled. Duration 541 ms by bot id=8749053931
+2026-03-21 15:56:34,802 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=95 total_exceptions=0 levels={'INFO': 95}
+2026-03-21 15:56:34,802 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=95 total_exceptions=0 levels={'INFO': 95}
+2026-03-21 15:56:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=95 total_exceptions=0 levels={'INFO': 95}
+2026-03-21 15:56:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=95 total_exceptions=0 levels={'INFO': 95}
+2026-03-21 15:58:34,803 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=97 total_exceptions=0 levels={'INFO': 97}
+2026-03-21 15:58:34,803 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=97 total_exceptions=0 levels={'INFO': 97}
+2026-03-21 15:58:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=97 total_exceptions=0 levels={'INFO': 97}
+2026-03-21 15:58:34,808 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=97 total_exceptions=0 levels={'INFO': 97}
+2026-03-21 16:00:34,803 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=99 total_exceptions=0 levels={'INFO': 99}
+2026-03-21 16:00:34,803 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=99 total_exceptions=0 levels={'INFO': 99}
+2026-03-21 16:00:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=99 total_exceptions=0 levels={'INFO': 99}
+2026-03-21 16:00:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=99 total_exceptions=0 levels={'INFO': 99}
+2026-03-21 16:02:34,804 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=101 total_exceptions=0 levels={'INFO': 101}
+2026-03-21 16:02:34,804 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=101 total_exceptions=0 levels={'INFO': 101}
+2026-03-21 16:02:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=101 total_exceptions=0 levels={'INFO': 101}
+2026-03-21 16:02:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=101 total_exceptions=0 levels={'INFO': 101}
+2026-03-21 16:04:34,805 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=103 total_exceptions=0 levels={'INFO': 103}
+2026-03-21 16:04:34,805 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=103 total_exceptions=0 levels={'INFO': 103}
+2026-03-21 16:04:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=103 total_exceptions=0 levels={'INFO': 103}
+2026-03-21 16:04:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=103 total_exceptions=0 levels={'INFO': 103}
+2026-03-21 16:06:34,805 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=105 total_exceptions=0 levels={'INFO': 105}
+2026-03-21 16:06:34,805 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=105 total_exceptions=0 levels={'INFO': 105}
+2026-03-21 16:06:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=105 total_exceptions=0 levels={'INFO': 105}
+2026-03-21 16:06:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=105 total_exceptions=0 levels={'INFO': 105}
+2026-03-21 16:08:34,806 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=107 total_exceptions=0 levels={'INFO': 107}
+2026-03-21 16:08:34,806 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=107 total_exceptions=0 levels={'INFO': 107}
+2026-03-21 16:08:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=107 total_exceptions=0 levels={'INFO': 107}
+2026-03-21 16:08:34,809 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=107 total_exceptions=0 levels={'INFO': 107}
+2026-03-21 16:10:34,807 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=109 total_exceptions=0 levels={'INFO': 109}
+2026-03-21 16:10:34,807 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=109 total_exceptions=0 levels={'INFO': 109}
+2026-03-21 16:10:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=109 total_exceptions=0 levels={'INFO': 109}
+2026-03-21 16:10:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=109 total_exceptions=0 levels={'INFO': 109}
+2026-03-21 16:12:34,807 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=111 total_exceptions=0 levels={'INFO': 111}
+2026-03-21 16:12:34,807 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=111 total_exceptions=0 levels={'INFO': 111}
+2026-03-21 16:12:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=111 total_exceptions=0 levels={'INFO': 111}
+2026-03-21 16:12:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=111 total_exceptions=0 levels={'INFO': 111}
+2026-03-21 16:14:34,808 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=113 total_exceptions=0 levels={'INFO': 113}
+2026-03-21 16:14:34,808 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=113 total_exceptions=0 levels={'INFO': 113}
+2026-03-21 16:14:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=113 total_exceptions=0 levels={'INFO': 113}
+2026-03-21 16:14:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=113 total_exceptions=0 levels={'INFO': 113}
+2026-03-21 16:16:34,808 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=115 total_exceptions=0 levels={'INFO': 115}
+2026-03-21 16:16:34,808 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=115 total_exceptions=0 levels={'INFO': 115}
+2026-03-21 16:16:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=115 total_exceptions=0 levels={'INFO': 115}
+2026-03-21 16:16:34,810 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=115 total_exceptions=0 levels={'INFO': 115}
+2026-03-21 16:17:18,565 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:17:18,565 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:17:18,566 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:17:18,566 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:17:18,566 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 16:17:18,566 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 16:17:18,816 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 16:17:18,816 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 16:17:20,583 - telegram - INFO - runtime_logging_enabled pid=54706 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:20,587 - aiogram - INFO - runtime_logging_enabled pid=54706 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:20,587 - aiogram - INFO - runtime_logging_enabled pid=54706 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:20,604 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 16:17:20,604 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 16:17:20,605 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 16:17:20,605 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 16:17:20,669 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:17:20,669 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:19:20,583 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:19:20,583 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:19:20,586 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:19:20,586 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:21:20,584 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:21:20,584 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:21:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:21:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:23:20,584 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:23:20,584 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:23:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:23:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:25:20,585 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:25:20,585 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:25:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:25:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:27:20,586 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:27:20,586 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:27:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:27:20,587 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:29:20,586 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:29:20,586 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:29:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:29:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:31:20,587 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:31:20,587 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:31:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:31:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:33:20,587 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:33:20,587 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:33:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:33:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:35:20,588 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:35:20,588 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:35:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:35:20,588 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:35:39,106 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:35:39,106 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:35:39,107 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:35:39,107 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:35:39,110 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 16:35:39,110 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 16:35:39,222 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:35:39,222 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 16:35:39,361 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 16:35:39,361 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 16:35:41,580 - telegram - INFO - runtime_logging_enabled pid=55184 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:41,583 - aiogram - INFO - runtime_logging_enabled pid=55184 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:41,583 - aiogram - INFO - runtime_logging_enabled pid=55184 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:41,591 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 16:35:41,591 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 16:35:41,592 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 16:35:41,592 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 16:35:41,661 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:35:41,661 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 16:37:41,581 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:37:41,581 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:37:41,583 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:37:41,583 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 16:39:41,581 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:39:41,581 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:39:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:39:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 16:41:41,582 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:41:41,582 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:41:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:41:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:43:41,582 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:43:41,582 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:43:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:43:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 16:45:41,583 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:45:41,583 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:45:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:45:41,584 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 16:47:41,583 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:47:41,583 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:47:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:47:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:49:41,584 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:49:41,584 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:49:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:49:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:51:32,131 - aiogram.event - INFO - Update id=261501710 is handled. Duration 216 ms by bot id=8749053931
+2026-03-21 16:51:32,131 - aiogram.event - INFO - Update id=261501710 is handled. Duration 216 ms by bot id=8749053931
+2026-03-21 16:51:37,724 - aiogram.event - INFO - Update id=261501711 is handled. Duration 316 ms by bot id=8749053931
+2026-03-21 16:51:37,724 - aiogram.event - INFO - Update id=261501711 is handled. Duration 316 ms by bot id=8749053931
+2026-03-21 16:51:41,584 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:51:41,584 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:51:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:51:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:51:47,163 - aiogram.event - INFO - Update id=261501712 is handled. Duration 297 ms by bot id=8749053931
+2026-03-21 16:51:47,163 - aiogram.event - INFO - Update id=261501712 is handled. Duration 297 ms by bot id=8749053931
+2026-03-21 16:51:49,502 - aiogram.event - INFO - Update id=261501713 is handled. Duration 345 ms by bot id=8749053931
+2026-03-21 16:51:49,502 - aiogram.event - INFO - Update id=261501713 is handled. Duration 345 ms by bot id=8749053931
+2026-03-21 16:51:52,196 - aiogram.event - INFO - Update id=261501714 is handled. Duration 290 ms by bot id=8749053931
+2026-03-21 16:51:52,196 - aiogram.event - INFO - Update id=261501714 is handled. Duration 290 ms by bot id=8749053931
+2026-03-21 16:53:41,585 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:53:41,585 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:53:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:53:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:55:41,585 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 16:55:41,585 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 16:55:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 16:55:41,585 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 16:57:41,586 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=30 total_exceptions=0 levels={'INFO': 30}
+2026-03-21 16:57:41,586 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 16:57:41,586 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=30 total_exceptions=0 levels={'INFO': 30}
+2026-03-21 16:57:41,586 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 16:59:41,588 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 16:59:41,588 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 16:59:41,588 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 16:59:41,588 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 17:01:41,591 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 17:01:41,591 - telegram.runtime - INFO - runtime_stats uptime_s=1560 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 17:01:41,591 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 17:01:41,591 - aiogram.runtime - INFO - runtime_stats uptime_s=1560 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 17:03:41,591 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 17:03:41,591 - telegram.runtime - INFO - runtime_stats uptime_s=1680 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 17:03:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 17:03:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1680 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 17:05:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=38 total_exceptions=0 levels={'INFO': 38}
+2026-03-21 17:05:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 17:05:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=1800 total_records=38 total_exceptions=0 levels={'INFO': 38}
+2026-03-21 17:05:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1800 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 17:07:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 17:07:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=1920 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 17:07:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=39 total_exceptions=0 levels={'INFO': 39}
+2026-03-21 17:07:41,592 - aiogram.runtime - INFO - runtime_stats uptime_s=1920 total_records=39 total_exceptions=0 levels={'INFO': 39}
+2026-03-21 17:09:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 17:09:41,592 - telegram.runtime - INFO - runtime_stats uptime_s=2040 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 17:09:41,593 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 17:09:41,593 - aiogram.runtime - INFO - runtime_stats uptime_s=2040 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 17:11:41,593 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 17:11:41,593 - telegram.runtime - INFO - runtime_stats uptime_s=2160 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 17:11:41,593 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 17:11:41,593 - aiogram.runtime - INFO - runtime_stats uptime_s=2160 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 17:12:31,521 - aiogram.event - INFO - Update id=261501715 is handled. Duration 309 ms by bot id=8749053931
+2026-03-21 17:12:31,521 - aiogram.event - INFO - Update id=261501715 is handled. Duration 309 ms by bot id=8749053931
+2026-03-21 17:12:35,018 - aiogram.event - INFO - Update id=261501716 is handled. Duration 449 ms by bot id=8749053931
+2026-03-21 17:12:35,018 - aiogram.event - INFO - Update id=261501716 is handled. Duration 449 ms by bot id=8749053931
+2026-03-21 17:12:37,136 - aiogram.event - INFO - Update id=261501717 is handled. Duration 307 ms by bot id=8749053931
+2026-03-21 17:12:37,136 - aiogram.event - INFO - Update id=261501717 is handled. Duration 307 ms by bot id=8749053931
+2026-03-21 17:12:39,014 - aiogram.event - INFO - Update id=261501718 is handled. Duration 302 ms by bot id=8749053931
+2026-03-21 17:12:39,014 - aiogram.event - INFO - Update id=261501718 is handled. Duration 302 ms by bot id=8749053931
+2026-03-21 17:12:44,236 - aiogram.event - INFO - Update id=261501719 is handled. Duration 290 ms by bot id=8749053931
+2026-03-21 17:12:44,236 - aiogram.event - INFO - Update id=261501719 is handled. Duration 290 ms by bot id=8749053931
+2026-03-21 17:12:45,781 - aiogram.event - INFO - Update id=261501720 is handled. Duration 350 ms by bot id=8749053931
+2026-03-21 17:12:45,781 - aiogram.event - INFO - Update id=261501720 is handled. Duration 350 ms by bot id=8749053931
+2026-03-21 17:12:48,084 - aiogram.event - INFO - Update id=261501721 is handled. Duration 295 ms by bot id=8749053931
+2026-03-21 17:12:48,084 - aiogram.event - INFO - Update id=261501721 is handled. Duration 295 ms by bot id=8749053931
+2026-03-21 17:12:50,453 - aiogram.event - INFO - Update id=261501722 is handled. Duration 326 ms by bot id=8749053931
+2026-03-21 17:12:50,453 - aiogram.event - INFO - Update id=261501722 is handled. Duration 326 ms by bot id=8749053931
+2026-03-21 17:12:52,226 - aiogram.event - INFO - Update id=261501723 is handled. Duration 381 ms by bot id=8749053931
+2026-03-21 17:12:52,226 - aiogram.event - INFO - Update id=261501723 is handled. Duration 381 ms by bot id=8749053931
+2026-03-21 17:12:54,740 - aiogram.event - INFO - Update id=261501724 is handled. Duration 322 ms by bot id=8749053931
+2026-03-21 17:12:54,740 - aiogram.event - INFO - Update id=261501724 is handled. Duration 322 ms by bot id=8749053931
+2026-03-21 17:13:01,753 - aiogram.event - INFO - Update id=261501725 is handled. Duration 329 ms by bot id=8749053931
+2026-03-21 17:13:01,753 - aiogram.event - INFO - Update id=261501725 is handled. Duration 329 ms by bot id=8749053931
+2026-03-21 17:13:04,854 - aiogram.event - INFO - Update id=261501726 is handled. Duration 372 ms by bot id=8749053931
+2026-03-21 17:13:04,854 - aiogram.event - INFO - Update id=261501726 is handled. Duration 372 ms by bot id=8749053931
+2026-03-21 17:13:07,937 - aiogram.event - INFO - Update id=261501727 is handled. Duration 471 ms by bot id=8749053931
+2026-03-21 17:13:07,937 - aiogram.event - INFO - Update id=261501727 is handled. Duration 471 ms by bot id=8749053931
+2026-03-21 17:13:09,580 - aiogram.event - INFO - Update id=261501728 is handled. Duration 307 ms by bot id=8749053931
+2026-03-21 17:13:09,580 - aiogram.event - INFO - Update id=261501728 is handled. Duration 307 ms by bot id=8749053931
+2026-03-21 17:13:12,393 - aiogram.event - INFO - Update id=261501729 is handled. Duration 292 ms by bot id=8749053931
+2026-03-21 17:13:12,393 - aiogram.event - INFO - Update id=261501729 is handled. Duration 292 ms by bot id=8749053931
+2026-03-21 17:13:13,849 - aiogram.event - INFO - Update id=261501730 is handled. Duration 340 ms by bot id=8749053931
+2026-03-21 17:13:13,849 - aiogram.event - INFO - Update id=261501730 is handled. Duration 340 ms by bot id=8749053931
+2026-03-21 17:13:17,704 - aiogram.event - INFO - Update id=261501731 is handled. Duration 305 ms by bot id=8749053931
+2026-03-21 17:13:17,704 - aiogram.event - INFO - Update id=261501731 is handled. Duration 305 ms by bot id=8749053931
+2026-03-21 17:13:19,241 - aiogram.event - INFO - Update id=261501732 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 17:13:19,241 - aiogram.event - INFO - Update id=261501732 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 17:13:21,122 - aiogram.event - INFO - Update id=261501733 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 17:13:21,122 - aiogram.event - INFO - Update id=261501733 is handled. Duration 304 ms by bot id=8749053931
+2026-03-21 17:13:22,532 - aiogram.event - INFO - Update id=261501734 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 17:13:22,532 - aiogram.event - INFO - Update id=261501734 is handled. Duration 321 ms by bot id=8749053931
+2026-03-21 17:13:23,823 - aiogram.event - INFO - Update id=261501735 is handled. Duration 420 ms by bot id=8749053931
+2026-03-21 17:13:23,823 - aiogram.event - INFO - Update id=261501735 is handled. Duration 420 ms by bot id=8749053931
+2026-03-21 17:13:27,687 - aiogram.event - INFO - Update id=261501736 is handled. Duration 370 ms by bot id=8749053931
+2026-03-21 17:13:27,687 - aiogram.event - INFO - Update id=261501736 is handled. Duration 370 ms by bot id=8749053931
+2026-03-21 17:13:32,565 - aiogram.event - INFO - Update id=261501737 is handled. Duration 325 ms by bot id=8749053931
+2026-03-21 17:13:32,565 - aiogram.event - INFO - Update id=261501737 is handled. Duration 325 ms by bot id=8749053931
+2026-03-21 17:13:34,609 - aiogram.event - INFO - Update id=261501738 is handled. Duration 356 ms by bot id=8749053931
+2026-03-21 17:13:34,609 - aiogram.event - INFO - Update id=261501738 is handled. Duration 356 ms by bot id=8749053931
+2026-03-21 17:13:41,593 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=70 total_exceptions=0 levels={'INFO': 70}
+2026-03-21 17:13:41,594 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=69 total_exceptions=0 levels={'INFO': 69}
+2026-03-21 17:13:41,593 - telegram.runtime - INFO - runtime_stats uptime_s=2280 total_records=70 total_exceptions=0 levels={'INFO': 70}
+2026-03-21 17:13:41,594 - aiogram.runtime - INFO - runtime_stats uptime_s=2280 total_records=69 total_exceptions=0 levels={'INFO': 69}
+2026-03-21 17:15:41,594 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=72 total_exceptions=0 levels={'INFO': 72}
+2026-03-21 17:15:41,594 - telegram.runtime - INFO - runtime_stats uptime_s=2400 total_records=72 total_exceptions=0 levels={'INFO': 72}
+2026-03-21 17:15:41,594 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=71 total_exceptions=0 levels={'INFO': 71}
+2026-03-21 17:15:41,594 - aiogram.runtime - INFO - runtime_stats uptime_s=2400 total_records=71 total_exceptions=0 levels={'INFO': 71}
+2026-03-21 17:17:41,594 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=74 total_exceptions=0 levels={'INFO': 74}
+2026-03-21 17:17:41,594 - telegram.runtime - INFO - runtime_stats uptime_s=2520 total_records=74 total_exceptions=0 levels={'INFO': 74}
+2026-03-21 17:17:41,595 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=74 total_exceptions=0 levels={'INFO': 74}
+2026-03-21 17:17:41,595 - aiogram.runtime - INFO - runtime_stats uptime_s=2520 total_records=74 total_exceptions=0 levels={'INFO': 74}
+2026-03-21 17:19:41,595 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=76 total_exceptions=0 levels={'INFO': 76}
+2026-03-21 17:19:41,596 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=75 total_exceptions=0 levels={'INFO': 75}
+2026-03-21 17:19:41,595 - telegram.runtime - INFO - runtime_stats uptime_s=2640 total_records=76 total_exceptions=0 levels={'INFO': 76}
+2026-03-21 17:19:41,596 - aiogram.runtime - INFO - runtime_stats uptime_s=2640 total_records=75 total_exceptions=0 levels={'INFO': 75}
+2026-03-21 17:21:41,596 - telegram.runtime - INFO - runtime_stats uptime_s=2760 total_records=78 total_exceptions=0 levels={'INFO': 78}
+2026-03-21 17:21:41,596 - aiogram.runtime - INFO - runtime_stats uptime_s=2760 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 17:21:41,596 - telegram.runtime - INFO - runtime_stats uptime_s=2760 total_records=78 total_exceptions=0 levels={'INFO': 78}
+2026-03-21 17:21:41,596 - aiogram.runtime - INFO - runtime_stats uptime_s=2760 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 17:23:41,597 - telegram.runtime - INFO - runtime_stats uptime_s=2880 total_records=80 total_exceptions=0 levels={'INFO': 80}
+2026-03-21 17:23:41,597 - aiogram.runtime - INFO - runtime_stats uptime_s=2880 total_records=79 total_exceptions=0 levels={'INFO': 79}
+2026-03-21 17:23:41,597 - telegram.runtime - INFO - runtime_stats uptime_s=2880 total_records=80 total_exceptions=0 levels={'INFO': 80}
+2026-03-21 17:23:41,597 - aiogram.runtime - INFO - runtime_stats uptime_s=2880 total_records=79 total_exceptions=0 levels={'INFO': 79}
+2026-03-21 17:25:41,598 - telegram.runtime - INFO - runtime_stats uptime_s=3000 total_records=82 total_exceptions=0 levels={'INFO': 82}
+2026-03-21 17:25:41,598 - aiogram.runtime - INFO - runtime_stats uptime_s=3000 total_records=81 total_exceptions=0 levels={'INFO': 81}
+2026-03-21 17:25:41,598 - telegram.runtime - INFO - runtime_stats uptime_s=3000 total_records=82 total_exceptions=0 levels={'INFO': 82}
+2026-03-21 17:25:41,598 - aiogram.runtime - INFO - runtime_stats uptime_s=3000 total_records=81 total_exceptions=0 levels={'INFO': 81}
+2026-03-21 17:27:41,598 - telegram.runtime - INFO - runtime_stats uptime_s=3120 total_records=84 total_exceptions=0 levels={'INFO': 84}
+2026-03-21 17:27:41,598 - aiogram.runtime - INFO - runtime_stats uptime_s=3120 total_records=83 total_exceptions=0 levels={'INFO': 83}
+2026-03-21 17:27:41,598 - telegram.runtime - INFO - runtime_stats uptime_s=3120 total_records=84 total_exceptions=0 levels={'INFO': 84}
+2026-03-21 17:27:41,598 - aiogram.runtime - INFO - runtime_stats uptime_s=3120 total_records=83 total_exceptions=0 levels={'INFO': 83}
+2026-03-21 17:29:41,599 - telegram.runtime - INFO - runtime_stats uptime_s=3240 total_records=86 total_exceptions=0 levels={'INFO': 86}
+2026-03-21 17:29:41,599 - aiogram.runtime - INFO - runtime_stats uptime_s=3240 total_records=85 total_exceptions=0 levels={'INFO': 85}
+2026-03-21 17:29:41,599 - telegram.runtime - INFO - runtime_stats uptime_s=3240 total_records=86 total_exceptions=0 levels={'INFO': 86}
+2026-03-21 17:29:41,599 - aiogram.runtime - INFO - runtime_stats uptime_s=3240 total_records=85 total_exceptions=0 levels={'INFO': 85}
+2026-03-21 17:31:41,599 - telegram.runtime - INFO - runtime_stats uptime_s=3360 total_records=88 total_exceptions=0 levels={'INFO': 88}
+2026-03-21 17:31:41,599 - telegram.runtime - INFO - runtime_stats uptime_s=3360 total_records=88 total_exceptions=0 levels={'INFO': 88}
+2026-03-21 17:31:41,600 - aiogram.runtime - INFO - runtime_stats uptime_s=3360 total_records=88 total_exceptions=0 levels={'INFO': 88}
+2026-03-21 17:31:41,600 - aiogram.runtime - INFO - runtime_stats uptime_s=3360 total_records=88 total_exceptions=0 levels={'INFO': 88}
+2026-03-21 17:32:58,523 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 17:32:58,523 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2026-03-21 17:32:58,525 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 17:32:58,525 - aiogram.dispatcher - INFO - Polling stopped for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 17:32:58,526 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 17:32:58,526 - aiogram.dispatcher - INFO - Polling stopped
+2026-03-21 17:32:58,776 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 17:32:58,776 - aiogram - INFO - aiogram adapter stopped
+2026-03-21 17:33:01,171 - telegram - INFO - runtime_logging_enabled pid=59032 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:33:01,176 - aiogram - INFO - runtime_logging_enabled pid=59032 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:33:01,176 - aiogram - INFO - runtime_logging_enabled pid=59032 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:33:01,186 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 17:33:01,186 - aiogram - INFO - aiogram adapter starting (full_fsm_coverage)
+2026-03-21 17:33:01,186 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 17:33:01,186 - aiogram.dispatcher - INFO - Start polling
+2026-03-21 17:33:01,254 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 17:33:01,254 - aiogram.dispatcher - INFO - Run polling for bot @myfsgodbot id=8749053931 - 'myfsgodbot'
+2026-03-21 17:35:01,171 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 17:35:01,171 - telegram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 17:35:01,176 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 17:35:01,176 - aiogram.runtime - INFO - runtime_stats uptime_s=120 total_records=5 total_exceptions=0 levels={'INFO': 5}
+2026-03-21 17:37:01,171 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 17:37:01,171 - telegram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 17:37:01,176 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 17:37:01,176 - aiogram.runtime - INFO - runtime_stats uptime_s=240 total_records=7 total_exceptions=0 levels={'INFO': 7}
+2026-03-21 17:39:01,172 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 17:39:01,172 - telegram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 17:39:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 17:39:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=360 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 17:41:01,172 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 17:41:01,172 - telegram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 17:41:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 17:41:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=480 total_records=11 total_exceptions=0 levels={'INFO': 11}
+2026-03-21 17:43:01,173 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 17:43:01,173 - telegram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 17:43:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 17:43:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=600 total_records=13 total_exceptions=0 levels={'INFO': 13}
+2026-03-21 17:45:01,173 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 17:45:01,173 - telegram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 17:45:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 17:45:01,177 - aiogram.runtime - INFO - runtime_stats uptime_s=720 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 17:47:01,174 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 17:47:01,174 - telegram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 17:47:01,178 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 17:47:01,178 - aiogram.runtime - INFO - runtime_stats uptime_s=840 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 17:49:01,175 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 17:49:01,175 - telegram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 17:49:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 17:49:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=960 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 17:51:01,176 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 17:51:01,176 - telegram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 17:51:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 17:51:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1080 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 17:53:01,176 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 17:53:01,176 - telegram.runtime - INFO - runtime_stats uptime_s=1200 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 17:53:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 17:53:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1200 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 17:55:01,177 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 17:55:01,177 - telegram.runtime - INFO - runtime_stats uptime_s=1320 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 17:55:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 17:55:01,179 - aiogram.runtime - INFO - runtime_stats uptime_s=1320 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 17:57:01,177 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 17:57:01,177 - telegram.runtime - INFO - runtime_stats uptime_s=1440 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 17:57:01,180 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 17:57:01,180 - aiogram.runtime - INFO - runtime_stats uptime_s=1440 total_records=27 total_exceptions=0 levels={'INFO': 27}

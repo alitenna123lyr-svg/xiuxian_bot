@@ -6,6 +6,9 @@ from core.routes._helpers import success
 from core.database.connection import fetch_all, get_user_by_id, get_item_by_db_id, fetch_one, execute
 from core.game.leaderboards import leaderboard_entry, get_stage_goal
 from core.game.items import calculate_equipment_score
+from core.game.maps import get_map
+from core.game.realms import get_realm_by_id
+from core.services.sect_service import get_user_sect_buffs
 from core.utils.timeutil import local_day_key
 
 misc_bp = Blueprint("misc", __name__)
@@ -42,6 +45,36 @@ def _ensure_growth_snapshot(user: dict, power: int, affix_score: int, day_key: i
         (user.get("user_id"), int(day_key), int(user.get("exp", 0) or 0), int(power or 0), int(affix_score or 0)),
     )
 
+
+def _enrich_leaderboard_entry(entry: dict, user_row: dict) -> None:
+    rank = int(entry.get("rank", user_row.get("rank", 1)) or 1)
+    realm_name = (get_realm_by_id(rank) or {}).get("name", "未知")
+
+    current_map = str(user_row.get("current_map") or "canglan_city")
+    current_map_name = current_map
+    try:
+        map_info = get_map(current_map)
+        if map_info:
+            current_map_name = str(map_info.get("name") or current_map)
+    except Exception:
+        pass
+
+    sect_name = None
+    user_id = str(entry.get("user_id") or "")
+    if user_id:
+        try:
+            buffs = get_user_sect_buffs(user_id)
+            if buffs.get("in_sect"):
+                sect_name = buffs.get("sect_name")
+        except Exception:
+            pass
+
+    entry["realm_name"] = realm_name
+    entry["current_map"] = current_map
+    entry["current_map_name"] = current_map_name
+    entry["sect_name"] = sect_name
+
+
 @misc_bp.route("/api/leaderboard", methods=["GET"])
 def leaderboard():
     mode = request.args.get("mode", "power")
@@ -59,6 +92,7 @@ def leaderboard():
         mode = "power"
 
     users = fetch_all("SELECT * FROM users")
+    user_index = {str(u.get("user_id")): u for u in users}
     entries = [leaderboard_entry(u) for u in users]
     if mode in ("affix_score", "growth_7d"):
         day_key = local_day_key()
@@ -93,4 +127,10 @@ def leaderboard():
         entries = sorted(entries, key=lambda x: x["dy_times"], reverse=True)
     else:
         entries = sorted(entries, key=lambda x: x["power"], reverse=True)
-    return success(mode=mode, entries=entries[:20], stage_goal=stage_goal)
+
+    top_entries = entries[:20]
+    for entry in top_entries:
+        user_row = user_index.get(str(entry.get("user_id") or ""), {})
+        _enrich_leaderboard_entry(entry, user_row)
+
+    return success(mode=mode, entries=top_entries, stage_goal=stage_goal)

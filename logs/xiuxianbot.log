@@ -5588,3 +5588,520 @@ LINE 1: ..._social_chat_pending_pair ON social_chat_requests(CASE WHEN ...
 2026-03-21 11:41:15,057 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:11452
 2026-03-21 11:41:15,057 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 11:42:34,557 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 11:42:35,060 - xiuxianbot - INFO - Stopping aiogram adapter (PID 48119)
+2026-03-21 11:42:35,076 - xiuxianbot - INFO - aiogram adapter stopped
+2026-03-21 11:42:35,076 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 11:42:35,193 - xiuxianbot - INFO - runtime_logging_enabled pid=48278 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:35,198 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 11:42:35,198 - xiuxianbot - INFO - Core server started with PID 48280
+2026-03-21 11:42:35,199 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 11:42:35,203 - xiuxianbot - INFO - aiogram adapter started with PID 48281
+2026-03-21 11:42:37,204 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 11:42:37,295 - web_local - INFO - runtime_logging_enabled pid=48278 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:37,315 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 11:42:37,347 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 11:42:37,350 - Database - INFO - Database tables created/verified
+2026-03-21 11:42:37,361 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 11:42:37,361 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 11:42:37,362 - web_public - INFO - runtime_logging_enabled pid=48278 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 11:42:37,366 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 11:42:37,366 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 11:42:37,368 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 11:42:37,368 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 11:42:37,369 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 11:42:37,369 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 11:45:35,193 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 11:45:37,296 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 11:45:37,362 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 11:48:35,194 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=360 total_records=22 total_exceptions=0 levels={'INFO': 22}
+2026-03-21 11:48:37,296 - web_local.runtime - INFO - runtime_stats uptime_s=360 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 11:48:37,363 - web_public.runtime - INFO - runtime_stats uptime_s=360 total_records=12 total_exceptions=0 levels={'INFO': 12}
+2026-03-21 11:51:35,195 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=540 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 11:51:37,296 - web_local.runtime - INFO - runtime_stats uptime_s=540 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 11:51:37,363 - web_public.runtime - INFO - runtime_stats uptime_s=540 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 11:54:35,196 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=720 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 11:54:37,297 - web_local.runtime - INFO - runtime_stats uptime_s=720 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 11:54:37,363 - web_public.runtime - INFO - runtime_stats uptime_s=720 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 11:57:35,196 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=900 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 11:57:37,297 - web_local.runtime - INFO - runtime_stats uptime_s=900 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 11:57:37,364 - web_public.runtime - INFO - runtime_stats uptime_s=900 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 12:00:35,197 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1080 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 12:00:37,298 - web_local.runtime - INFO - runtime_stats uptime_s=1080 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 12:00:37,364 - web_public.runtime - INFO - runtime_stats uptime_s=1080 total_records=24 total_exceptions=0 levels={'INFO': 24}
+2026-03-21 12:03:35,198 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1260 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 12:03:37,298 - web_local.runtime - INFO - runtime_stats uptime_s=1260 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 12:03:37,364 - web_public.runtime - INFO - runtime_stats uptime_s=1260 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 12:06:35,198 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1440 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 12:06:37,298 - web_local.runtime - INFO - runtime_stats uptime_s=1440 total_records=35 total_exceptions=0 levels={'INFO': 35}
+2026-03-21 12:06:37,365 - web_public.runtime - INFO - runtime_stats uptime_s=1440 total_records=30 total_exceptions=0 levels={'INFO': 30}
+2026-03-21 12:09:35,199 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1620 total_records=43 total_exceptions=0 levels={'INFO': 43}
+2026-03-21 12:09:37,299 - web_local.runtime - INFO - runtime_stats uptime_s=1620 total_records=38 total_exceptions=0 levels={'INFO': 38}
+2026-03-21 12:09:37,365 - web_public.runtime - INFO - runtime_stats uptime_s=1620 total_records=33 total_exceptions=0 levels={'INFO': 33}
+2026-03-21 12:12:35,199 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1800 total_records=46 total_exceptions=0 levels={'INFO': 46}
+2026-03-21 12:12:37,299 - web_local.runtime - INFO - runtime_stats uptime_s=1800 total_records=41 total_exceptions=0 levels={'INFO': 41}
+2026-03-21 12:12:37,366 - web_public.runtime - INFO - runtime_stats uptime_s=1800 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 12:15:35,200 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1980 total_records=49 total_exceptions=0 levels={'INFO': 49}
+2026-03-21 12:15:37,299 - web_local.runtime - INFO - runtime_stats uptime_s=1980 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 12:15:37,366 - web_public.runtime - INFO - runtime_stats uptime_s=1980 total_records=39 total_exceptions=0 levels={'INFO': 39}
+2026-03-21 12:18:35,201 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2160 total_records=52 total_exceptions=0 levels={'INFO': 52}
+2026-03-21 12:18:37,300 - web_local.runtime - INFO - runtime_stats uptime_s=2160 total_records=47 total_exceptions=0 levels={'INFO': 47}
+2026-03-21 12:18:37,366 - web_public.runtime - INFO - runtime_stats uptime_s=2160 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 12:21:35,201 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2340 total_records=55 total_exceptions=0 levels={'INFO': 55}
+2026-03-21 12:21:37,300 - web_local.runtime - INFO - runtime_stats uptime_s=2340 total_records=50 total_exceptions=0 levels={'INFO': 50}
+2026-03-21 12:21:37,367 - web_public.runtime - INFO - runtime_stats uptime_s=2340 total_records=45 total_exceptions=0 levels={'INFO': 45}
+2026-03-21 12:24:35,202 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2520 total_records=58 total_exceptions=0 levels={'INFO': 58}
+2026-03-21 12:24:37,300 - web_local.runtime - INFO - runtime_stats uptime_s=2520 total_records=53 total_exceptions=0 levels={'INFO': 53}
+2026-03-21 12:24:37,367 - web_public.runtime - INFO - runtime_stats uptime_s=2520 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 12:27:35,203 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2700 total_records=61 total_exceptions=0 levels={'INFO': 61}
+2026-03-21 12:27:37,301 - web_local.runtime - INFO - runtime_stats uptime_s=2700 total_records=56 total_exceptions=0 levels={'INFO': 56}
+2026-03-21 12:27:37,367 - web_public.runtime - INFO - runtime_stats uptime_s=2700 total_records=51 total_exceptions=0 levels={'INFO': 51}
+2026-03-21 12:30:35,204 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2880 total_records=64 total_exceptions=0 levels={'INFO': 64}
+2026-03-21 12:30:37,302 - web_local.runtime - INFO - runtime_stats uptime_s=2880 total_records=59 total_exceptions=0 levels={'INFO': 59}
+2026-03-21 12:30:37,368 - web_public.runtime - INFO - runtime_stats uptime_s=2880 total_records=54 total_exceptions=0 levels={'INFO': 54}
+2026-03-21 12:33:35,204 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3060 total_records=67 total_exceptions=0 levels={'INFO': 67}
+2026-03-21 12:33:37,302 - web_local.runtime - INFO - runtime_stats uptime_s=3060 total_records=62 total_exceptions=0 levels={'INFO': 62}
+2026-03-21 12:33:37,368 - web_public.runtime - INFO - runtime_stats uptime_s=3060 total_records=57 total_exceptions=0 levels={'INFO': 57}
+2026-03-21 12:36:35,205 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3240 total_records=70 total_exceptions=0 levels={'INFO': 70}
+2026-03-21 12:36:37,302 - web_local.runtime - INFO - runtime_stats uptime_s=3240 total_records=65 total_exceptions=0 levels={'INFO': 65}
+2026-03-21 12:36:37,368 - web_public.runtime - INFO - runtime_stats uptime_s=3240 total_records=60 total_exceptions=0 levels={'INFO': 60}
+2026-03-21 12:39:35,206 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3420 total_records=73 total_exceptions=0 levels={'INFO': 73}
+2026-03-21 12:39:37,302 - web_local.runtime - INFO - runtime_stats uptime_s=3420 total_records=68 total_exceptions=0 levels={'INFO': 68}
+2026-03-21 12:39:37,370 - web_public.runtime - INFO - runtime_stats uptime_s=3420 total_records=63 total_exceptions=0 levels={'INFO': 63}
+2026-03-21 12:42:35,207 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3600 total_records=76 total_exceptions=0 levels={'INFO': 76}
+2026-03-21 12:42:37,303 - web_local.runtime - INFO - runtime_stats uptime_s=3600 total_records=71 total_exceptions=0 levels={'INFO': 71}
+2026-03-21 12:42:37,374 - web_public.runtime - INFO - runtime_stats uptime_s=3600 total_records=66 total_exceptions=0 levels={'INFO': 66}
+2026-03-21 12:45:35,207 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3780 total_records=79 total_exceptions=0 levels={'INFO': 79}
+2026-03-21 12:45:37,303 - web_local.runtime - INFO - runtime_stats uptime_s=3780 total_records=74 total_exceptions=0 levels={'INFO': 74}
+2026-03-21 12:45:37,374 - web_public.runtime - INFO - runtime_stats uptime_s=3780 total_records=69 total_exceptions=0 levels={'INFO': 69}
+2026-03-21 12:48:35,208 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3960 total_records=82 total_exceptions=0 levels={'INFO': 82}
+2026-03-21 12:48:37,303 - web_local.runtime - INFO - runtime_stats uptime_s=3960 total_records=77 total_exceptions=0 levels={'INFO': 77}
+2026-03-21 12:48:37,375 - web_public.runtime - INFO - runtime_stats uptime_s=3960 total_records=72 total_exceptions=0 levels={'INFO': 72}
+2026-03-21 12:51:35,209 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=4140 total_records=85 total_exceptions=0 levels={'INFO': 85}
+2026-03-21 12:51:37,304 - web_local.runtime - INFO - runtime_stats uptime_s=4140 total_records=80 total_exceptions=0 levels={'INFO': 80}
+2026-03-21 12:51:37,375 - web_public.runtime - INFO - runtime_stats uptime_s=4140 total_records=75 total_exceptions=0 levels={'INFO': 75}
+2026-03-21 12:54:35,209 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=4320 total_records=88 total_exceptions=0 levels={'INFO': 88}
+2026-03-21 12:54:37,304 - web_local.runtime - INFO - runtime_stats uptime_s=4320 total_records=83 total_exceptions=0 levels={'INFO': 83}
+2026-03-21 12:54:37,375 - web_public.runtime - INFO - runtime_stats uptime_s=4320 total_records=78 total_exceptions=0 levels={'INFO': 78}
+2026-03-21 12:57:35,210 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=4500 total_records=91 total_exceptions=0 levels={'INFO': 91}
+2026-03-21 12:57:37,304 - web_local.runtime - INFO - runtime_stats uptime_s=4500 total_records=86 total_exceptions=0 levels={'INFO': 86}
+2026-03-21 12:57:37,376 - web_public.runtime - INFO - runtime_stats uptime_s=4500 total_records=81 total_exceptions=0 levels={'INFO': 81}
+2026-03-21 13:00:35,211 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=4680 total_records=94 total_exceptions=0 levels={'INFO': 94}
+2026-03-21 13:00:37,306 - web_local.runtime - INFO - runtime_stats uptime_s=4680 total_records=89 total_exceptions=0 levels={'INFO': 89}
+2026-03-21 13:00:37,376 - web_public.runtime - INFO - runtime_stats uptime_s=4680 total_records=84 total_exceptions=0 levels={'INFO': 84}
+2026-03-21 13:03:35,211 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=4860 total_records=97 total_exceptions=0 levels={'INFO': 97}
+2026-03-21 13:03:37,306 - web_local.runtime - INFO - runtime_stats uptime_s=4860 total_records=92 total_exceptions=0 levels={'INFO': 92}
+2026-03-21 13:03:37,376 - web_public.runtime - INFO - runtime_stats uptime_s=4860 total_records=87 total_exceptions=0 levels={'INFO': 87}
+2026-03-21 13:06:35,212 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5040 total_records=100 total_exceptions=0 levels={'INFO': 100}
+2026-03-21 13:06:37,307 - web_local.runtime - INFO - runtime_stats uptime_s=5040 total_records=95 total_exceptions=0 levels={'INFO': 95}
+2026-03-21 13:06:37,377 - web_public.runtime - INFO - runtime_stats uptime_s=5040 total_records=90 total_exceptions=0 levels={'INFO': 90}
+2026-03-21 13:09:35,213 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5220 total_records=103 total_exceptions=0 levels={'INFO': 103}
+2026-03-21 13:09:37,307 - web_local.runtime - INFO - runtime_stats uptime_s=5220 total_records=98 total_exceptions=0 levels={'INFO': 98}
+2026-03-21 13:09:37,377 - web_public.runtime - INFO - runtime_stats uptime_s=5220 total_records=93 total_exceptions=0 levels={'INFO': 93}
+2026-03-21 13:12:35,213 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5400 total_records=106 total_exceptions=0 levels={'INFO': 106}
+2026-03-21 13:12:37,307 - web_local.runtime - INFO - runtime_stats uptime_s=5400 total_records=101 total_exceptions=0 levels={'INFO': 101}
+2026-03-21 13:12:37,377 - web_public.runtime - INFO - runtime_stats uptime_s=5400 total_records=96 total_exceptions=0 levels={'INFO': 96}
+2026-03-21 13:15:35,215 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5580 total_records=109 total_exceptions=0 levels={'INFO': 109}
+2026-03-21 13:15:37,308 - web_local.runtime - INFO - runtime_stats uptime_s=5580 total_records=104 total_exceptions=0 levels={'INFO': 104}
+2026-03-21 13:15:37,378 - web_public.runtime - INFO - runtime_stats uptime_s=5580 total_records=99 total_exceptions=0 levels={'INFO': 99}
+2026-03-21 13:18:35,216 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5760 total_records=112 total_exceptions=0 levels={'INFO': 112}
+2026-03-21 13:18:37,308 - web_local.runtime - INFO - runtime_stats uptime_s=5760 total_records=107 total_exceptions=0 levels={'INFO': 107}
+2026-03-21 13:18:37,378 - web_public.runtime - INFO - runtime_stats uptime_s=5760 total_records=102 total_exceptions=0 levels={'INFO': 102}
+2026-03-21 13:21:35,216 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=5940 total_records=115 total_exceptions=0 levels={'INFO': 115}
+2026-03-21 13:21:37,308 - web_local.runtime - INFO - runtime_stats uptime_s=5940 total_records=110 total_exceptions=0 levels={'INFO': 110}
+2026-03-21 13:21:37,378 - web_public.runtime - INFO - runtime_stats uptime_s=5940 total_records=105 total_exceptions=0 levels={'INFO': 105}
+2026-03-21 13:24:35,217 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=6120 total_records=118 total_exceptions=0 levels={'INFO': 118}
+2026-03-21 13:24:37,309 - web_local.runtime - INFO - runtime_stats uptime_s=6120 total_records=113 total_exceptions=0 levels={'INFO': 113}
+2026-03-21 13:24:37,379 - web_public.runtime - INFO - runtime_stats uptime_s=6120 total_records=108 total_exceptions=0 levels={'INFO': 108}
+2026-03-21 13:27:35,218 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=6300 total_records=121 total_exceptions=0 levels={'INFO': 121}
+2026-03-21 13:27:37,309 - web_local.runtime - INFO - runtime_stats uptime_s=6300 total_records=116 total_exceptions=0 levels={'INFO': 116}
+2026-03-21 13:27:37,379 - web_public.runtime - INFO - runtime_stats uptime_s=6300 total_records=111 total_exceptions=0 levels={'INFO': 111}
+2026-03-21 13:30:35,218 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=6480 total_records=124 total_exceptions=0 levels={'INFO': 124}
+2026-03-21 13:30:37,310 - web_local.runtime - INFO - runtime_stats uptime_s=6480 total_records=119 total_exceptions=0 levels={'INFO': 119}
+2026-03-21 13:30:37,379 - web_public.runtime - INFO - runtime_stats uptime_s=6480 total_records=114 total_exceptions=0 levels={'INFO': 114}
+2026-03-21 13:33:35,219 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=6660 total_records=127 total_exceptions=0 levels={'INFO': 127}
+2026-03-21 13:33:37,310 - web_local.runtime - INFO - runtime_stats uptime_s=6660 total_records=122 total_exceptions=0 levels={'INFO': 122}
+2026-03-21 13:33:37,380 - web_public.runtime - INFO - runtime_stats uptime_s=6660 total_records=117 total_exceptions=0 levels={'INFO': 117}
+2026-03-21 13:36:35,220 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=6840 total_records=130 total_exceptions=0 levels={'INFO': 130}
+2026-03-21 13:36:37,310 - web_local.runtime - INFO - runtime_stats uptime_s=6840 total_records=125 total_exceptions=0 levels={'INFO': 125}
+2026-03-21 13:36:37,380 - web_public.runtime - INFO - runtime_stats uptime_s=6840 total_records=120 total_exceptions=0 levels={'INFO': 120}
+2026-03-21 13:39:35,220 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7020 total_records=133 total_exceptions=0 levels={'INFO': 133}
+2026-03-21 13:39:37,311 - web_local.runtime - INFO - runtime_stats uptime_s=7020 total_records=128 total_exceptions=0 levels={'INFO': 128}
+2026-03-21 13:39:37,380 - web_public.runtime - INFO - runtime_stats uptime_s=7020 total_records=123 total_exceptions=0 levels={'INFO': 123}
+2026-03-21 13:42:35,221 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7200 total_records=136 total_exceptions=0 levels={'INFO': 136}
+2026-03-21 13:42:37,311 - web_local.runtime - INFO - runtime_stats uptime_s=7200 total_records=131 total_exceptions=0 levels={'INFO': 131}
+2026-03-21 13:42:37,381 - web_public.runtime - INFO - runtime_stats uptime_s=7200 total_records=126 total_exceptions=0 levels={'INFO': 126}
+2026-03-21 13:45:35,221 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7380 total_records=139 total_exceptions=0 levels={'INFO': 139}
+2026-03-21 13:45:37,311 - web_local.runtime - INFO - runtime_stats uptime_s=7380 total_records=134 total_exceptions=0 levels={'INFO': 134}
+2026-03-21 13:45:37,381 - web_public.runtime - INFO - runtime_stats uptime_s=7380 total_records=129 total_exceptions=0 levels={'INFO': 129}
+2026-03-21 13:48:35,222 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7560 total_records=142 total_exceptions=0 levels={'INFO': 142}
+2026-03-21 13:48:37,312 - web_local.runtime - INFO - runtime_stats uptime_s=7560 total_records=137 total_exceptions=0 levels={'INFO': 137}
+2026-03-21 13:48:37,381 - web_public.runtime - INFO - runtime_stats uptime_s=7560 total_records=132 total_exceptions=0 levels={'INFO': 132}
+2026-03-21 13:51:35,223 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7740 total_records=145 total_exceptions=0 levels={'INFO': 145}
+2026-03-21 13:51:37,312 - web_local.runtime - INFO - runtime_stats uptime_s=7740 total_records=140 total_exceptions=0 levels={'INFO': 140}
+2026-03-21 13:51:37,382 - web_public.runtime - INFO - runtime_stats uptime_s=7740 total_records=135 total_exceptions=0 levels={'INFO': 135}
+2026-03-21 13:54:35,224 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=7920 total_records=148 total_exceptions=0 levels={'INFO': 148}
+2026-03-21 13:54:37,312 - web_local.runtime - INFO - runtime_stats uptime_s=7920 total_records=143 total_exceptions=0 levels={'INFO': 143}
+2026-03-21 13:54:37,382 - web_public.runtime - INFO - runtime_stats uptime_s=7920 total_records=138 total_exceptions=0 levels={'INFO': 138}
+2026-03-21 13:57:35,225 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=8100 total_records=151 total_exceptions=0 levels={'INFO': 151}
+2026-03-21 13:57:37,313 - web_local.runtime - INFO - runtime_stats uptime_s=8100 total_records=146 total_exceptions=0 levels={'INFO': 146}
+2026-03-21 13:57:37,383 - web_public.runtime - INFO - runtime_stats uptime_s=8100 total_records=141 total_exceptions=0 levels={'INFO': 141}
+2026-03-21 14:00:35,226 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=8280 total_records=154 total_exceptions=0 levels={'INFO': 154}
+2026-03-21 14:00:37,313 - web_local.runtime - INFO - runtime_stats uptime_s=8280 total_records=149 total_exceptions=0 levels={'INFO': 149}
+2026-03-21 14:00:37,383 - web_public.runtime - INFO - runtime_stats uptime_s=8280 total_records=144 total_exceptions=0 levels={'INFO': 144}
+2026-03-21 14:03:35,226 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=8460 total_records=157 total_exceptions=0 levels={'INFO': 157}
+2026-03-21 14:03:37,313 - web_local.runtime - INFO - runtime_stats uptime_s=8460 total_records=152 total_exceptions=0 levels={'INFO': 152}
+2026-03-21 14:03:37,383 - web_public.runtime - INFO - runtime_stats uptime_s=8460 total_records=147 total_exceptions=0 levels={'INFO': 147}
+2026-03-21 14:06:35,227 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=8640 total_records=160 total_exceptions=0 levels={'INFO': 160}
+2026-03-21 14:06:37,314 - web_local.runtime - INFO - runtime_stats uptime_s=8640 total_records=155 total_exceptions=0 levels={'INFO': 155}
+2026-03-21 14:06:37,384 - web_public.runtime - INFO - runtime_stats uptime_s=8640 total_records=150 total_exceptions=0 levels={'INFO': 150}
+2026-03-21 14:09:35,228 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=8820 total_records=163 total_exceptions=0 levels={'INFO': 163}
+2026-03-21 14:09:37,314 - web_local.runtime - INFO - runtime_stats uptime_s=8820 total_records=158 total_exceptions=0 levels={'INFO': 158}
+2026-03-21 14:09:37,384 - web_public.runtime - INFO - runtime_stats uptime_s=8820 total_records=153 total_exceptions=0 levels={'INFO': 153}
+2026-03-21 14:12:35,230 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9000 total_records=166 total_exceptions=0 levels={'INFO': 166}
+2026-03-21 14:12:37,314 - web_local.runtime - INFO - runtime_stats uptime_s=9000 total_records=161 total_exceptions=0 levels={'INFO': 161}
+2026-03-21 14:12:37,384 - web_public.runtime - INFO - runtime_stats uptime_s=9000 total_records=156 total_exceptions=0 levels={'INFO': 156}
+2026-03-21 14:15:35,230 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9180 total_records=169 total_exceptions=0 levels={'INFO': 169}
+2026-03-21 14:15:37,315 - web_local.runtime - INFO - runtime_stats uptime_s=9180 total_records=164 total_exceptions=0 levels={'INFO': 164}
+2026-03-21 14:15:37,385 - web_public.runtime - INFO - runtime_stats uptime_s=9180 total_records=159 total_exceptions=0 levels={'INFO': 159}
+2026-03-21 14:18:35,231 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9360 total_records=172 total_exceptions=0 levels={'INFO': 172}
+2026-03-21 14:18:37,315 - web_local.runtime - INFO - runtime_stats uptime_s=9360 total_records=167 total_exceptions=0 levels={'INFO': 167}
+2026-03-21 14:18:37,385 - web_public.runtime - INFO - runtime_stats uptime_s=9360 total_records=162 total_exceptions=0 levels={'INFO': 162}
+2026-03-21 14:21:35,232 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9540 total_records=175 total_exceptions=0 levels={'INFO': 175}
+2026-03-21 14:21:37,316 - web_local.runtime - INFO - runtime_stats uptime_s=9540 total_records=170 total_exceptions=0 levels={'INFO': 170}
+2026-03-21 14:21:37,385 - web_public.runtime - INFO - runtime_stats uptime_s=9540 total_records=165 total_exceptions=0 levels={'INFO': 165}
+2026-03-21 14:24:35,232 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9720 total_records=178 total_exceptions=0 levels={'INFO': 178}
+2026-03-21 14:24:37,316 - web_local.runtime - INFO - runtime_stats uptime_s=9720 total_records=173 total_exceptions=0 levels={'INFO': 173}
+2026-03-21 14:24:37,386 - web_public.runtime - INFO - runtime_stats uptime_s=9720 total_records=168 total_exceptions=0 levels={'INFO': 168}
+2026-03-21 14:27:35,233 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=9900 total_records=181 total_exceptions=0 levels={'INFO': 181}
+2026-03-21 14:27:37,316 - web_local.runtime - INFO - runtime_stats uptime_s=9900 total_records=176 total_exceptions=0 levels={'INFO': 176}
+2026-03-21 14:27:37,386 - web_public.runtime - INFO - runtime_stats uptime_s=9900 total_records=171 total_exceptions=0 levels={'INFO': 171}
+2026-03-21 14:30:35,234 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10080 total_records=184 total_exceptions=0 levels={'INFO': 184}
+2026-03-21 14:30:37,317 - web_local.runtime - INFO - runtime_stats uptime_s=10080 total_records=179 total_exceptions=0 levels={'INFO': 179}
+2026-03-21 14:30:37,387 - web_public.runtime - INFO - runtime_stats uptime_s=10080 total_records=174 total_exceptions=0 levels={'INFO': 174}
+2026-03-21 14:33:35,234 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10260 total_records=187 total_exceptions=0 levels={'INFO': 187}
+2026-03-21 14:33:37,317 - web_local.runtime - INFO - runtime_stats uptime_s=10260 total_records=182 total_exceptions=0 levels={'INFO': 182}
+2026-03-21 14:33:37,387 - web_public.runtime - INFO - runtime_stats uptime_s=10260 total_records=177 total_exceptions=0 levels={'INFO': 177}
+2026-03-21 14:36:35,235 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10440 total_records=190 total_exceptions=0 levels={'INFO': 190}
+2026-03-21 14:36:37,317 - web_local.runtime - INFO - runtime_stats uptime_s=10440 total_records=185 total_exceptions=0 levels={'INFO': 185}
+2026-03-21 14:36:37,387 - web_public.runtime - INFO - runtime_stats uptime_s=10440 total_records=180 total_exceptions=0 levels={'INFO': 180}
+2026-03-21 14:39:35,236 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10620 total_records=193 total_exceptions=0 levels={'INFO': 193}
+2026-03-21 14:39:37,318 - web_local.runtime - INFO - runtime_stats uptime_s=10620 total_records=188 total_exceptions=0 levels={'INFO': 188}
+2026-03-21 14:39:37,388 - web_public.runtime - INFO - runtime_stats uptime_s=10620 total_records=183 total_exceptions=0 levels={'INFO': 183}
+2026-03-21 14:42:35,236 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10800 total_records=196 total_exceptions=0 levels={'INFO': 196}
+2026-03-21 14:42:37,318 - web_local.runtime - INFO - runtime_stats uptime_s=10800 total_records=191 total_exceptions=0 levels={'INFO': 191}
+2026-03-21 14:42:37,388 - web_public.runtime - INFO - runtime_stats uptime_s=10800 total_records=186 total_exceptions=0 levels={'INFO': 186}
+2026-03-21 14:45:35,237 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=10980 total_records=199 total_exceptions=0 levels={'INFO': 199}
+2026-03-21 14:45:37,319 - web_local.runtime - INFO - runtime_stats uptime_s=10980 total_records=194 total_exceptions=0 levels={'INFO': 194}
+2026-03-21 14:45:37,388 - web_public.runtime - INFO - runtime_stats uptime_s=10980 total_records=189 total_exceptions=0 levels={'INFO': 189}
+2026-03-21 14:48:35,238 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=11160 total_records=202 total_exceptions=0 levels={'INFO': 202}
+2026-03-21 14:48:37,319 - web_local.runtime - INFO - runtime_stats uptime_s=11160 total_records=197 total_exceptions=0 levels={'INFO': 197}
+2026-03-21 14:48:37,389 - web_public.runtime - INFO - runtime_stats uptime_s=11160 total_records=192 total_exceptions=0 levels={'INFO': 192}
+2026-03-21 14:51:35,239 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=11340 total_records=205 total_exceptions=0 levels={'INFO': 205}
+2026-03-21 14:51:37,320 - web_local.runtime - INFO - runtime_stats uptime_s=11340 total_records=200 total_exceptions=0 levels={'INFO': 200}
+2026-03-21 14:51:37,389 - web_public.runtime - INFO - runtime_stats uptime_s=11340 total_records=195 total_exceptions=0 levels={'INFO': 195}
+2026-03-21 14:54:35,240 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=11520 total_records=208 total_exceptions=0 levels={'INFO': 208}
+2026-03-21 14:54:37,320 - web_local.runtime - INFO - runtime_stats uptime_s=11520 total_records=203 total_exceptions=0 levels={'INFO': 203}
+2026-03-21 14:54:37,389 - web_public.runtime - INFO - runtime_stats uptime_s=11520 total_records=198 total_exceptions=0 levels={'INFO': 198}
+2026-03-21 14:57:35,240 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=11700 total_records=211 total_exceptions=0 levels={'INFO': 211}
+2026-03-21 14:57:37,320 - web_local.runtime - INFO - runtime_stats uptime_s=11700 total_records=206 total_exceptions=0 levels={'INFO': 206}
+2026-03-21 14:57:37,390 - web_public.runtime - INFO - runtime_stats uptime_s=11700 total_records=201 total_exceptions=0 levels={'INFO': 201}
+2026-03-21 15:00:35,241 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=11880 total_records=214 total_exceptions=0 levels={'INFO': 214}
+2026-03-21 15:00:37,321 - web_local.runtime - INFO - runtime_stats uptime_s=11880 total_records=209 total_exceptions=0 levels={'INFO': 209}
+2026-03-21 15:00:37,390 - web_public.runtime - INFO - runtime_stats uptime_s=11880 total_records=204 total_exceptions=0 levels={'INFO': 204}
+2026-03-21 15:03:35,242 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12060 total_records=217 total_exceptions=0 levels={'INFO': 217}
+2026-03-21 15:03:37,321 - web_local.runtime - INFO - runtime_stats uptime_s=12060 total_records=212 total_exceptions=0 levels={'INFO': 212}
+2026-03-21 15:03:37,390 - web_public.runtime - INFO - runtime_stats uptime_s=12060 total_records=207 total_exceptions=0 levels={'INFO': 207}
+2026-03-21 15:06:35,243 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12240 total_records=220 total_exceptions=0 levels={'INFO': 220}
+2026-03-21 15:06:37,322 - web_local.runtime - INFO - runtime_stats uptime_s=12240 total_records=215 total_exceptions=0 levels={'INFO': 215}
+2026-03-21 15:06:37,390 - web_public.runtime - INFO - runtime_stats uptime_s=12240 total_records=210 total_exceptions=0 levels={'INFO': 210}
+2026-03-21 15:09:35,243 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12420 total_records=223 total_exceptions=0 levels={'INFO': 223}
+2026-03-21 15:09:37,322 - web_local.runtime - INFO - runtime_stats uptime_s=12420 total_records=218 total_exceptions=0 levels={'INFO': 218}
+2026-03-21 15:09:37,391 - web_public.runtime - INFO - runtime_stats uptime_s=12420 total_records=213 total_exceptions=0 levels={'INFO': 213}
+2026-03-21 15:12:35,244 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12600 total_records=226 total_exceptions=0 levels={'INFO': 226}
+2026-03-21 15:12:37,323 - web_local.runtime - INFO - runtime_stats uptime_s=12600 total_records=221 total_exceptions=0 levels={'INFO': 221}
+2026-03-21 15:12:37,391 - web_public.runtime - INFO - runtime_stats uptime_s=12600 total_records=216 total_exceptions=0 levels={'INFO': 216}
+2026-03-21 15:15:35,246 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12780 total_records=229 total_exceptions=0 levels={'INFO': 229}
+2026-03-21 15:15:37,323 - web_local.runtime - INFO - runtime_stats uptime_s=12780 total_records=224 total_exceptions=0 levels={'INFO': 224}
+2026-03-21 15:15:37,391 - web_public.runtime - INFO - runtime_stats uptime_s=12780 total_records=219 total_exceptions=0 levels={'INFO': 219}
+2026-03-21 15:18:35,247 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=12960 total_records=232 total_exceptions=0 levels={'INFO': 232}
+2026-03-21 15:18:37,323 - web_local.runtime - INFO - runtime_stats uptime_s=12960 total_records=227 total_exceptions=0 levels={'INFO': 227}
+2026-03-21 15:18:37,392 - web_public.runtime - INFO - runtime_stats uptime_s=12960 total_records=222 total_exceptions=0 levels={'INFO': 222}
+2026-03-21 15:21:35,248 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=13140 total_records=235 total_exceptions=0 levels={'INFO': 235}
+2026-03-21 15:21:37,323 - web_local.runtime - INFO - runtime_stats uptime_s=13140 total_records=230 total_exceptions=0 levels={'INFO': 230}
+2026-03-21 15:21:37,392 - web_public.runtime - INFO - runtime_stats uptime_s=13140 total_records=225 total_exceptions=0 levels={'INFO': 225}
+2026-03-21 15:24:35,248 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=13320 total_records=238 total_exceptions=0 levels={'INFO': 238}
+2026-03-21 15:24:37,324 - web_local.runtime - INFO - runtime_stats uptime_s=13320 total_records=233 total_exceptions=0 levels={'INFO': 233}
+2026-03-21 15:24:37,392 - web_public.runtime - INFO - runtime_stats uptime_s=13320 total_records=228 total_exceptions=0 levels={'INFO': 228}
+2026-03-21 15:27:35,249 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=13500 total_records=241 total_exceptions=0 levels={'INFO': 241}
+2026-03-21 15:27:37,324 - web_local.runtime - INFO - runtime_stats uptime_s=13500 total_records=236 total_exceptions=0 levels={'INFO': 236}
+2026-03-21 15:27:37,393 - web_public.runtime - INFO - runtime_stats uptime_s=13500 total_records=231 total_exceptions=0 levels={'INFO': 231}
+2026-03-21 15:29:27,041 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 15:29:27,820 - xiuxianbot - INFO - aiogram adapter already stopped
+2026-03-21 15:29:27,821 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 15:29:28,137 - xiuxianbot - INFO - runtime_logging_enabled pid=52369 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:28,143 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 15:29:28,144 - xiuxianbot - INFO - Core server started with PID 52371
+2026-03-21 15:29:28,144 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 15:29:28,145 - xiuxianbot - INFO - aiogram adapter started with PID 52372
+2026-03-21 15:29:30,146 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 15:29:30,232 - web_local - INFO - runtime_logging_enabled pid=52369 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:30,249 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 15:29:30,273 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 15:29:30,275 - Database - INFO - Database tables created/verified
+2026-03-21 15:29:30,280 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 15:29:30,280 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 15:29:30,282 - web_public - INFO - runtime_logging_enabled pid=52369 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:29:30,283 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 15:29:30,284 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 15:29:30,292 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 15:29:30,292 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 15:29:30,292 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 15:29:30,292 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 15:32:28,137 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 15:32:30,232 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:32:30,281 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 15:32:32,394 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 15:32:33,300 - xiuxianbot - INFO - aiogram adapter already stopped
+2026-03-21 15:32:33,300 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 15:32:33,403 - xiuxianbot - INFO - runtime_logging_enabled pid=52582 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:33,408 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 15:32:33,408 - xiuxianbot - INFO - Core server started with PID 52584
+2026-03-21 15:32:33,409 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 15:32:33,413 - xiuxianbot - INFO - aiogram adapter started with PID 52585
+2026-03-21 15:32:35,414 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 15:32:35,499 - web_local - INFO - runtime_logging_enabled pid=52582 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:35,516 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 15:32:35,538 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 15:32:35,549 - Database - INFO - Database tables created/verified
+2026-03-21 15:32:35,554 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 15:32:35,554 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 15:32:35,556 - web_public - INFO - runtime_logging_enabled pid=52582 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 15:32:35,560 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 15:32:35,560 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 15:32:35,563 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 15:32:35,564 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 15:32:35,564 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 15:32:35,564 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 15:35:33,403 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 15:35:35,499 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 15:35:35,554 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 15:38:33,404 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=360 total_records=22 total_exceptions=0 levels={'INFO': 22}
+2026-03-21 15:38:35,500 - web_local.runtime - INFO - runtime_stats uptime_s=360 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 15:38:35,555 - web_public.runtime - INFO - runtime_stats uptime_s=360 total_records=12 total_exceptions=0 levels={'INFO': 12}
+2026-03-21 15:41:33,405 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=540 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 15:41:35,500 - web_local.runtime - INFO - runtime_stats uptime_s=540 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 15:41:35,555 - web_public.runtime - INFO - runtime_stats uptime_s=540 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 15:44:33,406 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=720 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 15:44:35,500 - web_local.runtime - INFO - runtime_stats uptime_s=720 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 15:44:35,555 - web_public.runtime - INFO - runtime_stats uptime_s=720 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 15:47:33,406 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=900 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 15:47:35,501 - web_local.runtime - INFO - runtime_stats uptime_s=900 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 15:47:35,556 - web_public.runtime - INFO - runtime_stats uptime_s=900 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 15:50:33,407 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1080 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 15:50:35,501 - web_local.runtime - INFO - runtime_stats uptime_s=1080 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 15:50:35,556 - web_public.runtime - INFO - runtime_stats uptime_s=1080 total_records=24 total_exceptions=0 levels={'INFO': 24}
+2026-03-21 15:53:33,408 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1260 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 15:53:35,502 - web_local.runtime - INFO - runtime_stats uptime_s=1260 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 15:53:35,557 - web_public.runtime - INFO - runtime_stats uptime_s=1260 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 15:56:33,408 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1440 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 15:56:35,502 - web_local.runtime - INFO - runtime_stats uptime_s=1440 total_records=35 total_exceptions=0 levels={'INFO': 35}
+2026-03-21 15:56:35,557 - web_public.runtime - INFO - runtime_stats uptime_s=1440 total_records=30 total_exceptions=0 levels={'INFO': 30}
+2026-03-21 15:59:33,409 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1620 total_records=43 total_exceptions=0 levels={'INFO': 43}
+2026-03-21 15:59:35,503 - web_local.runtime - INFO - runtime_stats uptime_s=1620 total_records=38 total_exceptions=0 levels={'INFO': 38}
+2026-03-21 15:59:35,558 - web_public.runtime - INFO - runtime_stats uptime_s=1620 total_records=33 total_exceptions=0 levels={'INFO': 33}
+2026-03-21 16:02:33,410 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1800 total_records=46 total_exceptions=0 levels={'INFO': 46}
+2026-03-21 16:02:35,503 - web_local.runtime - INFO - runtime_stats uptime_s=1800 total_records=41 total_exceptions=0 levels={'INFO': 41}
+2026-03-21 16:02:35,558 - web_public.runtime - INFO - runtime_stats uptime_s=1800 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 16:05:33,411 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1980 total_records=49 total_exceptions=0 levels={'INFO': 49}
+2026-03-21 16:05:35,504 - web_local.runtime - INFO - runtime_stats uptime_s=1980 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 16:05:35,558 - web_public.runtime - INFO - runtime_stats uptime_s=1980 total_records=39 total_exceptions=0 levels={'INFO': 39}
+2026-03-21 16:08:33,412 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2160 total_records=52 total_exceptions=0 levels={'INFO': 52}
+2026-03-21 16:08:35,504 - web_local.runtime - INFO - runtime_stats uptime_s=2160 total_records=47 total_exceptions=0 levels={'INFO': 47}
+2026-03-21 16:08:35,559 - web_public.runtime - INFO - runtime_stats uptime_s=2160 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 16:11:33,413 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2340 total_records=55 total_exceptions=0 levels={'INFO': 55}
+2026-03-21 16:11:35,505 - web_local.runtime - INFO - runtime_stats uptime_s=2340 total_records=50 total_exceptions=0 levels={'INFO': 50}
+2026-03-21 16:11:35,559 - web_public.runtime - INFO - runtime_stats uptime_s=2340 total_records=45 total_exceptions=0 levels={'INFO': 45}
+2026-03-21 16:14:33,414 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2520 total_records=58 total_exceptions=0 levels={'INFO': 58}
+2026-03-21 16:14:35,505 - web_local.runtime - INFO - runtime_stats uptime_s=2520 total_records=53 total_exceptions=0 levels={'INFO': 53}
+2026-03-21 16:14:35,560 - web_public.runtime - INFO - runtime_stats uptime_s=2520 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 16:17:18,564 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 16:17:18,831 - xiuxianbot - INFO - Stopping aiogram adapter (PID 52585)
+2026-03-21 16:17:18,848 - xiuxianbot - INFO - aiogram adapter stopped
+2026-03-21 16:17:18,848 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 16:17:18,957 - xiuxianbot - INFO - runtime_logging_enabled pid=54703 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:18,963 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 16:17:18,963 - xiuxianbot - INFO - Core server started with PID 54705
+2026-03-21 16:17:18,964 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 16:17:18,966 - xiuxianbot - INFO - aiogram adapter started with PID 54706
+2026-03-21 16:17:20,966 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 16:17:21,053 - web_local - INFO - runtime_logging_enabled pid=54703 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:21,071 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 16:17:21,095 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 16:17:21,102 - Database - INFO - Database tables created/verified
+2026-03-21 16:17:21,106 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 16:17:21,107 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 16:17:21,111 - web_public - INFO - runtime_logging_enabled pid=54703 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:17:21,113 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 16:17:21,113 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 16:17:21,120 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 16:17:21,120 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 16:17:21,121 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 16:17:21,121 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 16:20:18,958 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:20:21,053 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 16:20:21,111 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:23:18,958 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=360 total_records=22 total_exceptions=0 levels={'INFO': 22}
+2026-03-21 16:23:21,054 - web_local.runtime - INFO - runtime_stats uptime_s=360 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:23:21,111 - web_public.runtime - INFO - runtime_stats uptime_s=360 total_records=12 total_exceptions=0 levels={'INFO': 12}
+2026-03-21 16:26:18,959 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=540 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 16:26:21,054 - web_local.runtime - INFO - runtime_stats uptime_s=540 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 16:26:21,111 - web_public.runtime - INFO - runtime_stats uptime_s=540 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:29:18,960 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=720 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 16:29:21,055 - web_local.runtime - INFO - runtime_stats uptime_s=720 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 16:29:21,112 - web_public.runtime - INFO - runtime_stats uptime_s=720 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 16:32:18,960 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=900 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 16:32:21,055 - web_local.runtime - INFO - runtime_stats uptime_s=900 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:32:21,112 - web_public.runtime - INFO - runtime_stats uptime_s=900 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:35:18,961 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1080 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 16:35:21,055 - web_local.runtime - INFO - runtime_stats uptime_s=1080 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 16:35:21,113 - web_public.runtime - INFO - runtime_stats uptime_s=1080 total_records=24 total_exceptions=0 levels={'INFO': 24}
+2026-03-21 16:35:39,105 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 16:35:39,106 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 16:35:39,221 - xiuxianbot - INFO - Stopping aiogram adapter (PID 54706)
+2026-03-21 16:35:39,687 - xiuxianbot - INFO - aiogram adapter stopped
+2026-03-21 16:35:39,687 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 16:35:39,815 - xiuxianbot - INFO - runtime_logging_enabled pid=55181 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:39,821 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 16:35:39,821 - xiuxianbot - INFO - Core server started with PID 55183
+2026-03-21 16:35:39,822 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 16:35:39,822 - xiuxianbot - INFO - aiogram adapter started with PID 55184
+2026-03-21 16:35:41,822 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 16:35:41,973 - web_local - INFO - runtime_logging_enabled pid=55181 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:41,995 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 16:35:42,021 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 16:35:42,024 - Database - INFO - Database tables created/verified
+2026-03-21 16:35:42,029 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 16:35:42,029 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 16:35:42,029 - web_public - INFO - runtime_logging_enabled pid=55181 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 16:35:42,032 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 16:35:42,032 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 16:35:42,037 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 16:35:42,037 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 16:35:42,037 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 16:35:42,038 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 16:38:39,815 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 16:38:41,974 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 16:38:42,029 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 16:41:39,816 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=360 total_records=22 total_exceptions=0 levels={'INFO': 22}
+2026-03-21 16:41:41,974 - web_local.runtime - INFO - runtime_stats uptime_s=360 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 16:41:42,030 - web_public.runtime - INFO - runtime_stats uptime_s=360 total_records=12 total_exceptions=0 levels={'INFO': 12}
+2026-03-21 16:44:39,817 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=540 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 16:44:41,974 - web_local.runtime - INFO - runtime_stats uptime_s=540 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 16:44:42,030 - web_public.runtime - INFO - runtime_stats uptime_s=540 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 16:47:39,818 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=720 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 16:47:41,975 - web_local.runtime - INFO - runtime_stats uptime_s=720 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 16:47:42,030 - web_public.runtime - INFO - runtime_stats uptime_s=720 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 16:50:39,819 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=900 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 16:50:41,975 - web_local.runtime - INFO - runtime_stats uptime_s=900 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 16:50:42,031 - web_public.runtime - INFO - runtime_stats uptime_s=900 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 16:53:39,820 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1080 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 16:53:41,976 - web_local.runtime - INFO - runtime_stats uptime_s=1080 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 16:53:42,031 - web_public.runtime - INFO - runtime_stats uptime_s=1080 total_records=24 total_exceptions=0 levels={'INFO': 24}
+2026-03-21 16:56:39,820 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1260 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 16:56:41,976 - web_local.runtime - INFO - runtime_stats uptime_s=1260 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 16:56:42,031 - web_public.runtime - INFO - runtime_stats uptime_s=1260 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 16:59:39,856 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1440 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 16:59:41,977 - web_local.runtime - INFO - runtime_stats uptime_s=1440 total_records=35 total_exceptions=0 levels={'INFO': 35}
+2026-03-21 16:59:42,035 - web_public.runtime - INFO - runtime_stats uptime_s=1440 total_records=30 total_exceptions=0 levels={'INFO': 30}
+2026-03-21 17:02:39,857 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1620 total_records=43 total_exceptions=0 levels={'INFO': 43}
+2026-03-21 17:02:41,977 - web_local.runtime - INFO - runtime_stats uptime_s=1620 total_records=38 total_exceptions=0 levels={'INFO': 38}
+2026-03-21 17:02:42,036 - web_public.runtime - INFO - runtime_stats uptime_s=1620 total_records=33 total_exceptions=0 levels={'INFO': 33}
+2026-03-21 17:05:39,858 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1800 total_records=46 total_exceptions=0 levels={'INFO': 46}
+2026-03-21 17:05:41,977 - web_local.runtime - INFO - runtime_stats uptime_s=1800 total_records=41 total_exceptions=0 levels={'INFO': 41}
+2026-03-21 17:05:42,036 - web_public.runtime - INFO - runtime_stats uptime_s=1800 total_records=36 total_exceptions=0 levels={'INFO': 36}
+2026-03-21 17:08:39,859 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1980 total_records=49 total_exceptions=0 levels={'INFO': 49}
+2026-03-21 17:08:41,978 - web_local.runtime - INFO - runtime_stats uptime_s=1980 total_records=44 total_exceptions=0 levels={'INFO': 44}
+2026-03-21 17:08:42,037 - web_public.runtime - INFO - runtime_stats uptime_s=1980 total_records=39 total_exceptions=0 levels={'INFO': 39}
+2026-03-21 17:11:39,860 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2160 total_records=52 total_exceptions=0 levels={'INFO': 52}
+2026-03-21 17:11:41,978 - web_local.runtime - INFO - runtime_stats uptime_s=2160 total_records=47 total_exceptions=0 levels={'INFO': 47}
+2026-03-21 17:11:42,037 - web_public.runtime - INFO - runtime_stats uptime_s=2160 total_records=42 total_exceptions=0 levels={'INFO': 42}
+2026-03-21 17:14:39,861 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2340 total_records=55 total_exceptions=0 levels={'INFO': 55}
+2026-03-21 17:14:41,978 - web_local.runtime - INFO - runtime_stats uptime_s=2340 total_records=50 total_exceptions=0 levels={'INFO': 50}
+2026-03-21 17:14:42,037 - web_public.runtime - INFO - runtime_stats uptime_s=2340 total_records=45 total_exceptions=0 levels={'INFO': 45}
+2026-03-21 17:17:39,862 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2520 total_records=58 total_exceptions=0 levels={'INFO': 58}
+2026-03-21 17:17:41,979 - web_local.runtime - INFO - runtime_stats uptime_s=2520 total_records=53 total_exceptions=0 levels={'INFO': 53}
+2026-03-21 17:17:42,038 - web_public.runtime - INFO - runtime_stats uptime_s=2520 total_records=48 total_exceptions=0 levels={'INFO': 48}
+2026-03-21 17:20:39,865 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2700 total_records=61 total_exceptions=0 levels={'INFO': 61}
+2026-03-21 17:20:41,979 - web_local.runtime - INFO - runtime_stats uptime_s=2700 total_records=56 total_exceptions=0 levels={'INFO': 56}
+2026-03-21 17:20:42,038 - web_public.runtime - INFO - runtime_stats uptime_s=2700 total_records=51 total_exceptions=0 levels={'INFO': 51}
+2026-03-21 17:23:39,866 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=2880 total_records=64 total_exceptions=0 levels={'INFO': 64}
+2026-03-21 17:23:41,980 - web_local.runtime - INFO - runtime_stats uptime_s=2880 total_records=59 total_exceptions=0 levels={'INFO': 59}
+2026-03-21 17:23:42,038 - web_public.runtime - INFO - runtime_stats uptime_s=2880 total_records=54 total_exceptions=0 levels={'INFO': 54}
+2026-03-21 17:26:39,867 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3060 total_records=67 total_exceptions=0 levels={'INFO': 67}
+2026-03-21 17:26:41,980 - web_local.runtime - INFO - runtime_stats uptime_s=3060 total_records=62 total_exceptions=0 levels={'INFO': 62}
+2026-03-21 17:26:42,039 - web_public.runtime - INFO - runtime_stats uptime_s=3060 total_records=57 total_exceptions=0 levels={'INFO': 57}
+2026-03-21 17:29:39,868 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3240 total_records=70 total_exceptions=0 levels={'INFO': 70}
+2026-03-21 17:29:41,981 - web_local.runtime - INFO - runtime_stats uptime_s=3240 total_records=65 total_exceptions=0 levels={'INFO': 65}
+2026-03-21 17:29:42,039 - web_public.runtime - INFO - runtime_stats uptime_s=3240 total_records=60 total_exceptions=0 levels={'INFO': 60}
+2026-03-21 17:32:39,869 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=3420 total_records=73 total_exceptions=0 levels={'INFO': 73}
+2026-03-21 17:32:41,981 - web_local.runtime - INFO - runtime_stats uptime_s=3420 total_records=68 total_exceptions=0 levels={'INFO': 68}
+2026-03-21 17:32:42,039 - web_public.runtime - INFO - runtime_stats uptime_s=3420 total_records=63 total_exceptions=0 levels={'INFO': 63}
+2026-03-21 17:32:58,522 - xiuxianbot - INFO - Received SIGTERM. Shutting down...
+2026-03-21 17:32:59,414 - xiuxianbot - INFO - aiogram adapter already stopped
+2026-03-21 17:32:59,415 - xiuxianbot - INFO - XiuXianBot stopped
+2026-03-21 17:32:59,570 - xiuxianbot - INFO - runtime_logging_enabled pid=59026 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:32:59,577 - xiuxianbot - INFO - Starting XiuXianBot
+2026-03-21 17:32:59,578 - xiuxianbot - INFO - Core server started with PID 59031
+2026-03-21 17:32:59,578 - xiuxianbot - INFO - Starting aiogram adapter
+2026-03-21 17:32:59,579 - xiuxianbot - INFO - aiogram adapter started with PID 59032
+2026-03-21 17:33:01,579 - xiuxianbot - INFO - Starting local admin dashboard on port 11451
+2026-03-21 17:33:01,699 - web_local - INFO - runtime_logging_enabled pid=59026 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:33:01,720 - Database - INFO - Connected to PostgreSQL (pool 2-5)
+2026-03-21 17:33:01,750 - Database - INFO - Ensured 64 indexes exist
+2026-03-21 17:33:01,753 - Database - INFO - Database tables created/verified
+2026-03-21 17:33:01,757 - xiuxianbot - INFO - Local admin dashboard started at http://127.0.0.1:11451
+2026-03-21 17:33:01,758 - xiuxianbot - INFO - Starting public web on 127.0.0.1:11452
+2026-03-21 17:33:01,759 - web_public - INFO - runtime_logging_enabled pid=59026 cwd=/root/xiuxian_bot python=3.13.12
+2026-03-21 17:33:01,763 - xiuxianbot - INFO - Public web started at http://127.0.0.1:11452
+2026-03-21 17:33:01,765 - xiuxianbot - INFO - XiuXianBot is running. Press Ctrl+C to stop.
+2026-03-21 17:33:01,771 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11452
+2026-03-21 17:33:01,771 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 17:33:01,772 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:11451
+2026-03-21 17:33:01,772 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-21 17:35:59,570 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=180 total_records=19 total_exceptions=0 levels={'INFO': 19}
+2026-03-21 17:36:01,699 - web_local.runtime - INFO - runtime_stats uptime_s=180 total_records=14 total_exceptions=0 levels={'INFO': 14}
+2026-03-21 17:36:01,759 - web_public.runtime - INFO - runtime_stats uptime_s=180 total_records=9 total_exceptions=0 levels={'INFO': 9}
+2026-03-21 17:38:59,570 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=360 total_records=22 total_exceptions=0 levels={'INFO': 22}
+2026-03-21 17:39:01,699 - web_local.runtime - INFO - runtime_stats uptime_s=360 total_records=17 total_exceptions=0 levels={'INFO': 17}
+2026-03-21 17:39:01,759 - web_public.runtime - INFO - runtime_stats uptime_s=360 total_records=12 total_exceptions=0 levels={'INFO': 12}
+2026-03-21 17:41:59,571 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=540 total_records=25 total_exceptions=0 levels={'INFO': 25}
+2026-03-21 17:42:01,699 - web_local.runtime - INFO - runtime_stats uptime_s=540 total_records=20 total_exceptions=0 levels={'INFO': 20}
+2026-03-21 17:42:01,760 - web_public.runtime - INFO - runtime_stats uptime_s=540 total_records=15 total_exceptions=0 levels={'INFO': 15}
+2026-03-21 17:44:59,572 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=720 total_records=28 total_exceptions=0 levels={'INFO': 28}
+2026-03-21 17:45:01,700 - web_local.runtime - INFO - runtime_stats uptime_s=720 total_records=23 total_exceptions=0 levels={'INFO': 23}
+2026-03-21 17:45:01,760 - web_public.runtime - INFO - runtime_stats uptime_s=720 total_records=18 total_exceptions=0 levels={'INFO': 18}
+2026-03-21 17:47:59,573 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=900 total_records=31 total_exceptions=0 levels={'INFO': 31}
+2026-03-21 17:48:01,700 - web_local.runtime - INFO - runtime_stats uptime_s=900 total_records=26 total_exceptions=0 levels={'INFO': 26}
+2026-03-21 17:48:01,760 - web_public.runtime - INFO - runtime_stats uptime_s=900 total_records=21 total_exceptions=0 levels={'INFO': 21}
+2026-03-21 17:50:59,574 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1080 total_records=34 total_exceptions=0 levels={'INFO': 34}
+2026-03-21 17:51:01,700 - web_local.runtime - INFO - runtime_stats uptime_s=1080 total_records=29 total_exceptions=0 levels={'INFO': 29}
+2026-03-21 17:51:01,761 - web_public.runtime - INFO - runtime_stats uptime_s=1080 total_records=24 total_exceptions=0 levels={'INFO': 24}
+2026-03-21 17:53:59,575 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1260 total_records=37 total_exceptions=0 levels={'INFO': 37}
+2026-03-21 17:54:01,701 - web_local.runtime - INFO - runtime_stats uptime_s=1260 total_records=32 total_exceptions=0 levels={'INFO': 32}
+2026-03-21 17:54:01,761 - web_public.runtime - INFO - runtime_stats uptime_s=1260 total_records=27 total_exceptions=0 levels={'INFO': 27}
+2026-03-21 17:56:59,575 - xiuxianbot.runtime - INFO - runtime_stats uptime_s=1440 total_records=40 total_exceptions=0 levels={'INFO': 40}
+2026-03-21 17:57:01,701 - web_local.runtime - INFO - runtime_stats uptime_s=1440 total_records=35 total_exceptions=0 levels={'INFO': 35}
+2026-03-21 17:57:01,761 - web_public.runtime - INFO - runtime_stats uptime_s=1440 total_records=30 total_exceptions=0 levels={'INFO': 30}

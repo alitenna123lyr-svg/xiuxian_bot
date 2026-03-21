@@ -1,5 +1,7 @@
 """区域移动路由。"""
 
+import json
+
 from flask import Blueprint, jsonify
 
 from core.routes._helpers import (
@@ -12,6 +14,8 @@ from core.routes._helpers import (
 from core.database.connection import fetch_one, execute_query, db_transaction
 from core.game.maps import (
     get_map,
+    get_maps_by_tier,
+    get_world_tier,
     get_adjacent_maps,
     calc_travel_cost,
     check_travel_requirements,
@@ -73,7 +77,6 @@ def travel():
 
     # 检查是否首次到达
     visited_maps_raw = user.get("visited_maps") or "[]"
-    import json
     try:
         visited_maps = json.loads(visited_maps_raw) if isinstance(visited_maps_raw, str) else visited_maps_raw
     except Exception:
@@ -110,6 +113,98 @@ def travel():
         "first_visit_text": first_visit_text,
         "actions": actions,
     }), 200
+
+
+@travel_bp.route("/api/travel/map/<user_id>", methods=["GET"])
+def travel_map(user_id: str):
+    """返回玩家当前世界层级的大地图数据。"""
+    _, auth_error = resolve_actor_user_id({"user_id": user_id})
+    if auth_error:
+        return auth_error
+
+    user = fetch_one("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    if not user:
+        return error("NOT_FOUND", "用户不存在", 404)
+
+    current_map_id = str(user.get("current_map") or "canglan_city")
+    current = get_map(current_map_id)
+    if not current:
+        return error("NOT_FOUND", "当前地图不存在", 404)
+
+    rank = int(user.get("rank", 1) or 1)
+    stamina = float(user.get("stamina", 0) or 0)
+    dao_heng = float(user.get("dao_heng", 0) or 0)
+    dao_ni = float(user.get("dao_ni", 0) or 0)
+    dao_yan = float(user.get("dao_yan", 0) or 0)
+
+    visited_maps_raw = user.get("visited_maps") or "[]"
+    try:
+        visited_maps = json.loads(visited_maps_raw) if isinstance(visited_maps_raw, str) else visited_maps_raw
+    except Exception:
+        visited_maps = []
+    if not isinstance(visited_maps, list):
+        visited_maps = []
+    visited_set = {str(mid) for mid in visited_maps}
+
+    current_tier = int(current.get("world_tier", 1) or 1)
+    tier_info = get_world_tier(current_tier) or {"tier": current_tier, "name": "未知", "desc": ""}
+    adjacent_ids = {m["id"] for m in get_adjacent_maps(current_map_id)}
+
+    map_nodes = []
+    tier_maps = get_maps_by_tier(current_tier)
+    for m in tier_maps:
+        map_id = str(m["id"])
+        can_enter, reason = check_travel_requirements(map_id, rank, dao_heng, dao_ni, dao_yan)
+        is_current = map_id == current_map_id
+        is_adjacent = map_id in adjacent_ids
+        cost = calc_travel_cost(current_map_id, map_id) if is_adjacent and not is_current else {
+            "can_travel": False,
+            "stamina_cost": 0,
+            "time_desc": "",
+            "reason": "",
+        }
+
+        map_nodes.append({
+            "id": map_id,
+            "name": m.get("name", map_id),
+            "desc": m.get("desc", ""),
+            "region": m.get("region", ""),
+            "region_name": m.get("region_name", ""),
+            "world_tier": int(m.get("world_tier", current_tier) or current_tier),
+            "spirit_density": float(m.get("spirit_density", 1.0) or 1.0),
+            "min_realm": int(m.get("min_realm", 1) or 1),
+            "is_current": is_current,
+            "is_adjacent": is_adjacent,
+            "visited": map_id in visited_set,
+            "unlocked": bool(can_enter),
+            "unlock_reason": "" if can_enter else reason,
+            "can_travel": bool(can_enter and is_adjacent and cost.get("can_travel", False) and stamina >= float(cost.get("stamina_cost", 0) or 0)),
+            "travel_cost": int(cost.get("stamina_cost", 0) or 0),
+            "travel_time_desc": str(cost.get("time_desc", "") or ""),
+            "travel_block_reason": str(cost.get("reason", "") or ""),
+            "adjacent_ids": [a["id"] for a in get_adjacent_maps(map_id)],
+            "actions": get_area_actions(map_id),
+        })
+
+    map_nodes.sort(key=lambda x: (x["region_name"], x["name"]))
+    return success(
+        world={
+            "tier": current_tier,
+            "name": tier_info.get("name", "未知"),
+            "desc": tier_info.get("desc", ""),
+        },
+        player={
+            "user_id": user_id,
+            "rank": rank,
+            "stamina": stamina,
+            "dao_heng": dao_heng,
+            "dao_ni": dao_ni,
+            "dao_yan": dao_yan,
+            "current_map": current_map_id,
+            "current_map_name": current.get("name", current_map_id),
+        },
+        maps=map_nodes,
+    )
 
 
 @travel_bp.route("/api/travel/info", methods=["GET"])
