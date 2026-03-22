@@ -1,13 +1,31 @@
 # 项目变更日志（Changelog）
 
-- 最后更新：2026-03-22 20:46 (UTC+8)
-- 本轮修复完成时间：2026-03-22 20:46 (UTC+8)
+- 最后更新：2026-03-22 20:32 (UTC+8)
+- 本轮修复完成时间：2026-03-22 20:32 (UTC+8)
 - 维护规则：新记录写在最前；每条记录必须包含“记录时间、影响范围、修改摘要”。
 
 ## 2026-03-22
 
+### [52] 突破预览鉴权链路修复（背包用药后文案与成功率不再回退旧模板）
+- 记录时间：2026-03-22 20:32 (UTC+8)
+- 影响范围：`adapters/actor_paths.py`、`adapters/telegram/bot.py`、`tests/test_actor_path_patterns.py`。
+- 修改摘要：
+  - 修复 Telegram 端获取 `/api/breakthrough/preview/<uid>` 时未注入 `X-Actor-User-Id` 导致 401 的问题。
+  - 根因：actor path 白名单缺少 `breakthrough/preview` 与 `realm-trial`，预览请求被后端鉴权拒绝后回退到 Bot 本地旧模板（固定“突破丹 +10%”）。
+  - 已补齐 actor path 规则，并在预览请求参数中显式携带 `user_id`，双保险确保走服务端真实预览。
+  - 新增回归测试覆盖上述两条路径的 actor 提取。
+
+### [51] 聚灵阵突破文案同步 + 商店“全部”展示完整商品
+- 记录时间：2026-03-22 20:28 (UTC+8)
+- 影响范围：`core/services/settlement_extra.py`、`adapters/telegram/bot.py`。
+- 修改摘要：
+  - 突破预览“加成构成”中激活类加成文案由“突破增益”统一为“聚灵增益”，与聚灵阵玩法文案一致。
+  - 稳妥突破在已激活增益时的提示文案同步为“已激活聚灵增益”。
+  - 万宝楼“全部/分类”去除前 10 条截断，改为列出完整商品列表与完整购买按钮。
+  - “全部”分类采用精简条目展示，避免商品数量上升时消息超长。
+
 ### [50] 高级/超级突破丹修复与上品灵石商店接入
-- 记录时间：2026-03-22 20:46 (UTC+8)
+- 记录时间：2026-03-22 20:24 (UTC+8)
 - 影响范围：`core/services/settlement_extra.py`、`core/game/items.py`、`core/routes/shop.py`、`adapters/telegram/bot.py`、`tests/test_shop_economy_fixes.py`、`tests/test_breakthrough_failure_message_consistency.py`。
 - 修改摘要：
   - 修复“高级突破丹加成未体现在突破”的问题：稳妥突破现在会自动优先消耗 `超级突破丹(+50%)` / `高级突破丹(+20%)` / `突破丹(+配置值)`，并同步到预览成功率与实际结算。

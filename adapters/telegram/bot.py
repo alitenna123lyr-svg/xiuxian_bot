@@ -3090,11 +3090,11 @@ def _shop_item_matches_category(item: dict, category: str) -> bool:
 
 def _build_shop_text(items: list[dict], *, rank: int = 1, category: str = "all") -> str:
     text = _format_shop_intro(rank=rank)
-    text += f"当前货架：*{_shop_category_label(category)}*\n\n"
+    text += f"当前货架：*{_shop_category_label(category)}*（共 {len(items)} 件）\n\n"
     if not items:
         return text + "当前分类暂无商品。"
 
-    for item in items[:10]:
+    for item in items:
         item_id = str(item.get("item_id") or "")
         item_name = str(item.get("name") or _item_display_name(item_id) or item_id or "未知物品")
         price = int(item.get("price", item.get("actual_price", 0)) or 0)
@@ -3106,6 +3106,15 @@ def _build_shop_text(items: list[dict], *, rank: int = 1, category: str = "all")
         min_rank = int(item.get("min_rank", 1) or 1)
         currency_name = _shop_currency_name(str(item.get("currency") or "copper"))
         text += f"• *{item_name}* - {price} {currency_name}\n"
+
+        # “全部”分类采用精简展示，避免商品较多时消息过长。
+        if category == "all":
+            if tag and tag != "常驻货架":
+                text += f"  货架: {tag}\n"
+            if remaining_limit is not None:
+                text += f"  限购剩余: {remaining_limit}\n"
+            continue
+
         if tag and tag != "常驻货架":
             text += f"  货架: {tag}\n"
         if usage:
@@ -3124,7 +3133,7 @@ def _build_shop_text(items: list[dict], *, rank: int = 1, category: str = "all")
 
 def _build_shop_keyboard(category: str, items: list[dict]):
     keyboard = []
-    for item in items[:10]:
+    for item in items:
         item_id = str(item.get("item_id") or "")
         item_name = str(item.get("name") or _item_display_name(item_id) or item_id or "未知物品")
         price = int(item.get("price", item.get("actual_price", 0)) or 0)
@@ -3362,6 +3371,7 @@ def _format_realm_trial_text(trial: dict | None) -> str:
 def _build_breakthrough_preview(user_data: dict, *, strategy: str = "normal") -> str:
     from core.game.maps import get_map, get_spirit_density
 
+    now_ts = int(time.time())
     current_rank = int(user_data.get("rank", 1) or 1)
     current_realm = get_realm_by_id(current_rank) or {"name": "当前境界"}
     next_realm = get_next_realm(current_rank)
@@ -3402,6 +3412,11 @@ def _build_breakthrough_preview(user_data: dict, *, strategy: str = "normal") ->
     if user_data.get("element") == "火":
         shown_rate = min(1.0, shown_rate + fire_bonus)
         rate_parts.append(f"火灵根 +{int(fire_bonus * 100)}%")
+    boost_until = int(user_data.get("breakthrough_boost_until", 0) or 0)
+    boost_pct = float(user_data.get("breakthrough_boost_pct", 0) or 0)
+    if boost_until > now_ts and boost_pct > 0:
+        shown_rate = min(1.0, shown_rate + boost_pct / 100.0)
+        rate_parts.append(f"聚灵增益 +{int(boost_pct)}%")
     shown_rate = min(1.0, max(0.0, shown_rate + location_bonus))
     rate_parts.append(f"地脉灵气 {location_bonus * 100:+.1f}%")
     shown_rate = min(1.0, shown_rate + ally_bonus)
@@ -3507,7 +3522,7 @@ async def _build_breakthrough_preview_block(uid: str, user_data: dict, *, strate
     try:
         data = await http_get(
             f"{SERVER_URL}/api/breakthrough/preview/{uid}",
-            params={"strategy": strategy, "call_for_help": "true"},
+            params={"user_id": uid, "strategy": strategy, "call_for_help": "true"},
             timeout=15,
         )
         if data.get("success"):
@@ -3517,6 +3532,8 @@ async def _build_breakthrough_preview_block(uid: str, user_data: dict, *, strate
             blocks = [b for b in (preview_text, notes) if b]
             if blocks:
                 return "\n\n".join(blocks)
+        if data.get("code") in ("UNAUTHORIZED", "FORBIDDEN"):
+            return "❌ 突破预告鉴权失败，请关闭面板后重试。"
     except Exception:
         pass
     # fallback: local rendering

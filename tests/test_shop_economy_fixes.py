@@ -220,3 +220,9 @@ def test_advanced_breakthrough_pill_daily_stock_is_10():
     assert offer is not None
     assert int(offer.get("stock", 0) or 0) == 10
     assert int(offer.get("limit", 0) or 0) == 10
+
+
+def test_spirit_array_is_available_in_gold_shop():
+    offer = get_shop_offer("spirit_array_mid", "gold")
+    assert offer is not None
+    assert str(offer.get("currency") or "") == "gold"

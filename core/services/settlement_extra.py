@@ -106,6 +106,10 @@ def _steady_breakthrough_pill_candidates(bt_cfg: Dict[str, Any]) -> list[Dict[st
     ]
 
 
+def _pill_breaks_tribulation_limit(item_id: str | None) -> bool:
+    return str(item_id or "").strip() in {"advanced_breakthrough_pill", "super_breakthrough_pill"}
+
+
 def _pick_steady_breakthrough_pill(*, user_id: str, bt_cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     for candidate in _steady_breakthrough_pill_candidates(bt_cfg):
         row = fetch_one(
@@ -260,6 +264,20 @@ def _format_weak_penalty_text(weak_seconds: int) -> str:
     return f"进入虚弱状态{seconds}秒"
 
 
+def _active_buff_value(*, now: int, until: Any, value: Any, default: float = 0.0) -> float:
+    """Return buff value only when it is currently active."""
+    try:
+        until_ts = int(until or 0)
+    except (TypeError, ValueError):
+        until_ts = 0
+    if until_ts <= int(now or 0):
+        return float(default)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+
 def get_breakthrough_preview(
     *,
     user_id: str,
@@ -331,6 +349,12 @@ def get_breakthrough_preview(
     steady_default_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
     steady_pill = _pick_steady_breakthrough_pill(user_id=user_id, bt_cfg=bt_cfg) if strategy == "steady" else None
     steady_pill_bonus = float((steady_pill or {}).get("bonus", 0.0) or 0.0)
+    tribulation_rate_ignored = bool(
+        is_tribulation
+        and strategy == "steady"
+        and _pill_breaks_tribulation_limit((steady_pill or {}).get("item_id"))
+    )
+    tribulation_rate_active = bool(is_tribulation and not tribulation_rate_ignored)
     rate_parts = [f"基础成功率 {int(base_rate * 100)}%"]
     shown_rate = base_rate
     if user.get("element") == "火":
@@ -344,7 +368,7 @@ def get_breakthrough_preview(
             rate_parts.append(f"保护丹 +{int(protect_bonus * 100)}%")
     if boost_active:
         shown_rate = min(1.0, shown_rate + boost_pct / 100.0)
-        rate_parts.append(f"突破增益 +{int(boost_pct)}%")
+        rate_parts.append(f"聚灵增益 +{int(boost_pct)}%")
     if abs(location_bonus) > 1e-9:
         shown_rate = min(1.0, max(0.0, shown_rate + location_bonus))
         rate_parts.append(f"地脉灵气 {_format_signed_ratio_percent(location_bonus)}")
@@ -369,7 +393,7 @@ def get_breakthrough_preview(
             rate_parts.append(f"{steady_pill['item_name']} +{_format_ratio_percent(steady_pill_bonus)}")
             extra_cost_text = f"额外消耗: {steady_pill['item_name']} x1"
         elif boost_active:
-            extra_cost_text = "额外消耗: 无（已激活突破增益）"
+            extra_cost_text = "额外消耗: 无（已激活聚灵增益）"
         else:
             rate_parts.append("当前无可用突破丹")
             extra_cost_text = "额外消耗: 需要突破丹/高级突破丹/超级突破丹 x1"
@@ -390,7 +414,7 @@ def get_breakthrough_preview(
     steady_notes_bonus = steady_pill_bonus if steady_pill else (0.0 if boost_active else steady_default_bonus)
     steady_rate = _apply_tribulation_rate_adjustment(
         rate=min(1.0, base_for_notes + steady_notes_bonus),
-        is_tribulation=is_tribulation,
+        is_tribulation=tribulation_rate_active,
         bt_cfg=bt_cfg,
     )
     protect_rate = _apply_tribulation_rate_adjustment(
@@ -403,20 +427,32 @@ def get_breakthrough_preview(
         is_tribulation=is_tribulation,
         bt_cfg=bt_cfg,
     )
-    shown_rate = _apply_tribulation_rate_adjustment(rate=shown_rate, is_tribulation=is_tribulation, bt_cfg=bt_cfg)
-    if is_tribulation:
+    shown_rate = _apply_tribulation_rate_adjustment(
+        rate=shown_rate,
+        is_tribulation=tribulation_rate_active,
+        bt_cfg=bt_cfg,
+    )
+    if tribulation_rate_active:
         rate_parts.append(f"天雷劫压制 {_format_signed_ratio_percent(-tribulation_flat_penalty)}")
         rate_parts.append(f"雷劫强度倍率 x{tribulation_rate_multiplier:.2f}")
+    elif is_tribulation and tribulation_rate_ignored:
+        rate_parts.append(f"{(steady_pill or {}).get('item_name', '高阶突破丹')}破劫：天雷劫压制豁免")
 
     title_text = "⛈️ *渡劫突破·天雷劫*" if is_tribulation else "⚡ *突破预告*"
     mode_text = "圆满渡劫（天雷劫）" if is_tribulation else "常规破境"
     tribulation_line = ""
     if is_tribulation:
-        tribulation_line = (
-            f"雷劫压制: 固定{_format_signed_ratio_percent(-tribulation_flat_penalty)}，"
-            f"再乘以 {tribulation_rate_multiplier:.2f} 倍\n"
-            f"雷劫附加消耗: +{tribulation_extra_cost} 下品灵石，+{tribulation_extra_stamina} 点精力\n"
-        )
+        if tribulation_rate_active:
+            tribulation_line = (
+                f"雷劫压制: 固定{_format_signed_ratio_percent(-tribulation_flat_penalty)}，"
+                f"再乘以 {tribulation_rate_multiplier:.2f} 倍\n"
+                f"雷劫附加消耗: +{tribulation_extra_cost} 下品灵石，+{tribulation_extra_stamina} 点精力\n"
+            )
+        else:
+            tribulation_line = (
+                f"雷劫压制: 已被{(steady_pill or {}).get('item_name', '高阶突破丹')}豁免\n"
+                f"雷劫附加消耗: +{tribulation_extra_cost} 下品灵石，+{tribulation_extra_stamina} 点精力\n"
+            )
 
     preview_text = (
         f"{title_text}\n"
@@ -439,7 +475,8 @@ def get_breakthrough_preview(
         strategy_notes = (
             f"当前为【{current_realm.get('name', '圆满境')}】圆满关口，仅开放 *渡劫突破*。\n"
             f"渡劫突破：消耗下品灵石 + 突破丹系道具 x1，成功率约 *{int(steady_rate * 100)}%*。\n"
-            "说明：渡劫成功率由灵根、增益、地脉、运势、道友助阵与天雷劫共同决定，不含保底机制。"
+            "说明：渡劫成功率由灵根、增益、地脉、运势、道友助阵与天雷劫共同决定；"
+            "高级/超级突破丹可豁免雷劫成功率压制，不含保底机制。"
         )
     else:
         strategy_notes = (
@@ -464,6 +501,7 @@ def get_breakthrough_preview(
             "tribulation_name": "天雷劫" if is_tribulation else "",
             "tribulation_flat_penalty": float(tribulation_flat_penalty if is_tribulation else 0.0),
             "tribulation_rate_multiplier": float(tribulation_rate_multiplier if is_tribulation else 1.0),
+            "tribulation_rate_ignored": bool(tribulation_rate_ignored),
             "tribulation_extra_cost_copper": int(tribulation_extra_cost),
             "tribulation_extra_stamina": int(tribulation_extra_stamina),
             "stamina_cost": stamina_cost,
@@ -1141,7 +1179,7 @@ def settle_breakthrough(
         return {
             "success": False,
             "code": "INSUFFICIENT_ITEM",
-            "message": "突破丹不足，需持有突破丹/高级突破丹/超级突破丹或先激活突破增益",
+            "message": "突破丹不足，需持有突破丹/高级突破丹/超级突破丹或先激活聚灵增益",
         }, 400
 
     fire_bonus = float(bt_cfg.get("fire_bonus", 0.03) or 0.03)
@@ -1160,7 +1198,16 @@ def settle_breakthrough(
         shown_rate = min(1.0, shown_rate + ally_help_bonus)
     if pill_bonus > 0:
         shown_rate = min(1.0, shown_rate + pill_bonus)
-    shown_rate = _apply_tribulation_rate_adjustment(rate=shown_rate, is_tribulation=is_tribulation, bt_cfg=bt_cfg)
+    tribulation_rate_ignored = bool(
+        is_tribulation
+        and strategy == "steady"
+        and _pill_breaks_tribulation_limit(consume_item_id)
+    )
+    shown_rate = _apply_tribulation_rate_adjustment(
+        rate=shown_rate,
+        is_tribulation=bool(is_tribulation and not tribulation_rate_ignored),
+        bt_cfg=bt_cfg,
+    )
     stamina_cost = int(bt_cfg.get("stamina_cost", 1) or 1) + tribulation_extra_stamina
 
     try:
@@ -1254,8 +1301,7 @@ def settle_breakthrough(
                            rank = %s, copper = copper - %s + %s, gold = gold + %s,
                            max_hp = %s, max_mp = %s, hp = %s, mp = %s,
                            attack = %s, defense = %s,
-                           weak_until = 0, breakthrough_pity = 0, breakthrough_protect_until = 0,
-                           breakthrough_boost_until = 0, breakthrough_boost_pct = 0
+                           weak_until = 0, breakthrough_pity = 0, breakthrough_protect_until = 0
                            WHERE user_id = %s AND copper >= %s""",
                         (
                             new_rank,
@@ -1278,8 +1324,7 @@ def settle_breakthrough(
                            rank = %s, copper = copper - %s + %s, gold = gold + %s,
                            max_hp = %s, max_mp = %s, hp = %s, mp = %s,
                            attack = %s, defense = %s,
-                           weak_until = 0, breakthrough_pity = 0,
-                           breakthrough_boost_until = 0, breakthrough_boost_pct = 0
+                           weak_until = 0, breakthrough_pity = 0
                            WHERE user_id = %s AND copper >= %s""",
                         (
                             new_rank,
@@ -1351,6 +1396,7 @@ def settle_breakthrough(
             "tribulation_name": "天雷劫" if is_tribulation else "",
             "tribulation_flat_penalty": float(tribulation_flat_penalty if is_tribulation else 0.0),
             "tribulation_rate_multiplier": float(tribulation_rate_multiplier if is_tribulation else 1.0),
+            "tribulation_rate_ignored": bool(tribulation_rate_ignored),
             "tribulation_extra_cost_copper": int(tribulation_extra_cost),
             "tribulation_extra_stamina": int(tribulation_extra_stamina),
             "call_for_help": bool(call_for_help),
@@ -1416,6 +1462,7 @@ def settle_breakthrough(
                 "is_tribulation": bool(is_tribulation),
                 "tribulation_flat_penalty": tribulation_flat_penalty if is_tribulation else 0.0,
                 "tribulation_rate_multiplier": tribulation_rate_multiplier if is_tribulation else 1.0,
+                "tribulation_rate_ignored": bool(tribulation_rate_ignored),
                 "tribulation_extra_cost": tribulation_extra_cost,
                 "tribulation_extra_stamina": tribulation_extra_stamina,
                 "item_id": consume_item_id,
@@ -1446,6 +1493,7 @@ def settle_breakthrough(
                 "is_tribulation": bool(is_tribulation),
                 "tribulation_flat_penalty": tribulation_flat_penalty if is_tribulation else 0.0,
                 "tribulation_rate_multiplier": tribulation_rate_multiplier if is_tribulation else 1.0,
+                "tribulation_rate_ignored": bool(tribulation_rate_ignored),
                 "tribulation_extra_cost": tribulation_extra_cost,
                 "tribulation_extra_stamina": tribulation_extra_stamina,
             },
@@ -1501,8 +1549,7 @@ def settle_breakthrough(
                 cur.execute(
                     """UPDATE users SET
                        exp = GREATEST(0, exp - %s), copper = copper - %s,
-                       weak_until = %s, breakthrough_pity = 0, breakthrough_protect_until = 0,
-                       breakthrough_boost_until = 0, breakthrough_boost_pct = 0
+                       weak_until = %s, breakthrough_pity = 0, breakthrough_protect_until = 0
                        WHERE user_id = %s AND copper >= %s""",
                     (
                         exp_lost,
@@ -1516,8 +1563,7 @@ def settle_breakthrough(
                 cur.execute(
                     """UPDATE users SET
                        exp = GREATEST(0, exp - %s), copper = copper - %s,
-                       weak_until = %s, breakthrough_pity = 0,
-                       breakthrough_boost_until = 0, breakthrough_boost_pct = 0
+                       weak_until = %s, breakthrough_pity = 0
                        WHERE user_id = %s AND copper >= %s""",
                     (
                         exp_lost,
@@ -1574,10 +1620,20 @@ def settle_breakthrough(
     penalty_prefix = "渡劫失败，遭天雷反噬，" if is_tribulation else "突破失败，"
     penalty_message = penalty_prefix + f"损失{_format_ratio_percent(exp_lost_pct)}修为，{_format_weak_penalty_text(weak_seconds)}"
 
+    if strategy == "steady":
+        if consume_item_id:
+            strategy_cost_text = f"已消耗{consume_item_name or '突破丹'} x1"
+        else:
+            strategy_cost_text = "稳妥突破：本次未消耗突破丹（由聚灵增益替代）"
+    elif strategy == "protect" and protect_material_need > 0:
+        strategy_cost_text = f"已额外消耗下品灵石 x{protect_material_need}"
+    else:
+        strategy_cost_text = ""
+
     resp = {
         "success": False,
         "code": "BREAKTHROUGH_FAILED",
-        "message": penalty_message + "\n\n本次突破按实时成功率判定，不含保底机制。",
+        "message": penalty_message + f"\n本次判定成功率：{int(shown_rate * 100)}%\n\n本次突破按实时成功率判定，不含保底机制。",
         "exp_lost": exp_lost,
         "weak_seconds": weak_seconds,
         "cost": cost,
@@ -1588,6 +1644,7 @@ def settle_breakthrough(
         "tribulation_name": "天雷劫" if is_tribulation else "",
         "tribulation_flat_penalty": float(tribulation_flat_penalty if is_tribulation else 0.0),
         "tribulation_rate_multiplier": float(tribulation_rate_multiplier if is_tribulation else 1.0),
+        "tribulation_rate_ignored": bool(tribulation_rate_ignored),
         "tribulation_extra_cost_copper": int(tribulation_extra_cost),
         "tribulation_extra_stamina": int(tribulation_extra_stamina),
         "call_for_help": bool(call_for_help),
@@ -1601,10 +1658,7 @@ def settle_breakthrough(
         "event_title": "天雷劫未渡，道心仍可重铸" if is_tribulation else "天劫未过，但道心未碎",
         "event_flavor": "本次雷劫过于凶险，但你已摸清劫雷节奏，调整准备后仍可再战。" if is_tribulation else "这次冲关虽然折戟，但你已积累了更清晰的破境经验，调整状态后可再次尝试。",
         "next_goal": "建议补足丹药、灵石与精力后再渡劫，并尽量选择高灵气地脉与道友助阵。" if is_tribulation else "建议先恢复状态，补齐突破丹或下品灵石，再择时再次冲关。",
-        "strategy_cost_text": (
-            "已消耗突破丹 x1" if strategy == "steady"
-            else (f"已额外消耗下品灵石 x{protect_material_need}" if strategy == "protect" else "")
-        ),
+        "strategy_cost_text": strategy_cost_text,
     }
     if protect_active:
         resp["protect_pill_used"] = True
@@ -1630,6 +1684,7 @@ def settle_breakthrough(
             "is_tribulation": bool(is_tribulation),
             "tribulation_flat_penalty": tribulation_flat_penalty if is_tribulation else 0.0,
             "tribulation_rate_multiplier": tribulation_rate_multiplier if is_tribulation else 1.0,
+            "tribulation_rate_ignored": bool(tribulation_rate_ignored),
             "tribulation_extra_cost": tribulation_extra_cost,
             "tribulation_extra_stamina": tribulation_extra_stamina,
             "item_id": consume_item_id,
@@ -1661,6 +1716,7 @@ def settle_breakthrough(
             "is_tribulation": bool(is_tribulation),
             "tribulation_flat_penalty": tribulation_flat_penalty if is_tribulation else 0.0,
             "tribulation_rate_multiplier": tribulation_rate_multiplier if is_tribulation else 1.0,
+            "tribulation_rate_ignored": bool(tribulation_rate_ignored),
             "tribulation_extra_cost": tribulation_extra_cost,
             "tribulation_extra_stamina": tribulation_extra_stamina,
         },
@@ -1753,17 +1809,17 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
             return {"success": False, "code": "INVALID", "message": "此物品无法使用"}, 400
         if effect == "attack_buff":
             current_until = int(user.get("attack_buff_until", 0) or 0)
-            current_val = int(user.get("attack_buff_value", 0) or 0)
-            new_until = max(current_until, now + duration)
-            new_val = max(current_val, value)
+            active_val = int(_active_buff_value(now=now, until=current_until, value=user.get("attack_buff_value", 0), default=0.0))
+            new_until = max(current_until if current_until > now else 0, now + duration)
+            new_val = max(active_val, value)
             message = f"使用成功！攻击+{new_val}（{duration // 60}分钟内有效）"
             update_sql = "UPDATE users SET attack_buff_until = %s, attack_buff_value = %s WHERE user_id = %s"
             update_params = (new_until, new_val, user_id)
         else:
             current_until = int(user.get("defense_buff_until", 0) or 0)
-            current_val = int(user.get("defense_buff_value", 0) or 0)
-            new_until = max(current_until, now + duration)
-            new_val = max(current_val, value)
+            active_val = int(_active_buff_value(now=now, until=current_until, value=user.get("defense_buff_value", 0), default=0.0))
+            new_until = max(current_until if current_until > now else 0, now + duration)
+            new_val = max(active_val, value)
             message = f"使用成功！防御+{new_val}（{duration // 60}分钟内有效）"
             update_sql = "UPDATE users SET defense_buff_until = %s, defense_buff_value = %s WHERE user_id = %s"
             update_params = (new_until, new_val, user_id)
@@ -1786,9 +1842,9 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
             exp_mult = float(cfg.get("exp_mult", 1.35))
             bonus_pct = int(round((exp_mult - 1) * 100))
         current_until = int(user.get("cultivation_boost_until", 0) or 0)
-        current_pct = float(user.get("cultivation_boost_pct", 0) or 0)
-        new_until = max(current_until, now + duration)
-        new_pct = max(current_pct, bonus_pct)
+        active_pct = _active_buff_value(now=now, until=current_until, value=user.get("cultivation_boost_pct", 0), default=0.0)
+        new_until = max(current_until if current_until > now else 0, now + duration)
+        new_pct = max(active_pct, bonus_pct)
         message = f"使用成功！修炼冲刺丹生效，下一次修炼收益+{int(new_pct)}%（{duration // 60}分钟内有效）"
         try:
             with db_transaction() as cur:
@@ -1845,13 +1901,13 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
         if bonus_pct <= 0:
             return {"success": False, "code": "INVALID", "message": "此物品无法使用"}, 400
         current_until = int(user.get("breakthrough_boost_until", 0) or 0)
-        current_pct = float(user.get("breakthrough_boost_pct", 0) or 0)
-        new_until = max(current_until, now + duration)
-        new_pct = max(current_pct, bonus_pct)
+        active_pct = _active_buff_value(now=now, until=current_until, value=user.get("breakthrough_boost_pct", 0), default=0.0)
+        new_until = max(current_until if current_until > now else 0, now + duration)
+        new_pct = max(active_pct, bonus_pct)
         recover_amount = 0
         if mp_pct > 0:
             recover_amount = max(1, int(round(int(user.get("max_mp", 50) or 50) * mp_pct)))
-        message = f"使用成功！聚灵阵已启动，当前突破增益+{int(new_pct)}%"
+        message = f"使用成功！聚灵阵已启动，当前聚灵增益+{int(new_pct)}%"
         if recover_amount > 0:
             message += f"，恢复 {recover_amount} MP"
         message += f"（{duration // 60}分钟内有效）"
@@ -1885,9 +1941,9 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
         if bonus_pct <= 0:
             return {"success": False, "code": "INVALID", "message": "此物品无法使用"}, 400
         current_until = int(user.get("breakthrough_boost_until", 0) or 0)
-        current_pct = float(user.get("breakthrough_boost_pct", 0) or 0)
-        new_until = max(current_until, now + duration)
-        new_pct = max(current_pct, bonus_pct)
+        active_pct = _active_buff_value(now=now, until=current_until, value=user.get("breakthrough_boost_pct", 0), default=0.0)
+        new_until = max(current_until if current_until > now else 0, now + duration)
+        new_pct = max(active_pct, bonus_pct)
         message = f"使用成功！突破成功率+{int(new_pct)}%（{duration // 60}分钟内有效）"
         try:
             with db_transaction() as cur:
