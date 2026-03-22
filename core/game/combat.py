@@ -124,29 +124,89 @@ _SKILL_SELF_EFFECT_HANDLERS = [
 
 
 MONSTERS = [
-    {"id": "wild_boar", "name": "野猪", "element": "土", "hp": 50, "attack": 8, "defense": 3, "exp_reward": 20, "copper_reward": (5, 15), "min_rank": 1},
-    {"id": "wolf", "name": "灰狼", "element": "木", "hp": 80, "attack": 12, "defense": 5, "exp_reward": 35, "copper_reward": (10, 25), "min_rank": 1},
-    {"id": "giant_snake", "name": "巨蛇", "element": "水", "hp": 120, "attack": 18, "defense": 8, "exp_reward": 60, "copper_reward": (20, 40), "min_rank": 2},
-    {"id": "spirit_rat", "name": "灵鼠", "element": "金", "hp": 60, "attack": 15, "defense": 2, "exp_reward": 50, "copper_reward": (15, 30), "min_rank": 2},
-    {"id": "stone_golem", "name": "石魔", "element": "土", "hp": 300, "attack": 30, "defense": 25, "exp_reward": 150, "copper_reward": (50, 100), "min_rank": 5},
-    {"id": "fire_sprite", "name": "火精", "element": "火", "hp": 200, "attack": 45, "defense": 10, "exp_reward": 200, "copper_reward": (80, 150), "min_rank": 6},
-    {"id": "ice_demon", "name": "冰妖", "element": "水", "hp": 250, "attack": 40, "defense": 15, "exp_reward": 180, "copper_reward": (70, 130), "min_rank": 6},
-    {"id": "thunder_beast", "name": "雷兽", "element": "金", "hp": 350, "attack": 50, "defense": 20, "exp_reward": 250, "copper_reward": (100, 200), "min_rank": 8},
-    {"id": "blood_dragon", "name": "血龙", "element": "火", "hp": 800, "attack": 80, "defense": 40, "exp_reward": 500, "copper_reward": (200, 400), "min_rank": 10},
-    {"id": "phantom_spirit", "name": "幽魂", "element": "水", "hp": 500, "attack": 100, "defense": 20, "exp_reward": 600, "copper_reward": (300, 500), "min_rank": 12},
-    {"id": "golden_lion", "name": "金毛狮王", "element": "金", "hp": 1200, "attack": 120, "defense": 60, "exp_reward": 800, "copper_reward": (400, 700), "min_rank": 14},
-    {"id": "ancient_demon", "name": "上古魔尊", "element": "土", "hp": 5000, "attack": 300, "defense": 150, "exp_reward": 3000, "copper_reward": (1000, 2000), "min_rank": 18},
-    {"id": "heavenly_dragon", "name": "天龙", "element": "木", "hp": 10000, "attack": 500, "defense": 250, "exp_reward": 8000, "copper_reward": (3000, 5000), "min_rank": 22},
-    # === 新增高等级怪物 (Rank 24-32) ===
-    {"id": "void_phantom", "name": "虚空幻灵", "element": "水", "hp": 18000, "attack": 850, "defense": 400, "exp_reward": 15000, "copper_reward": (5000, 8000), "min_rank": 24},
-    {"id": "infernal_lord", "name": "炼狱魔君", "element": "火", "hp": 25000, "attack": 1200, "defense": 550, "exp_reward": 25000, "copper_reward": (8000, 12000), "min_rank": 26},
-    {"id": "celestial_tiger", "name": "天玄白虎", "element": "金", "hp": 35000, "attack": 1600, "defense": 750, "exp_reward": 40000, "copper_reward": (12000, 18000), "min_rank": 27},
-    {"id": "primordial_tortoise", "name": "太古玄龟", "element": "土", "hp": 60000, "attack": 1200, "defense": 1200, "exp_reward": 50000, "copper_reward": (15000, 22000), "min_rank": 28},
-    {"id": "divine_phoenix", "name": "九天凤凰", "element": "火", "hp": 45000, "attack": 2200, "defense": 900, "exp_reward": 65000, "copper_reward": (20000, 30000), "min_rank": 29},
-    {"id": "chaos_dragon", "name": "混沌神龙", "element": "木", "hp": 80000, "attack": 3000, "defense": 1400, "exp_reward": 100000, "copper_reward": (30000, 50000), "min_rank": 30},
-    {"id": "immortal_sovereign", "name": "不朽帝君", "element": "金", "hp": 120000, "attack": 5000, "defense": 2200, "exp_reward": 180000, "copper_reward": (50000, 80000), "min_rank": 31},
-    {"id": "heavenly_dao_beast", "name": "天道圣兽", "element": "土", "hp": 200000, "attack": 8000, "defense": 3500, "exp_reward": 300000, "copper_reward": (80000, 120000), "min_rank": 32},
+    # === 苍澜洲 - 练气期 ===
+    {"id": "wild_boar", "name": "野猪", "element": "土", "hp": 50, "attack": 8, "defense": 3, "exp_reward": 20, "copper_reward": (5, 15), "min_rank": 1, "maps": ["canglan_city", "east_forest"]},
+    {"id": "wolf", "name": "灰狼", "element": "木", "hp": 80, "attack": 12, "defense": 5, "exp_reward": 35, "copper_reward": (10, 25), "min_rank": 1, "maps": ["canglan_city"]},
+    {"id": "spirit_rat", "name": "灵鼠", "element": "金", "hp": 60, "attack": 15, "defense": 2, "exp_reward": 50, "copper_reward": (15, 30), "min_rank": 2, "maps": ["canglan_city", "east_forest"]},
+    {"id": "giant_snake", "name": "巨蛇", "element": "水", "hp": 120, "attack": 18, "defense": 8, "exp_reward": 60, "copper_reward": (20, 40), "min_rank": 2, "maps": ["east_forest"]},
+    {"id": "shadow_fox", "name": "幻影狐", "element": "金", "hp": 90, "attack": 20, "defense": 4, "exp_reward": 55, "copper_reward": (18, 35), "min_rank": 2, "maps": ["east_forest"]},
+    {"id": "pickpocket_rat", "name": "窃灵鼠", "element": "金", "hp": 30, "attack": 6, "defense": 1, "exp_reward": 15, "copper_reward": (8, 20), "min_rank": 1, "maps": ["south_market"]},
+    {"id": "stone_ape", "name": "石猿", "element": "土", "hp": 180, "attack": 22, "defense": 15, "exp_reward": 80, "copper_reward": (30, 55), "min_rank": 2, "maps": ["north_mountain"]},
+    {"id": "cloud_crane", "name": "云鹤", "element": "金", "hp": 100, "attack": 25, "defense": 6, "exp_reward": 70, "copper_reward": (25, 45), "min_rank": 3, "maps": ["north_mountain"]},
+    {"id": "mist_python", "name": "迷雾蟒", "element": "水", "hp": 200, "attack": 28, "defense": 12, "exp_reward": 90, "copper_reward": (35, 60), "min_rank": 3, "maps": ["north_mountain"]},
+    {"id": "lake_serpent", "name": "湖蛟", "element": "水", "hp": 160, "attack": 24, "defense": 10, "exp_reward": 75, "copper_reward": (28, 50), "min_rank": 3, "maps": ["fallen_star_lake"]},
+    {"id": "water_spirit", "name": "水灵", "element": "水", "hp": 130, "attack": 30, "defense": 8, "exp_reward": 85, "copper_reward": (32, 55), "min_rank": 3, "maps": ["fallen_star_lake"]},
+    {"id": "star_fragment_golem", "name": "星碎石人", "element": "土", "hp": 250, "attack": 20, "defense": 20, "exp_reward": 100, "copper_reward": (40, 70), "min_rank": 4, "maps": ["fallen_star_lake"]},
+    {"id": "poison_bee", "name": "毒蜂", "element": "木", "hp": 70, "attack": 22, "defense": 3, "exp_reward": 55, "copper_reward": (20, 40), "min_rank": 2, "maps": ["luoxia_valley"]},
+    {"id": "flower_spider", "name": "花蛛", "element": "木", "hp": 110, "attack": 18, "defense": 8, "exp_reward": 60, "copper_reward": (22, 42), "min_rank": 3, "maps": ["luoxia_valley"]},
+    {"id": "vine_demon", "name": "藤妖", "element": "木", "hp": 180, "attack": 26, "defense": 14, "exp_reward": 85, "copper_reward": (30, 55), "min_rank": 3, "maps": ["luoxia_valley"]},
+    {"id": "mine_rat", "name": "矿鼠", "element": "土", "hp": 80, "attack": 14, "defense": 6, "exp_reward": 45, "copper_reward": (15, 30), "min_rank": 3, "maps": ["canglan_mines"]},
+    {"id": "crystal_golem", "name": "晶石魔", "element": "土", "hp": 220, "attack": 22, "defense": 22, "exp_reward": 95, "copper_reward": (35, 65), "min_rank": 4, "maps": ["canglan_mines"]},
+    {"id": "shadow_bat", "name": "暗影蝠", "element": "金", "hp": 90, "attack": 20, "defense": 4, "exp_reward": 50, "copper_reward": (18, 35), "min_rank": 3, "maps": ["canglan_mines"]},
+    {"id": "earth_worm", "name": "地龙蚓", "element": "土", "hp": 300, "attack": 30, "defense": 25, "exp_reward": 120, "copper_reward": (45, 80), "min_rank": 4, "maps": ["canglan_mines"]},
+    # === 苍澜洲 - 练气圆满～筑基 ===
+    {"id": "stone_golem", "name": "石魔", "element": "土", "hp": 300, "attack": 30, "defense": 25, "exp_reward": 150, "copper_reward": (50, 100), "min_rank": 5, "maps": ["misty_swamp"]},
+    {"id": "swamp_toad", "name": "瘴气蟾", "element": "水", "hp": 250, "attack": 35, "defense": 18, "exp_reward": 130, "copper_reward": (45, 85), "min_rank": 5, "maps": ["misty_swamp"]},
+    {"id": "miasma_ghost", "name": "瘴魂", "element": "水", "hp": 180, "attack": 42, "defense": 8, "exp_reward": 140, "copper_reward": (50, 95), "min_rank": 5, "maps": ["misty_swamp"]},
+    {"id": "mud_golem", "name": "泥偶", "element": "土", "hp": 350, "attack": 28, "defense": 28, "exp_reward": 135, "copper_reward": (48, 90), "min_rank": 5, "maps": ["misty_swamp"]},
+    {"id": "poison_hydra", "name": "毒蛟", "element": "水", "hp": 400, "attack": 45, "defense": 20, "exp_reward": 180, "copper_reward": (60, 120), "min_rank": 5, "maps": ["misty_swamp"]},
+    # === 天渊洲 - 筑基期 ===
+    {"id": "fire_sprite", "name": "火精", "element": "火", "hp": 200, "attack": 45, "defense": 10, "exp_reward": 200, "copper_reward": (80, 150), "min_rank": 6, "maps": ["tianyuan_sect_city"]},
+    {"id": "rogue_cultivator", "name": "散修", "element": "金", "hp": 350, "attack": 40, "defense": 22, "exp_reward": 220, "copper_reward": (85, 160), "min_rank": 6, "maps": ["tianyuan_sect_city"]},
+    {"id": "sword_puppet", "name": "剑傀儡", "element": "金", "hp": 400, "attack": 55, "defense": 30, "exp_reward": 280, "copper_reward": (100, 200), "min_rank": 7, "maps": ["sword_peak"]},
+    {"id": "phantom_swordsman", "name": "剑魂", "element": "金", "hp": 300, "attack": 65, "defense": 15, "exp_reward": 300, "copper_reward": (110, 210), "min_rank": 7, "maps": ["sword_peak"]},
+    {"id": "iron_winged_eagle", "name": "铁翼鹰", "element": "金", "hp": 280, "attack": 58, "defense": 18, "exp_reward": 260, "copper_reward": (95, 180), "min_rank": 7, "maps": ["sword_peak"]},
+    {"id": "pill_beast", "name": "丹兽", "element": "火", "hp": 320, "attack": 38, "defense": 20, "exp_reward": 240, "copper_reward": (90, 170), "min_rank": 6, "maps": ["pill_pavilion"]},
+    {"id": "herb_guardian", "name": "药田守护", "element": "木", "hp": 450, "attack": 35, "defense": 35, "exp_reward": 250, "copper_reward": (95, 180), "min_rank": 7, "maps": ["pill_pavilion"]},
+    {"id": "ice_demon", "name": "冰妖", "element": "水", "hp": 250, "attack": 40, "defense": 15, "exp_reward": 180, "copper_reward": (70, 130), "min_rank": 6, "maps": ["chaos_sea"]},
+    {"id": "thunder_beast", "name": "雷兽", "element": "金", "hp": 350, "attack": 50, "defense": 20, "exp_reward": 250, "copper_reward": (100, 200), "min_rank": 8, "maps": ["chaos_sea"]},
+    {"id": "sea_beast", "name": "海兽", "element": "水", "hp": 500, "attack": 48, "defense": 25, "exp_reward": 280, "copper_reward": (105, 195), "min_rank": 8, "maps": ["chaos_sea"]},
+    {"id": "pirate_cultivator", "name": "海盗修士", "element": "火", "hp": 380, "attack": 55, "defense": 22, "exp_reward": 300, "copper_reward": (110, 210), "min_rank": 8, "maps": ["chaos_sea"]},
+    {"id": "storm_spirit", "name": "风暴灵", "element": "水", "hp": 320, "attack": 60, "defense": 12, "exp_reward": 290, "copper_reward": (108, 205), "min_rank": 9, "maps": ["chaos_sea"]},
+    {"id": "deep_kraken", "name": "深渊巨章", "element": "水", "hp": 600, "attack": 52, "defense": 30, "exp_reward": 320, "copper_reward": (120, 230), "min_rank": 9, "maps": ["chaos_sea"]},
+    # === 天渊洲 - 金丹期 ===
+    {"id": "blood_dragon", "name": "血龙", "element": "火", "hp": 800, "attack": 80, "defense": 40, "exp_reward": 500, "copper_reward": (200, 400), "min_rank": 10, "maps": ["demon_forest"]},
+    {"id": "demon_tiger", "name": "妖虎", "element": "木", "hp": 700, "attack": 90, "defense": 35, "exp_reward": 480, "copper_reward": (190, 380), "min_rank": 10, "maps": ["demon_forest"]},
+    {"id": "ancient_treant", "name": "古树妖", "element": "木", "hp": 1000, "attack": 60, "defense": 55, "exp_reward": 520, "copper_reward": (210, 420), "min_rank": 11, "maps": ["demon_forest"]},
+    {"id": "sky_roc", "name": "天鹏", "element": "金", "hp": 650, "attack": 100, "defense": 30, "exp_reward": 550, "copper_reward": (220, 440), "min_rank": 11, "maps": ["demon_forest"]},
+    {"id": "blood_ape", "name": "血猿", "element": "火", "hp": 900, "attack": 95, "defense": 45, "exp_reward": 580, "copper_reward": (230, 460), "min_rank": 12, "maps": ["demon_forest"]},
+    {"id": "phantom_spirit", "name": "幽魂", "element": "水", "hp": 500, "attack": 100, "defense": 20, "exp_reward": 600, "copper_reward": (300, 500), "min_rank": 12, "maps": ["demon_forest"]},
+    {"id": "golden_lion", "name": "金毛狮王", "element": "金", "hp": 1200, "attack": 120, "defense": 60, "exp_reward": 800, "copper_reward": (400, 700), "min_rank": 14, "maps": ["star_fall_sea"]},
+    # === 星陨海 - 元婴期 ===
+    {"id": "star_jellyfish", "name": "星辰水母", "element": "水", "hp": 1000, "attack": 110, "defense": 40, "exp_reward": 750, "copper_reward": (380, 650), "min_rank": 14, "maps": ["star_fall_sea"]},
+    {"id": "void_whale", "name": "虚空鲸", "element": "水", "hp": 2000, "attack": 90, "defense": 80, "exp_reward": 900, "copper_reward": (420, 720), "min_rank": 15, "maps": ["star_fall_sea"]},
+    {"id": "meteor_golem", "name": "陨石傀儡", "element": "土", "hp": 1800, "attack": 130, "defense": 70, "exp_reward": 1000, "copper_reward": (450, 800), "min_rank": 15, "maps": ["star_fall_sea"]},
+    {"id": "ruin_guardian", "name": "遗迹守卫", "element": "土", "hp": 2500, "attack": 150, "defense": 100, "exp_reward": 1200, "copper_reward": (500, 900), "min_rank": 15, "maps": ["ancient_ruins"]},
+    {"id": "formation_spirit", "name": "阵灵", "element": "金", "hp": 1500, "attack": 180, "defense": 50, "exp_reward": 1300, "copper_reward": (520, 950), "min_rank": 16, "maps": ["ancient_ruins"]},
+    {"id": "ancient_construct", "name": "上古构装体", "element": "土", "hp": 3000, "attack": 160, "defense": 120, "exp_reward": 1500, "copper_reward": (600, 1100), "min_rank": 16, "maps": ["ancient_ruins"]},
+    {"id": "star_trial_puppet", "name": "星辰试炼傀儡", "element": "金", "hp": 2800, "attack": 200, "defense": 90, "exp_reward": 1800, "copper_reward": (700, 1300), "min_rank": 16, "maps": ["star_tower"]},
+    {"id": "law_fragment", "name": "法则碎片", "element": "火", "hp": 2000, "attack": 250, "defense": 60, "exp_reward": 2000, "copper_reward": (800, 1500), "min_rank": 17, "maps": ["star_tower"]},
+    {"id": "constellation_beast", "name": "星宿兽", "element": "火", "hp": 3500, "attack": 220, "defense": 110, "exp_reward": 2500, "copper_reward": (900, 1700), "min_rank": 17, "maps": ["star_tower"]},
+    # === 逆墟 - 化神期 ===
+    {"id": "ancient_demon", "name": "上古魔尊", "element": "土", "hp": 5000, "attack": 300, "defense": 150, "exp_reward": 3000, "copper_reward": (1000, 2000), "min_rank": 18, "maps": ["reverse_land"]},
+    {"id": "reverse_wraith", "name": "逆修怨灵", "element": "水", "hp": 4000, "attack": 350, "defense": 120, "exp_reward": 3200, "copper_reward": (1100, 2100), "min_rank": 18, "maps": ["reverse_land"]},
+    {"id": "law_breaker", "name": "破法者", "element": "金", "hp": 4500, "attack": 380, "defense": 140, "exp_reward": 3500, "copper_reward": (1200, 2300), "min_rank": 19, "maps": ["fate_crack"]},
+    {"id": "chaos_elemental", "name": "混沌元素", "element": "火", "hp": 5500, "attack": 400, "defense": 160, "exp_reward": 4000, "copper_reward": (1400, 2600), "min_rank": 19, "maps": ["reverse_land"]},
+    {"id": "fate_phantom", "name": "命运幻影", "element": "水", "hp": 6000, "attack": 420, "defense": 170, "exp_reward": 4500, "copper_reward": (1600, 2900), "min_rank": 19, "maps": ["fate_crack"]},
+    {"id": "temporal_beast", "name": "时空异兽", "element": "金", "hp": 7000, "attack": 450, "defense": 200, "exp_reward": 5000, "copper_reward": (1800, 3200), "min_rank": 20, "maps": ["fate_crack"]},
+    {"id": "void_worm", "name": "虚空蠕虫", "element": "土", "hp": 8000, "attack": 400, "defense": 250, "exp_reward": 5500, "copper_reward": (2000, 3500), "min_rank": 20, "maps": ["fate_crack"]},
+    {"id": "ancient_war_spirit", "name": "远古战灵", "element": "金", "hp": 9000, "attack": 500, "defense": 220, "exp_reward": 6000, "copper_reward": (2200, 4000), "min_rank": 20, "maps": ["ancient_battlefield"]},
+    {"id": "fallen_immortal_puppet", "name": "仙人残偶", "element": "土", "hp": 10000, "attack": 480, "defense": 280, "exp_reward": 7000, "copper_reward": (2500, 4500), "min_rank": 21, "maps": ["ancient_battlefield"]},
+    {"id": "abyssal_beast", "name": "深渊巨兽", "element": "火", "hp": 12000, "attack": 550, "defense": 300, "exp_reward": 8000, "copper_reward": (3000, 5000), "min_rank": 21, "maps": ["ancient_battlefield"]},
+    # === 炼虚～合体期 ===
+    {"id": "heavenly_dragon", "name": "天龙", "element": "木", "hp": 10000, "attack": 500, "defense": 250, "exp_reward": 8000, "copper_reward": (3000, 5000), "min_rank": 22, "maps": []},
+    {"id": "void_phantom", "name": "虚空幻灵", "element": "水", "hp": 18000, "attack": 850, "defense": 400, "exp_reward": 15000, "copper_reward": (5000, 8000), "min_rank": 24, "maps": []},
+    {"id": "infernal_lord", "name": "炼狱魔君", "element": "火", "hp": 25000, "attack": 1200, "defense": 550, "exp_reward": 25000, "copper_reward": (8000, 12000), "min_rank": 26, "maps": []},
+    {"id": "celestial_tiger", "name": "天玄白虎", "element": "金", "hp": 35000, "attack": 1600, "defense": 750, "exp_reward": 40000, "copper_reward": (12000, 18000), "min_rank": 27, "maps": []},
+    {"id": "primordial_tortoise", "name": "太古玄龟", "element": "土", "hp": 60000, "attack": 1200, "defense": 1200, "exp_reward": 50000, "copper_reward": (15000, 22000), "min_rank": 28, "maps": []},
+    {"id": "divine_phoenix", "name": "九天凤凰", "element": "火", "hp": 45000, "attack": 2200, "defense": 900, "exp_reward": 65000, "copper_reward": (20000, 30000), "min_rank": 29, "maps": []},
+    {"id": "chaos_dragon", "name": "混沌神龙", "element": "木", "hp": 80000, "attack": 3000, "defense": 1400, "exp_reward": 100000, "copper_reward": (30000, 50000), "min_rank": 30, "maps": []},
+    {"id": "immortal_sovereign", "name": "不朽帝君", "element": "金", "hp": 120000, "attack": 5000, "defense": 2200, "exp_reward": 180000, "copper_reward": (50000, 80000), "min_rank": 31, "maps": []},
+    {"id": "heavenly_dao_beast", "name": "天道圣兽", "element": "土", "hp": 200000, "attack": 8000, "defense": 3500, "exp_reward": 300000, "copper_reward": (80000, 120000), "min_rank": 32, "maps": []},
 ]
+
+# 按 id 建索引
+_MONSTER_INDEX: Dict[str, Dict[str, Any]] = {m["id"]: m for m in MONSTERS}
 
 
 class Combat:
@@ -364,19 +424,51 @@ class Combat:
         return damage
 
 
-def get_available_monsters(user_rank: int) -> List[Dict[str, Any]]:
-    unlocked = [m for m in MONSTERS if m["min_rank"] <= user_rank]
+def get_available_monsters(user_rank: int, *, current_map: str = "") -> List[Dict[str, Any]]:
+    """获取可挑战的怪物列表。
+
+    优先返回当前地图的怪物；若地图无怪物或未指定地图，回退到按等级筛选。
+    每个怪物附带 realm_name（境界名）和 difficulty（相对难度标签）。
+    """
+    from core.game.realms import format_realm_display
+
+    def _enrich(m: Dict[str, Any]) -> Dict[str, Any]:
+        enriched = m.copy()
+        enriched["realm_name"] = format_realm_display(m["min_rank"])
+        rank_diff = m["min_rank"] - user_rank
+        if rank_diff >= 4:
+            enriched["difficulty"] = "必死"
+        elif rank_diff >= 2:
+            enriched["difficulty"] = "极难"
+        elif rank_diff >= 0:
+            enriched["difficulty"] = "挑战"
+        elif rank_diff >= -2:
+            enriched["difficulty"] = "适中"
+        elif rank_diff >= -5:
+            enriched["difficulty"] = "轻松"
+        else:
+            enriched["difficulty"] = "碾压"
+        return enriched
+
+    # 优先按地图筛选
+    if current_map:
+        map_monsters = [
+            _enrich(m) for m in MONSTERS
+            if current_map in (m.get("maps") or []) and m["min_rank"] <= user_rank
+        ]
+        if map_monsters:
+            return map_monsters
+
+    # 回退：按等级筛选，取最近解锁的几个
+    unlocked = [_enrich(m) for m in MONSTERS if m["min_rank"] <= user_rank]
     if len(unlocked) <= 4:
         return unlocked
-    # Keep only the latest unlocked monsters to avoid flooding hunt panels.
     return unlocked[-4:]
 
 
 def get_monster_by_id(monster_id: str) -> Optional[Dict[str, Any]]:
-    for m in MONSTERS:
-        if m["id"] == monster_id:
-            return m.copy()
-    return None
+    m = _MONSTER_INDEX.get(monster_id)
+    return m.copy() if m else None
 
 
 def create_combatant_from_user(

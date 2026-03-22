@@ -278,19 +278,27 @@ def format_hunt_panel(
     *,
     cooldown_remaining: int = 0,
     can_hunt: bool = True,
+    current_map_name: str = "",
 ) -> str:
     lines = ["🦴 狩猎选择"]
+    if current_map_name:
+        lines.append(f"📍 当前地点: {current_map_name}")
     if not can_hunt and cooldown_remaining > 0:
         lines.append(f"⏱️ 冷却中: {_fmt_seconds(cooldown_remaining)}")
     else:
         lines.append("✅ 当前可发起狩猎")
     lines.append("可挑战怪物：")
     for monster in list(monsters or [])[:8]:
+        name = monster.get("name", monster.get("id", "未知"))
+        element = monster.get("element", "")
+        realm_name = monster.get("realm_name", "")
+        difficulty = monster.get("difficulty", "")
+        diff_icon = {"碾压": "🟢", "轻松": "🟢", "适中": "🟡", "挑战": "🟠", "极难": "🔴", "必死": "💀"}.get(difficulty, "⚪")
         lines.append(
-            f"• {monster.get('name', monster.get('id', '未知'))}（解锁境界 {monster.get('min_rank', 1)}）"
+            f"• {name}（{element}）{realm_name} {diff_icon}{difficulty}"
         )
-    if len(lines) <= 3:
-        lines.append("• 暂无可挑战怪物")
+    if len(lines) <= 4:
+        lines.append("• 当前地点无可挑战怪物，试试换个地图")
     return "\n".join(lines)
 
 

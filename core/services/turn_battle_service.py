@@ -1109,12 +1109,14 @@ def _finalize_hunt(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
                      drop.get("first_round_reduction_pct", 0), drop.get("crit_heal_pct", 0),
                      drop.get("element_damage_pct", 0), drop.get("low_hp_shield_pct", 0)),
                 )
+            tb_db_max_hp = int(user.get("max_hp", 100) or 100)
+            tb_db_max_mp = int(user.get("max_mp", 50) or 50)
             cur.execute(
                 """UPDATE users SET exp = exp + ?, copper = copper + ?, gold = gold + ?, hp = ?, dy_times = dy_times + 1
                    WHERE user_id = ?""",
-                (rewards["exp"], rewards["copper"], rewards["gold"], max(1, int(player["hp"])), user_id),
+                (rewards["exp"], rewards["copper"], rewards["gold"], max(1, min(tb_db_max_hp, int(player["hp"]))), user_id),
             )
-            cur.execute("UPDATE users SET mp = ?, vitals_updated_at = ? WHERE user_id = ?", (max(0, int(player.get("mp", 0) or 0)), int(time.time()), user_id))
+            cur.execute("UPDATE users SET mp = ?, vitals_updated_at = ? WHERE user_id = ?", (max(0, min(tb_db_max_mp, int(player.get("mp", 0) or 0))), int(time.time()), user_id))
             cur.execute(
                 """INSERT INTO battle_logs (user_id, monster_id, victory, rounds, exp_gained, copper_gained, gold_gained, timestamp)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
@@ -1134,7 +1136,7 @@ def _finalize_hunt(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
         weak_until = max(int(user.get("weak_until", 0) or 0), now_ts + weak_seconds) if weak_seconds > 0 else int(user.get("weak_until", 0) or 0)
         execute(
             "UPDATE users SET hp = 1, mp = ?, weak_until = ?, vitals_updated_at = ? WHERE user_id = ?",
-            (max(0, int(player.get("mp", 0) or 0)), weak_until, now_ts, user_id),
+            (max(0, min(int(user.get("max_mp", 50) or 50), int(player.get("mp", 0) or 0))), weak_until, now_ts, user_id),
         )
 
     updated = get_user_by_id(user_id) or user
@@ -1450,6 +1452,7 @@ def _finalize_secret_no_battle(
     gold_reward = int(reward.get("gold", 0) or 0)
     loot_score = int(reward["exp"] + reward["copper"] + gold_reward * 300 + sum((d.get("quantity", 1) or 1) * 120 for d in drops))
     current_hp = max(1, int(user.get("hp", 1) or 1))
+    sr_db_max_hp = int(user.get("max_hp", 100) or 100)
     with db_transaction() as cur:
         for drop in drops:
             cur.execute(
@@ -1467,7 +1470,7 @@ def _finalize_secret_no_battle(
             )
         cur.execute(
             "UPDATE users SET exp = exp + ?, copper = copper + ?, gold = gold + ?, hp = ?, secret_loot_score = secret_loot_score + ?, vitals_updated_at = ? WHERE user_id = ?",
-            (reward["exp"], reward["copper"], gold_reward, current_hp, loot_score, int(time.time()), user_id),
+            (reward["exp"], reward["copper"], gold_reward, min(sr_db_max_hp, current_hp), loot_score, int(time.time()), user_id),
         )
     for drop in drops:
         ensure_item(user_id, drop.get("item_id"), drop.get("quantity", 1))
@@ -1631,7 +1634,9 @@ def _finalize_secret(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
         if targeted_drop:
             drops.append(targeted_drop)
     loot_score = int(reward["exp"] + reward["copper"] + total_gold * 300 + sum((d.get("quantity", 1) or 1) * 120 for d in drops))
-    final_hp = max(1, int(player["hp"])) if victory else 1
+    sr2_db_max_hp = int(user.get("max_hp", 100) or 100)
+    sr2_db_max_mp = int(user.get("max_mp", 50) or 50)
+    final_hp = max(1, min(sr2_db_max_hp, int(player["hp"]))) if victory else 1
     with db_transaction() as cur:
         for drop in drops:
             cur.execute(
@@ -1649,7 +1654,7 @@ def _finalize_secret(session: Dict[str, Any], victory: bool) -> Dict[str, Any]:
             )
         cur.execute(
             "UPDATE users SET exp = exp + ?, copper = copper + ?, gold = gold + ?, hp = ?, mp = ?, secret_loot_score = secret_loot_score + ?, vitals_updated_at = ? WHERE user_id = ?",
-            (reward["exp"], reward["copper"], total_gold, final_hp, max(0, int(player.get("mp", 0) or 0)), loot_score, int(time.time()), user_id),
+            (reward["exp"], reward["copper"], total_gold, final_hp, max(0, min(sr2_db_max_mp, int(player.get("mp", 0) or 0))), loot_score, int(time.time()), user_id),
         )
     for drop in drops:
         ensure_item(user_id, drop.get("item_id"), drop.get("quantity", 1))

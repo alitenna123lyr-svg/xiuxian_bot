@@ -93,7 +93,7 @@ def hunt():
 
 @combat_bp.route("/api/monsters", methods=["GET"])
 def list_monsters():
-    """获取可挑战的怪物列表"""
+    """获取可挑战的怪物列表（按当前地图筛选，以修为量化难度）"""
     user_id = request.args.get("user_id")
 
     if user_id:
@@ -101,11 +101,22 @@ def list_monsters():
         if not user:
             return error("ERROR", "User not found", 404)
         rank = user.get("rank", 1)
+        current_map = str(user.get("current_map") or "")
     else:
         rank = 1
+        current_map = ""
 
-    monsters = get_available_monsters(rank)
-    return success(monsters=monsters, user_rank=rank)
+    from core.game.maps import get_map
+    map_info = get_map(current_map) if current_map else None
+    map_name = map_info.get("name", current_map) if map_info else ""
+
+    monsters = get_available_monsters(rank, current_map=current_map)
+    return success(
+        monsters=monsters,
+        user_rank=rank,
+        current_map=current_map,
+        current_map_name=map_name,
+    )
 
 
 @combat_bp.route("/api/hunt/status/<user_id>", methods=["GET"])

@@ -1797,8 +1797,15 @@ def refresh_user_vitals(
     if updated_at <= 0:
         updated_at = now
     if hp >= max_hp and mp >= max_mp:
-        if int(user.get("vitals_updated_at", 0) or 0) != updated_at:
-            execute("UPDATE users SET vitals_updated_at = %s WHERE user_id = %s", (updated_at, user_id))
+        clamped = hp > max_hp or mp > max_mp
+        if int(user.get("vitals_updated_at", 0) or 0) != updated_at or clamped:
+            if clamped:
+                execute(
+                    "UPDATE users SET hp = %s, mp = %s, vitals_updated_at = %s WHERE user_id = %s",
+                    (max_hp, max_mp, updated_at, user_id),
+                )
+            else:
+                execute("UPDATE users SET vitals_updated_at = %s WHERE user_id = %s", (updated_at, user_id))
         user["hp"] = max_hp
         user["mp"] = max_mp
         user["vitals_updated_at"] = updated_at
