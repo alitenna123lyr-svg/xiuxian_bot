@@ -1,7 +1,7 @@
 import time
 
 from core.database.connection import fetch_one, execute, add_item, get_user_by_id
-from core.game.items import generate_pill
+from core.game.items import generate_pill, get_shop_offer
 from core.game.secret_realms import get_secret_realm_by_id
 from core.services.settlement import settle_secret_realm_explore
 from core.services.settlement_extra import settle_shop_buy, settle_use_item
@@ -141,6 +141,7 @@ def test_use_buff_and_breakthrough_pills(test_db):
     add_item("u1", generate_pill("defense_buff_pill", 1))
     add_item("u1", generate_pill("cultivation_buff_pill", 1))
     add_item("u1", generate_pill("advanced_breakthrough_pill", 1))
+    add_item("u1", generate_pill("spirit_array_mid", 1))
 
     payload, status = settle_use_item(user_id="u1", item_id="attack_buff_pill")
     assert status == 200
@@ -177,3 +178,45 @@ def test_use_buff_and_breakthrough_pills(test_db):
     )
     assert int(row["breakthrough_boost_until"] or 0) > 0
     assert int(row["breakthrough_boost_pct"] or 0) == 20
+
+    execute("UPDATE users SET mp = 10, max_mp = 200 WHERE user_id = %s", ("u1",))
+    payload, status = settle_use_item(user_id="u1", item_id="spirit_array_mid")
+    assert status == 200
+    row = fetch_one(
+        "SELECT breakthrough_boost_until, breakthrough_boost_pct, mp FROM users WHERE user_id = %s",
+        ("u1",),
+    )
+    assert int(row["breakthrough_boost_until"] or 0) > 0
+    assert int(row["breakthrough_boost_pct"] or 0) == 20
+    assert int(row["mp"] or 0) == 80
+
+
+def test_shop_buy_super_breakthrough_pill_by_spirit_high(test_db):
+    create_user("u1", "甲", rank=10)
+    execute("UPDATE users SET spirit_high = 120, copper = 0, gold = 0 WHERE user_id = %s", ("u1",))
+
+    payload, status = settle_shop_buy(
+        user_id="u1",
+        item_id="super_breakthrough_pill",
+        quantity=1,
+        currency="spirit_high",
+    )
+    assert status == 200
+    assert payload.get("success") is True
+    assert payload.get("currency") == "spirit_high"
+
+    row = fetch_one("SELECT spirit_high FROM users WHERE user_id = %s", ("u1",))
+    assert int(row["spirit_high"] or 0) == 20
+
+    item_row = fetch_one(
+        "SELECT quantity FROM items WHERE user_id = %s AND item_id = %s AND item_type = %s",
+        ("u1", "super_breakthrough_pill", "pill"),
+    )
+    assert int(item_row["quantity"] or 0) == 1
+
+
+def test_advanced_breakthrough_pill_daily_stock_is_10():
+    offer = get_shop_offer("advanced_breakthrough_pill", "gold")
+    assert offer is not None
+    assert int(offer.get("stock", 0) or 0) == 10
+    assert int(offer.get("limit", 0) or 0) == 10

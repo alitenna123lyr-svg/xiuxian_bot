@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import time
 import psycopg2.errors
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from core.database.connection import (
     get_user_by_id,
@@ -43,11 +43,13 @@ from core.config import config
 from core.game.secret_realms import get_secret_realm_attempts_left
 
 
-APP_CONFIG = config.raw
+def _config_raw() -> Dict[str, Any]:
+    raw = config.raw
+    return raw if isinstance(raw, dict) else {}
 
 
 def _pill_buff_cfg() -> Dict[str, Any]:
-    cfg = (APP_CONFIG.get("balance", {}) or {}).get("pill_buffs", {}) or {}
+    cfg = (_config_raw().get("balance", {}) or {}).get("pill_buffs", {}) or {}
     return {
         "cultivation_sprint": cfg.get("cultivation_sprint", {}) or {"duration_seconds": 7200, "exp_mult": 1.35},
         "realm_drop": cfg.get("realm_drop", {}) or {"duration_seconds": 3600, "drop_mul": 1.35},
@@ -70,7 +72,7 @@ def _cfg_int(raw: Any, default: int) -> int:
 
 
 def _breakthrough_cfg() -> Dict[str, Any]:
-    cfg = (APP_CONFIG.get("balance", {}) or {}).get("breakthrough", {}) or {}
+    cfg = (_config_raw().get("balance", {}) or {}).get("breakthrough", {}) or {}
     return {
         "fire_bonus": _cfg_float(cfg.get("fire_bonus"), 0.03),
         "steady_bonus": _cfg_float(cfg.get("steady_bonus"), 0.10),
@@ -93,6 +95,29 @@ def _breakthrough_cfg() -> Dict[str, Any]:
         "tribulation_fail_exp_penalty_add": max(0.0, _cfg_float(cfg.get("tribulation_fail_exp_penalty_add"), 0.05)),
         "tribulation_fail_weak_seconds_add": max(0, _cfg_int(cfg.get("tribulation_fail_weak_seconds_add"), 1200)),
     }
+
+
+def _steady_breakthrough_pill_candidates(bt_cfg: Dict[str, Any]) -> list[Dict[str, Any]]:
+    default_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
+    return [
+        {"item_id": "super_breakthrough_pill", "item_name": "超级突破丹", "bonus": 0.50},
+        {"item_id": "advanced_breakthrough_pill", "item_name": "高级突破丹", "bonus": 0.20},
+        {"item_id": "breakthrough_pill", "item_name": "突破丹", "bonus": default_bonus},
+    ]
+
+
+def _pick_steady_breakthrough_pill(*, user_id: str, bt_cfg: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    for candidate in _steady_breakthrough_pill_candidates(bt_cfg):
+        row = fetch_one(
+            "SELECT id, quantity FROM items WHERE user_id = %s AND item_id = %s AND item_type = 'pill' AND quantity >= 1 ORDER BY id ASC LIMIT 1",
+            (user_id, candidate["item_id"]),
+        )
+        if row:
+            chosen = candidate.copy()
+            chosen["db_id"] = int(row.get("id") or 0)
+            chosen["quantity"] = int(row.get("quantity") or 0)
+            return chosen
+    return None
 
 
 def _protect_material_need(rank: int, bt_cfg: Dict[str, Any]) -> int:
@@ -303,7 +328,9 @@ def get_breakthrough_preview(
     stamina_cost = int(bt_cfg.get("stamina_cost", 1) or 1) + tribulation_extra_stamina
     base_rate = float(next_realm.get("break_rate", 0.0) or 0.0)
     fire_bonus = float(bt_cfg.get("fire_bonus", 0.03) or 0.03)
-    steady_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
+    steady_default_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
+    steady_pill = _pick_steady_breakthrough_pill(user_id=user_id, bt_cfg=bt_cfg) if strategy == "steady" else None
+    steady_pill_bonus = float((steady_pill or {}).get("bonus", 0.0) or 0.0)
     rate_parts = [f"基础成功率 {int(base_rate * 100)}%"]
     shown_rate = base_rate
     if user.get("element") == "火":
@@ -337,9 +364,15 @@ def get_breakthrough_preview(
 
     extra_cost_text = "无额外材料"
     if strategy == "steady":
-        shown_rate = min(1.0, shown_rate + steady_bonus)
-        rate_parts.append(f"突破丹 +{_format_ratio_percent(steady_bonus)}")
-        extra_cost_text = "额外消耗: 突破丹 x1"
+        if steady_pill:
+            shown_rate = min(1.0, shown_rate + steady_pill_bonus)
+            rate_parts.append(f"{steady_pill['item_name']} +{_format_ratio_percent(steady_pill_bonus)}")
+            extra_cost_text = f"额外消耗: {steady_pill['item_name']} x1"
+        elif boost_active:
+            extra_cost_text = "额外消耗: 无（已激活突破增益）"
+        else:
+            rate_parts.append("当前无可用突破丹")
+            extra_cost_text = "额外消耗: 需要突破丹/高级突破丹/超级突破丹 x1"
     elif strategy == "protect":
         extra_cost_text = f"额外消耗: 下品灵石 x{protect_need}"
         rate_parts.append("护脉: 失败不进虚弱")
@@ -354,8 +387,9 @@ def get_breakthrough_preview(
     if boost_active:
         base_for_notes = min(1.0, base_for_notes + boost_pct / 100.0)
     base_for_notes = min(1.0, max(0.0, base_for_notes + location_bonus + fortune_bonus + ally_help_bonus))
+    steady_notes_bonus = steady_pill_bonus if steady_pill else (0.0 if boost_active else steady_default_bonus)
     steady_rate = _apply_tribulation_rate_adjustment(
-        rate=min(1.0, base_for_notes + steady_bonus),
+        rate=min(1.0, base_for_notes + steady_notes_bonus),
         is_tribulation=is_tribulation,
         bt_cfg=bt_cfg,
     )
@@ -404,12 +438,12 @@ def get_breakthrough_preview(
     if is_tribulation:
         strategy_notes = (
             f"当前为【{current_realm.get('name', '圆满境')}】圆满关口，仅开放 *渡劫突破*。\n"
-            f"渡劫突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*。\n"
+            f"渡劫突破：消耗下品灵石 + 突破丹系道具 x1，成功率约 *{int(steady_rate * 100)}%*。\n"
             "说明：渡劫成功率由灵根、增益、地脉、运势、道友助阵与天雷劫共同决定，不含保底机制。"
         )
     else:
         strategy_notes = (
-            f"稳妥突破：消耗下品灵石 + 突破丹 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
+            f"稳妥突破：消耗下品灵石 + 突破丹系道具 x1，成功率约 *{int(steady_rate * 100)}%*，失败损失减半\n"
             f"护脉突破：消耗下品灵石（含附加 x{protect_need}），成功率约 *{int(protect_rate * 100)}%*，失败不进虚弱\n"
             f"生死突破：只消耗下品灵石，成功率约 *{int(desperate_rate * 100)}%*，成功有额外奖励，失败惩罚更重\n"
             "说明：突破结果按实时成功率判定，不再包含保底机制。"
@@ -443,6 +477,9 @@ def get_breakthrough_preview(
             "fortune_bonus": float(fortune_bonus),
             "call_for_help": bool(call_for_help),
             "ally_help_bonus": float(ally_help_bonus if call_for_help else 0.0),
+            "steady_pill_item_id": steady_pill.get("item_id") if steady_pill else "",
+            "steady_pill_name": steady_pill.get("item_name") if steady_pill else "",
+            "steady_pill_bonus": float(steady_pill_bonus if steady_pill else 0.0),
             "rate_parts": rate_parts,
             "preview_text": preview_text,
             "strategy_notes": strategy_notes,
@@ -539,27 +576,55 @@ def settle_shop_buy(
         return _dedup_return({"success": False, "code": "USER_NOT_FOUND", "message": "User not found"}, 404)
 
     quantity = int(quantity or 1)
-    if quantity <= 0 or quantity > 99:
+    if quantity <= 0 or quantity > 999:
         return _dedup_return({"success": False, "code": "INVALID", "message": "quantity invalid"}, 400)
 
-    user_copper = user.get("copper", 0)
-    user_gold = user.get("gold", 0)
+    user_copper = int(user.get("copper", 0) or 0)
+    user_gold = int(user.get("gold", 0) or 0)
+    user_spirit_high = int(user.get("spirit_high", 0) or 0)
 
-    can_buy_ok, resolved_currency, msg = can_buy_item(
-        item_id,
-        user_copper,
-        user_gold,
-        user_rank=int(user.get("rank", 1) or 1),
-        preferred_currency=currency,
-        quantity=quantity,
-    )
-    if not can_buy_ok:
-        return _dedup_return({"success": False, "code": "FORBIDDEN", "message": msg}, 400)
-
-    currency = resolved_currency
     item_info = get_shop_offer(item_id, currency)
     if not item_info:
         return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "物品不存在"}, 404)
+    currency = str(item_info.get("currency", currency or "") or "").strip().lower()
+
+    if currency == "spirit_high":
+        min_rank = int(item_info.get("min_rank", 1) or 1)
+        if int(user.get("rank", 1) or 1) < min_rank:
+            from core.game.realms import format_realm_display
+            return _dedup_return(
+                {
+                    "success": False,
+                    "code": "FORBIDDEN",
+                    "message": f"境界不足，需达到{format_realm_display(min_rank)}才可购买",
+                },
+                400,
+            )
+        total_price = int(item_info.get("price", 0) or 0) * quantity
+        if user_spirit_high < total_price:
+            return _dedup_return(
+                {
+                    "success": False,
+                    "code": "FORBIDDEN",
+                    "message": f"上品灵石不足，需要 {total_price}",
+                },
+                400,
+            )
+    else:
+        can_buy_ok, resolved_currency, msg = can_buy_item(
+            item_id,
+            user_copper,
+            user_gold,
+            user_rank=int(user.get("rank", 1) or 1),
+            preferred_currency=currency,
+            quantity=quantity,
+        )
+        if not can_buy_ok:
+            return _dedup_return({"success": False, "code": "FORBIDDEN", "message": msg}, 400)
+        currency = resolved_currency
+        item_info = get_shop_offer(item_id, currency)
+        if not item_info:
+            return _dedup_return({"success": False, "code": "NOT_FOUND", "message": "物品不存在"}, 404)
 
     remaining_limit = get_shop_remaining_limit(user_id, item_id, item_info)
     if remaining_limit is not None and quantity > remaining_limit:
@@ -594,6 +659,11 @@ def settle_shop_buy(
             if currency == "copper":
                 cur.execute(
                     "UPDATE users SET copper = copper - %s WHERE user_id = %s AND copper >= %s",
+                    (actual_cost, user_id, actual_cost),
+                )
+            elif currency == "spirit_high":
+                cur.execute(
+                    "UPDATE users SET spirit_high = spirit_high - %s WHERE user_id = %s AND spirit_high >= %s",
                     (actual_cost, user_id, actual_cost),
                 )
             else:
@@ -691,7 +761,11 @@ def settle_shop_buy(
         success=True,
         request_id=request_id,
         rank=int(user.get("rank", 1) or 1),
-        meta={"limit": item_info.get("limit"), "limit_period": item_info.get("limit_period")},
+        meta={
+            "limit": item_info.get("limit"),
+            "limit_period": item_info.get("limit_period"),
+            "delta_spirit_high": -actual_cost if currency == "spirit_high" else 0,
+        },
     )
     return _dedup_return({
         "success": True,
@@ -1012,14 +1086,18 @@ def settle_breakthrough(
     fortune_bonus = float(env_ctx.get("fortune_bonus", 0.0) or 0.0)
     ally_help_bonus = float(bt_cfg.get("ally_help_bonus", 0.06) or 0.06) if call_for_help else 0.0
     consume_item_id = None
+    consume_item_name = ""
     consume_item_type = None
     consume_item_qty = 0
     pill_bonus = 0.0
     if strategy == "steady":
-        consume_item_id = "breakthrough_pill"
-        consume_item_type = "pill"
-        consume_item_qty = 1
-        pill_bonus = float(bt_cfg.get("steady_bonus", 0.10) or 0.10)
+        steady_pill = _pick_steady_breakthrough_pill(user_id=user_id, bt_cfg=bt_cfg)
+        if steady_pill:
+            consume_item_id = str(steady_pill.get("item_id") or "")
+            consume_item_name = str(steady_pill.get("item_name") or "")
+            consume_item_type = "pill"
+            consume_item_qty = 1
+            pill_bonus = float(steady_pill.get("bonus", 0.0) or 0.0)
 
     item_row = None
     if consume_item_id:
@@ -1028,13 +1106,13 @@ def settle_breakthrough(
             (user_id, consume_item_id, consume_item_type, consume_item_qty),
         )
         if not item_row:
-            if boost_active and consume_item_id == "breakthrough_pill":
+            if boost_active and consume_item_type == "pill":
                 consume_item_id = None
+                consume_item_name = ""
                 consume_item_type = None
                 consume_item_qty = 0
                 pill_bonus = 0.0
             else:
-                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
                 log_event(
                     "breakthrough",
                     user_id=user_id,
@@ -1043,7 +1121,28 @@ def settle_breakthrough(
                     reason="INSUFFICIENT_ITEM",
                     meta={"strategy": strategy, "item_id": consume_item_id, "cost": cost, "base_cost": base_cost, "extra_cost": protect_material_need},
                 )
+                item_name = consume_item_name or "突破材料"
                 return {"success": False, "code": "INSUFFICIENT_ITEM", "message": f"{item_name}不足，无法使用当前冲关策略"}, 400
+    elif strategy == "steady" and not boost_active:
+        log_event(
+            "breakthrough",
+            user_id=user_id,
+            success=False,
+            rank=rank,
+            reason="INSUFFICIENT_ITEM",
+            meta={
+                "strategy": strategy,
+                "item_id": "breakthrough_family",
+                "cost": cost,
+                "base_cost": base_cost,
+                "extra_cost": protect_material_need,
+            },
+        )
+        return {
+            "success": False,
+            "code": "INSUFFICIENT_ITEM",
+            "message": "突破丹不足，需持有突破丹/高级突破丹/超级突破丹或先激活突破增益",
+        }, 400
 
     fire_bonus = float(bt_cfg.get("fire_bonus", 0.03) or 0.03)
     shown_rate = base_rate
@@ -1092,7 +1191,12 @@ def settle_breakthrough(
     if use_pill_effective:
         attempt_base_rate += pill_bonus
     extra_bonus = shown_rate - attempt_base_rate
-    ok, message = attempt_breakthrough(user, use_pill_effective, extra_bonus=extra_bonus)
+    ok, message = attempt_breakthrough(
+        user,
+        use_pill_effective,
+        extra_bonus=extra_bonus,
+        forced_success_rate=shown_rate,
+    )
 
     new_rank = next_realm["id"]
 
@@ -1223,7 +1327,7 @@ def settle_breakthrough(
                     "copper": int((latest or {}).get("copper", 0) or 0),
                 }, 400
             if reason == "INSUFFICIENT_ITEM":
-                item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
+                item_name = consume_item_name or "突破材料"
                 log_event(
                     "breakthrough",
                     user_id=user_id,
@@ -1283,7 +1387,7 @@ def settle_breakthrough(
             resp["copper_reward"] = copper_reward
             resp["message"] += f"\n💰 生死破境额外获得 {copper_reward} 下品灵石！"
         if strategy == "steady" and item_row:
-            resp["strategy_cost_text"] = "消耗突破丹 x1"
+            resp["strategy_cost_text"] = f"消耗{(consume_item_name or '突破丹')} x1"
         elif strategy == "protect" and protect_material_need > 0:
             resp["strategy_cost_text"] = f"护脉附加消耗下品灵石 x{protect_material_need}"
         story_update = []
@@ -1349,7 +1453,7 @@ def settle_breakthrough(
         return resp, 200
 
     # ---- 突破失败 ----
-    app_cfg = APP_CONFIG
+    app_cfg = _config_raw()
     exp_lost_pct = float(app_cfg.get("balance", {}).get("breakthrough", {}).get("fail_exp_loss_pct", 0.05))
     if strategy == "steady":
         exp_lost_pct *= 0.5
@@ -1454,7 +1558,7 @@ def settle_breakthrough(
                 "copper": int((latest or {}).get("copper", 0) or 0),
             }, 400
         if reason == "INSUFFICIENT_ITEM":
-            item_name = "突破丹" if consume_item_id == "breakthrough_pill" else "突破材料"
+            item_name = consume_item_name or "突破材料"
             log_event(
                 "breakthrough",
                 user_id=user_id,
@@ -1733,6 +1837,47 @@ def settle_use_item(*, user_id: str, item_id: str) -> Tuple[Dict[str, Any], int]
         except ValueError:
             return {"success": False, "code": "NOT_FOUND", "message": "物品不存在或数量不足"}, 400
         return {"success": True, "message": message, "effect": effect, "value": bonus_pct}, 200
+
+    if effect == "spirit_array":
+        bonus_pct = int(base_item.get("value", 0) or 0)
+        duration = int(base_item.get("duration", 3600) or 3600)
+        mp_pct = float(base_item.get("value_pct", 0) or 0)
+        if bonus_pct <= 0:
+            return {"success": False, "code": "INVALID", "message": "此物品无法使用"}, 400
+        current_until = int(user.get("breakthrough_boost_until", 0) or 0)
+        current_pct = float(user.get("breakthrough_boost_pct", 0) or 0)
+        new_until = max(current_until, now + duration)
+        new_pct = max(current_pct, bonus_pct)
+        recover_amount = 0
+        if mp_pct > 0:
+            recover_amount = max(1, int(round(int(user.get("max_mp", 50) or 50) * mp_pct)))
+        message = f"使用成功！聚灵阵已启动，当前突破增益+{int(new_pct)}%"
+        if recover_amount > 0:
+            message += f"，恢复 {recover_amount} MP"
+        message += f"（{duration // 60}分钟内有效）"
+        try:
+            with db_transaction() as cur:
+                if not _consume_one_item_tx(cur, user_id=user_id, item_id=item_id):
+                    raise ValueError("NOT_FOUND")
+                if recover_amount > 0:
+                    cur.execute(
+                        "UPDATE users SET breakthrough_boost_until = %s, breakthrough_boost_pct = %s, mp = LEAST(max_mp, mp + %s), vitals_updated_at = %s WHERE user_id = %s",
+                        (new_until, new_pct, recover_amount, now, user_id),
+                    )
+                else:
+                    cur.execute(
+                        "UPDATE users SET breakthrough_boost_until = %s, breakthrough_boost_pct = %s WHERE user_id = %s",
+                        (new_until, new_pct, user_id),
+                    )
+        except ValueError:
+            return {"success": False, "code": "NOT_FOUND", "message": "物品不存在或数量不足"}, 400
+        return {
+            "success": True,
+            "message": message,
+            "effect": effect,
+            "value": int(new_pct),
+            "mp_recovered": recover_amount,
+        }, 200
 
     if effect == "breakthrough":
         bonus_pct = int(base_item.get("value", 0) or 0)

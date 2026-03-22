@@ -1,10 +1,87 @@
 # 项目变更日志（Changelog）
 
-- 最后更新：2026-03-22 19:07 (UTC+8)
-- 本轮修复完成时间：2026-03-22 19:07 (UTC+8)
+- 最后更新：2026-03-22 20:46 (UTC+8)
+- 本轮修复完成时间：2026-03-22 20:46 (UTC+8)
 - 维护规则：新记录写在最前；每条记录必须包含“记录时间、影响范围、修改摘要”。
 
 ## 2026-03-22
+
+### [50] 高级/超级突破丹修复与上品灵石商店接入
+- 记录时间：2026-03-22 20:46 (UTC+8)
+- 影响范围：`core/services/settlement_extra.py`、`core/game/items.py`、`core/routes/shop.py`、`adapters/telegram/bot.py`、`tests/test_shop_economy_fixes.py`、`tests/test_breakthrough_failure_message_consistency.py`。
+- 修改摘要：
+  - 修复“高级突破丹加成未体现在突破”的问题：稳妥突破现在会自动优先消耗 `超级突破丹(+50%)` / `高级突破丹(+20%)` / `突破丹(+配置值)`，并同步到预览成功率与实际结算。
+  - 新增 `超级突破丹`（`super_breakthrough_pill`）：突破增益 +50%，时效 60 分钟。
+  - 新增 `spirit_high`（上品灵石）商店货币通道，`超级突破丹` 定价 `100 上品灵石`。
+  - 购买链路支持 `spirit_high`：`/api/shop/buy`、结算扣费、TG 商店展示与购买回调均已接入。
+  - 聚灵阵（下/中/上）同步上架万宝阁（中品灵石货架），并加入万宝阁日/周轮换位，便于在万宝阁直接购买。
+  - `高级突破丹` 日限货架库存/限购从 `1` 提升到 `10`。
+  - 新增回归测试覆盖：高级库存配置、上品灵石购买超级突破丹、稳妥突破丹药优先级选择。
+
+### [49] 新增聚灵阵商品（上/中/下）并接入灵力恢复 + 突破增益
+- 记录时间：2026-03-22 20:20 (UTC+8)
+- 影响范围：`core/game/items.py`、`core/services/settlement_extra.py`、`tests/test_shop_economy_fixes.py`。
+- 修改摘要：
+  - 新增三档商品：`下品聚灵阵`、`中品聚灵阵`、`上品聚灵阵`，支持商店常驻与轮换售卖。
+  - 新增道具效果 `spirit_array`：使用后激活突破成功率增益，并立即恢复部分 MP（灵力）。
+  - 聚灵阵增益沿用突破增益字段（`breakthrough_boost_until/breakthrough_boost_pct`），与原有突破丹加成逻辑兼容，不会覆盖更高已生效增益。
+  - 增加回归测试，覆盖聚灵阵使用后的 MP 恢复与突破增益行为。
+
+### [48] `/test` “目标自己”被历史回复目标覆盖修复
+- 记录时间：2026-03-22 20:08 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`、`tests/test_admin_target_resolution.py`。
+- 修改摘要：
+  - 修复管理面板在回调刷新时误读 `reply_to_message` 覆盖当前目标的问题。
+  - 现在仅命令入口会采纳回复目标，按钮回调（含“目标自己”）不再被旧回复关系重置。
+  - 新增回归测试覆盖该场景。
+
+### [47] `/test` 面板示例命令修正（去除写死 TG_ID）
+- 记录时间：2026-03-22 20:06 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`。
+- 修改摘要：
+  - 管理面板“快速示例”不再写死 `8516652120`，改为当前目标或占位符 `<UID|TG_ID>`。
+  - 避免超管误抄示例后改到他人账号，导致“修为没变化”的误判。
+
+### [46] `/test` 目标解析修复（优先 TG_ID 映射游戏UID）+ 预设防连点
+- 记录时间：2026-03-22 20:04 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`、`tests/test_admin_target_resolution.py`。
+- 修改摘要：
+  - 修复超管面板目标解析：数字目标现在优先走 `platform_id(telegram)` 映射，成功时强制使用游戏 UID，避免误把 TG_ID 当作 `user_id` 写入。
+  - `/xian_give_*` 命令目标解析统一复用同一逻辑，保持与 `/test` 一致。
+  - 管理面板预设按钮增加短窗防连点（1.8 秒），群内限流/延迟场景下避免重复执行导致“+1w 实际多加”。
+  - 新增回归测试：覆盖 TG 映射优先与防连点行为。
+
+### [45] 秘境按钮“无响应”日志定位与回调限流降噪修复
+- 记录时间：2026-03-22 19:58 (UTC+8)
+- 影响范围：`adapters/telegram/bot.py`。
+- 修改摘要：
+  - 日志确认秘境接口正常（`/api/secret-realms/*` 返回 200），无响应主因是 Telegram 群内 `Flood control` 限流导致编辑/兜底消息发送失败。
+  - 回调 `_safe_edit` 在命中 `retry after` 时改为立即停止后续二次编辑与补发，避免继续放大限流。
+  - 保留限流日志并尝试回调提示“操作过于频繁，请稍后再试”，提高可感知性。
+
+### [44] 商店数量上限与冷却配置修复（支持 1-999，狩猎/秘境冷却关闭）
+- 记录时间：2026-03-22 19:55 (UTC+8)
+- 影响范围：`core/services/settlement_extra.py`、`config.json`、`tests/test_shop_quantity_limit.py`。
+- 修改摘要：
+  - 修复商店购买数量校验与前端提示不一致问题：后端上限由 `99` 调整为 `999`，输入 `100` 不再触发 `quantity invalid`。
+  - 关闭狩猎与秘境冷却：`cooldowns.hunt=0`、`cooldowns.secret_realm=0`。
+  - 新增数量上限回归测试，覆盖“100 可过、1000 拒绝”。
+
+### [43] 取消狩猎冷却（`cooldowns.hunt=0`）
+- 记录时间：2026-03-22 19:45 (UTC+8)
+- 影响范围：`config.json`。
+- 修改摘要：
+  - 将 `cooldowns.hunt` 从 `30` 调整为 `0`，后端狩猎冷却判定不再触发“请等待 X 秒”。
+  - 该配置对 `/api/hunt/status` 与实际狩猎结算共用，生效后面板与结算行为一致。
+
+### [42] 突破成功率判定对齐修复（预览值与实际 RNG 完全一致）
+- 记录时间：2026-03-22 19:40 (UTC+8)
+- 影响范围：`core/services/settlement_extra.py`、`core/game/realms.py`、`tests/test_breakthrough_failure_message_consistency.py`。
+- 修改摘要：
+  - `settle_breakthrough` 调用 `attempt_breakthrough` 时新增传入 `forced_success_rate=shown_rate`，实际随机判定直接使用结算阶段已展示的最终成功率。
+  - `attempt_breakthrough` 新增可选参数 `forced_success_rate`，在保留前置校验逻辑（修为/材料）前提下，避免重复计算导致展示与结算偏差。
+  - `settlement_extra` 去除模块级配置快照，改为实时读取 `config.raw`，避免运行期配置重载后与其它模块读取源不一致。
+  - 新增回归测试覆盖 `forced_success_rate` 行为，并补充“结算传递展示成功率到最终判定”的测试。
 
 ### [41] `/test` 扩展大量预设按钮（超管一键改资源/修为/境界/状态）
 - 记录时间：2026-03-22 19:07 (UTC+8)

@@ -212,7 +212,12 @@ def calculate_breakthrough_cost(realm_id: int) -> int:
     return realm_id * 100
 
 
-def attempt_breakthrough(user_data: Dict[str, Any], use_pill: bool = False, extra_bonus: float = 0.0) -> Tuple[bool, str]:
+def attempt_breakthrough(
+    user_data: Dict[str, Any],
+    use_pill: bool = False,
+    extra_bonus: float = 0.0,
+    forced_success_rate: Optional[float] = None,
+) -> Tuple[bool, str]:
     """
     尝试突破
     返回: (是否成功, 消息)
@@ -241,25 +246,29 @@ def attempt_breakthrough(user_data: Dict[str, Any], use_pill: bool = False, extr
                 f"💡 线索：{hint}"
             )
 
-    # 计算成功率（一次性汇总后再截断，避免中间截断导致显示与实际不一致）
-    success_rate = float(next_realm["break_rate"] or 0.0)
-    total_bonus = 0.0
+    # 允许调用方直接传入最终成功率，确保“展示成功率”与“实际判定”完全一致。
+    if forced_success_rate is not None:
+        success_rate = max(0.0, min(1.0, float(forced_success_rate)))
+    else:
+        # 计算成功率（一次性汇总后再截断，避免中间截断导致显示与实际不一致）
+        success_rate = float(next_realm["break_rate"] or 0.0)
+        total_bonus = 0.0
 
-    steady_bonus = float(config.get_nested("balance", "breakthrough", "steady_bonus", default=0.10) or 0.10)
-    if use_pill:
-        total_bonus += steady_bonus
+        steady_bonus = float(config.get_nested("balance", "breakthrough", "steady_bonus", default=0.10) or 0.10)
+        if use_pill:
+            total_bonus += steady_bonus
 
-    if extra_bonus:
-        total_bonus += float(extra_bonus)
+        if extra_bonus:
+            total_bonus += float(extra_bonus)
 
-    # 五行影响
-    element = user_data.get("element")
-    if element and element in ELEMENT_BONUSES:
-        fire_bonus = float(config.get_nested("balance", "breakthrough", "fire_bonus", default=0.03) or 0.03)
-        if element == "火":
-            total_bonus += fire_bonus
+        # 五行影响
+        element = user_data.get("element")
+        if element and element in ELEMENT_BONUSES:
+            fire_bonus = float(config.get_nested("balance", "breakthrough", "fire_bonus", default=0.03) or 0.03)
+            if element == "火":
+                total_bonus += fire_bonus
 
-    success_rate = max(0.0, min(1.0, success_rate + total_bonus))
+        success_rate = max(0.0, min(1.0, success_rate + total_bonus))
 
     # 随机判定
     success = random.random() < success_rate

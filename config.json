@@ -455,9 +455,9 @@
   },
   "cooldowns": {
     "enhance": 2,
-    "hunt": 30,
+    "hunt": 0,
     "quest_claim": 3,
-    "secret_realm": 20
+    "secret_realm": 0
   },
   "core_server": {
     "api_token": "change_me_internal_token",

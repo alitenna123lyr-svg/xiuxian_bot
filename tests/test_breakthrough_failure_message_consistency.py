@@ -40,6 +40,45 @@ def test_attempt_breakthrough_bonus_clamp_is_applied_at_end(monkeypatch):
     assert ok is True
 
 
+def test_attempt_breakthrough_can_use_forced_final_rate(monkeypatch):
+    user = {"rank": 1, "exp": 10000, "element": "火"}
+
+    monkeypatch.setattr(realms_module.random, "random", lambda: 0.9999)
+    ok, _ = realms_module.attempt_breakthrough(user, forced_success_rate=1.0)
+    assert ok is True
+
+    monkeypatch.setattr(realms_module.random, "random", lambda: 0.0)
+    ok, _ = realms_module.attempt_breakthrough(user, forced_success_rate=0.0)
+    assert ok is False
+
+
+def test_pick_steady_breakthrough_pill_prefers_higher_tier(monkeypatch):
+    from core.services import settlement_extra
+
+    inventory = {
+        "super_breakthrough_pill": 1,
+        "advanced_breakthrough_pill": 5,
+        "breakthrough_pill": 99,
+    }
+
+    def _fake_fetch_one(_sql, params):
+        item_id = str(params[1] or "")
+        qty = int(inventory.get(item_id, 0) or 0)
+        if qty <= 0:
+            return None
+        return {"id": 1, "quantity": qty}
+
+    monkeypatch.setattr(settlement_extra, "fetch_one", _fake_fetch_one)
+
+    selected = settlement_extra._pick_steady_breakthrough_pill(
+        user_id="u_test",
+        bt_cfg={"steady_bonus": 0.10},
+    )
+    assert selected is not None
+    assert selected.get("item_id") == "super_breakthrough_pill"
+    assert float(selected.get("bonus", 0.0) or 0.0) == pytest.approx(0.50)
+
+
 @pytest.mark.skipif(not HAS_PG_DRIVER, reason="psycopg2 not installed")
 def test_settle_breakthrough_failure_message_uses_actual_penalty(monkeypatch, test_db):
     from core.services import settlement_extra
@@ -65,6 +104,34 @@ def test_settle_breakthrough_failure_message_uses_actual_penalty(monkeypatch, te
     assert "虚弱状态90分钟" in str(resp.get("message", ""))
     assert "1小时" not in str(resp.get("message", ""))
     assert int(resp.get("weak_seconds", 0) or 0) == 5400
+
+
+@pytest.mark.skipif(not HAS_PG_DRIVER, reason="psycopg2 not installed")
+def test_settle_breakthrough_uses_preview_rate_for_final_roll(monkeypatch, test_db):
+    from core.services import settlement_extra
+
+    _create_user("bt_force_roll")
+
+    monkeypatch.setattr(settlement_extra, "is_realm_trial_complete", lambda _uid, _rank: True)
+    captured = {}
+
+    def _fake_attempt(user_data, use_pill=False, extra_bonus=0.0, forced_success_rate=None):
+        captured["forced_success_rate"] = forced_success_rate
+        captured["extra_bonus"] = extra_bonus
+        return False, "突破失败。"
+
+    monkeypatch.setattr(realms_module, "attempt_breakthrough", _fake_attempt)
+
+    resp, status = settlement_extra.settle_breakthrough(
+        user_id="bt_force_roll",
+        use_pill=False,
+        strategy="normal",
+        call_for_help=False,
+    )
+
+    assert status == 400
+    assert resp.get("code") == "BREAKTHROUGH_FAILED"
+    assert captured.get("forced_success_rate") == pytest.approx(float(resp.get("success_rate", 0.0) or 0.0))
 
 
 @pytest.mark.skipif(not HAS_PG_DRIVER, reason="psycopg2 not installed")

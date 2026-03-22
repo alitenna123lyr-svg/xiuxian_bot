@@ -72,7 +72,7 @@ def shop_buy():
 
     if currency is not None:
         currency = str(currency).strip().lower()
-        if currency not in ("copper", "gold"):
+        if currency not in ("copper", "gold", "spirit_high"):
             return error("INVALID", "Invalid currency", 400)
 
     resp, http_status = settle_shop_buy(

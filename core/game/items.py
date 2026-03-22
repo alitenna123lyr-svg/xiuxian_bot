@@ -169,6 +169,10 @@ PILLS = [
     # 突破丹
     {"id": "breakthrough_pill", "name": "突破丹", "type": ItemType.PILL, "effect": "breakthrough", "value": 10, "duration": 3600, "price": 500},
     {"id": "advanced_breakthrough_pill", "name": "高级突破丹", "type": ItemType.PILL, "effect": "breakthrough", "value": 20, "duration": 3600, "price": 1500},
+    {"id": "super_breakthrough_pill", "name": "超级突破丹", "type": ItemType.PILL, "effect": "breakthrough", "value": 50, "duration": 3600, "price": 100},
+    {"id": "spirit_array_low", "name": "下品聚灵阵", "type": ItemType.PILL, "effect": "spirit_array", "value": 8, "value_pct": 0.20, "duration": 3600, "price": 650},
+    {"id": "spirit_array_mid", "name": "中品聚灵阵", "type": ItemType.PILL, "effect": "spirit_array", "value": 15, "value_pct": 0.35, "duration": 7200, "price": 1800},
+    {"id": "spirit_array_high", "name": "上品聚灵阵", "type": ItemType.PILL, "effect": "spirit_array", "value": 25, "value_pct": 0.50, "duration": 10800, "price": 3600},
     
     # 恢复丹
     {"id": "hp_pill", "name": "回血丹", "type": ItemType.PILL, "effect": "hp", "value_pct": 0.30, "price": 50},
@@ -710,6 +714,9 @@ SHOP_ITEMS = {
         {"item_id": "hp_pill", "name": "回血丹", "price": 50, "stock": -1},
         {"item_id": "mp_pill", "name": "回蓝丹", "price": 50, "stock": -1},
         {"item_id": "breakthrough_pill", "name": "突破丹", "price": 500, "stock": -1},
+        {"item_id": "spirit_array_low", "name": "下品聚灵阵", "price": 650, "stock": -1},
+        {"item_id": "spirit_array_mid", "name": "中品聚灵阵", "price": 1800, "stock": -1},
+        {"item_id": "spirit_array_high", "name": "上品聚灵阵", "price": 3600, "stock": -1},
         # 材料
         {"item_id": "iron_ore", "name": "铁矿石", "price": 10, "stock": -1},
         {"item_id": "herb", "name": "灵草", "price": 20, "stock": -1},
@@ -719,10 +726,16 @@ SHOP_ITEMS = {
         {"item_id": "large_exp_pill", "name": "大修为丹", "price": 10, "stock": -1},
         {"item_id": "super_exp_pill", "name": "超级修为丹", "price": 25, "stock": -1},
         {"item_id": "advanced_breakthrough_pill", "name": "高级突破丹", "price": 15, "stock": -1},
+        {"item_id": "spirit_array_low", "name": "下品聚灵阵", "price": 5, "stock": -1},
+        {"item_id": "spirit_array_mid", "name": "中品聚灵阵", "price": 12, "stock": -1},
+        {"item_id": "spirit_array_high", "name": "上品聚灵阵", "price": 24, "stock": -1},
         {"item_id": "cultivation_buff_pill", "name": "悟道丹", "price": 5, "stock": -1},
         {"item_id": "cultivation_sprint_pill", "name": "修炼冲刺丹", "price": 8, "stock": -1},
         {"item_id": "realm_drop_pill", "name": "秘境掉落丹", "price": 8, "stock": -1},
         {"item_id": "breakthrough_guard_pill", "name": "突破保护丹", "price": 12, "stock": -1},
+    ],
+    "spirit_high": [
+        {"item_id": "super_breakthrough_pill", "name": "超级突破丹", "price": 100, "stock": 10},
     ]
 }
 
@@ -732,24 +745,30 @@ SHOP_ROTATIONS = {
             {"item_id": "hp_pill", "price": 35, "stock": 3, "tag": "每日特惠", "limit": 3, "limit_period": "day"},
             {"item_id": "mp_pill", "price": 35, "stock": 3, "tag": "每日特惠", "limit": 3, "limit_period": "day"},
             {"item_id": "small_exp_pill", "price": 80, "stock": 2, "tag": "每日特惠", "limit": 2, "limit_period": "day"},
+            {"item_id": "spirit_array_low", "price": 520, "stock": 2, "tag": "聚灵阵补给", "limit": 2, "limit_period": "day"},
             {"item_id": "iron_ore", "price": 8, "stock": 10, "tag": "每日特惠", "limit": 10, "limit_period": "day"},
             {"item_id": "herb", "price": 15, "stock": 10, "tag": "每日特惠", "limit": 10, "limit_period": "day"},
         ],
         "weekly_rare": [
             {"item_id": "spirit_stone", "price": 35, "stock": 12, "tag": "周稀有材料", "limit": 12, "limit_period": "week"},
             {"item_id": "spirit_herb", "price": 70, "stock": 8, "tag": "周稀有材料", "limit": 8, "limit_period": "week"},
+            {"item_id": "spirit_array_mid", "price": 1450, "stock": 4, "tag": "周限聚灵阵", "limit": 4, "limit_period": "week"},
+            {"item_id": "spirit_array_high", "price": 3000, "stock": 2, "tag": "周限聚灵阵", "limit": 2, "limit_period": "week"},
             {"item_id": "demon_core", "price": 220, "stock": 3, "tag": "周稀有材料", "limit": 3, "limit_period": "week"},
             {"item_id": "skill_book_basic", "price": 90, "stock": 4, "tag": "技能成长", "limit": 4, "limit_period": "week"},
         ],
     },
     "gold": {
         "daily_specials": [
-            {"item_id": "advanced_breakthrough_pill", "price": 10, "stock": 1, "tag": "限量突破资源", "limit": 1, "limit_period": "day"},
+            {"item_id": "advanced_breakthrough_pill", "price": 10, "stock": 10, "tag": "限量突破资源", "limit": 10, "limit_period": "day"},
+            {"item_id": "spirit_array_low", "price": 4, "stock": 4, "tag": "聚灵阵补给", "limit": 4, "limit_period": "day"},
             {"item_id": "cultivation_buff_pill", "price": 4, "stock": 2, "tag": "每日特惠", "limit": 2, "limit_period": "day"},
         ],
         "weekly_rare": [
             {"item_id": "demon_core", "price": 8, "stock": 2, "tag": "周稀有材料", "limit": 2, "limit_period": "week"},
             {"item_id": "recipe_fragment", "price": 6, "stock": 3, "tag": "周稀有材料", "limit": 3, "limit_period": "week"},
+            {"item_id": "spirit_array_mid", "price": 10, "stock": 4, "tag": "周限聚灵阵", "limit": 4, "limit_period": "week"},
+            {"item_id": "spirit_array_high", "price": 20, "stock": 2, "tag": "周限聚灵阵", "limit": 2, "limit_period": "week"},
             {"item_id": "phoenix_feather", "price": 15, "stock": 1, "tag": "限量突破资源", "limit": 1, "limit_period": "week", "min_rank": 20},
             {"item_id": "cultivation_sprint_pill", "price": 6, "stock": 2, "tag": "短期目标丹", "limit": 2, "limit_period": "week"},
             {"item_id": "realm_drop_pill", "price": 6, "stock": 2, "tag": "短期目标丹", "limit": 2, "limit_period": "week"},
@@ -757,11 +776,18 @@ SHOP_ROTATIONS = {
             {"item_id": "skill_book_advanced", "price": 6, "stock": 2, "tag": "技能成长", "limit": 2, "limit_period": "week", "min_rank": 12},
         ],
     },
+    "spirit_high": {
+        "daily_specials": [
+            {"item_id": "super_breakthrough_pill", "price": 100, "stock": 10, "tag": "上品限量丹", "limit": 10, "limit_period": "day"},
+        ],
+        "weekly_rare": [],
+    },
 }
 
 SHOP_CURRENCY_ROLES = {
     "copper": "下品灵石用于日常消耗，覆盖修炼补给、基础材料与低风险准备。",
     "gold": "中品灵石用于阶段推进与稀缺机会，优先用于突破、爆发成长和关键窗口资源。",
+    "spirit_high": "上品灵石用于高阶破境与关键冲关资源，建议在圆满关口集中投入。",
 }
 
 PROGRESSION_STAGE_THEMES = [

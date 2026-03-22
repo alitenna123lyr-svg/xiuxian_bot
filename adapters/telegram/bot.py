@@ -10,6 +10,7 @@ import sys
 import logging
 import json
 import re
+import time
 import uuid
 import random
 import aiohttp
@@ -1197,7 +1198,7 @@ async def text_message_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         currency = str(context.user_data.get("pending_shop_buy_currency", "") or "").strip().lower()
         item_id = str(context.user_data.get("pending_shop_buy_item_id", "") or "").strip()
         item_name = str(context.user_data.get("pending_shop_buy_item_name", "") or "").strip() or _item_display_name(item_id)
-        if currency not in ("copper", "gold") or not item_id:
+        if currency not in ("copper", "gold", "spirit_high") or not item_id:
             _clear_pending_action(context)
             await message.reply_text("❌ 购买状态已失效，请重新打开商店。", reply_markup=back_keyboard)
             return
@@ -3054,7 +3055,17 @@ def _format_shop_intro(*, rank: int = 1) -> str:
         f"阶段重点：{stage.get('focus')}\n"
         f"货币分工：{get_currency_role('copper')}\n"
         f"中品灵石定位：{get_currency_role('gold')}\n\n"
+        f"上品灵石定位：{get_currency_role('spirit_high')}\n\n"
     )
+
+
+def _shop_currency_name(currency: str) -> str:
+    cur = str(currency or "").strip().lower()
+    if cur == "gold":
+        return "中品灵石"
+    if cur == "spirit_high":
+        return "上品灵石"
+    return "下品灵石"
 
 
 def _shop_category_label(category: str) -> str:
@@ -3093,7 +3104,7 @@ def _build_shop_text(items: list[dict], *, rank: int = 1, category: str = "all")
         tag = item.get("tag")
         remaining_limit = item.get("remaining_limit")
         min_rank = int(item.get("min_rank", 1) or 1)
-        currency_name = "下品灵石" if item.get("currency") == "copper" else "中品灵石"
+        currency_name = _shop_currency_name(str(item.get("currency") or "copper"))
         text += f"• *{item_name}* - {price} {currency_name}\n"
         if tag and tag != "常驻货架":
             text += f"  货架: {tag}\n"
@@ -3118,7 +3129,7 @@ def _build_shop_keyboard(category: str, items: list[dict]):
         item_name = str(item.get("name") or _item_display_name(item_id) or item_id or "未知物品")
         price = int(item.get("price", item.get("actual_price", 0)) or 0)
         currency = item.get("currency", "copper")
-        currency_name = "下品灵石" if currency == "copper" else "中品灵石"
+        currency_name = _shop_currency_name(currency)
         keyboard.append([
             InlineKeyboardButton(
                 f"购买 {item_name} {price}{currency_name}",
@@ -3146,10 +3157,17 @@ async def _load_shop_view(uid: str | None, *, rank: int = 1, category: str = "al
         params={"currency": "gold", "user_id": uid},
         timeout=15,
     )
-    if not copper_result.get("success") and not gold_result.get("success"):
+    high_result = await http_get(
+        f"{SERVER_URL}/api/shop",
+        params={"currency": "spirit_high", "user_id": uid},
+        timeout=15,
+    )
+    if not copper_result.get("success") and not gold_result.get("success") and not high_result.get("success"):
         return "❌ 获取商店失败", [[InlineKeyboardButton("🔙 返回", callback_data="main_menu")]]
     items = (copper_result.get("items", []) if copper_result.get("success") else []) + (
         gold_result.get("items", []) if gold_result.get("success") else []
+    ) + (
+        high_result.get("items", []) if high_result.get("success") else []
     )
     filtered_items = [item for item in items if _shop_item_matches_category(item, category)]
     if not filtered_items and category != "all":
@@ -3602,7 +3620,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text(text, reply_markup=reply_markup, parse_mode=parse_mode)
             if reply_markup is not None:
                 _bind_panel_owner(context, query.message, panel_owner or user_id)
-        except Exception:
+        except Exception as first_exc:
+            if _is_retry_after_error(first_exc):
+                logger.warning(f"callback edit throttled: {first_exc}")
+                await _safe_answer("操作过于频繁，请稍后再试。", show_alert=False)
+                return
             try:
                 await query.edit_message_text(text, reply_markup=reply_markup)
                 if reply_markup is not None:
@@ -3610,6 +3632,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as edit_exc:
                 # Benign case: Telegram rejects idempotent edits.
                 if _is_message_not_modified_error(edit_exc):
+                    return
+                if _is_retry_after_error(edit_exc):
+                    logger.warning(f"callback edit throttled: {edit_exc}")
+                    await _safe_answer("操作过于频繁，请稍后再试。", show_alert=False)
                     return
                 try:
                     sent = await query.message.reply_text(text, reply_markup=reply_markup, parse_mode=parse_mode)
@@ -3736,6 +3762,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     reply_markup=_admin_panel_keyboard(context),
                 )
                 return
+            guard_key = f"{preset_id}:{target_token}"
+            now_ms = int(time.time() * 1000)
+            last_key = str(context.user_data.get("admin_quick_guard_key", "") or "")
+            last_ts = int(context.user_data.get("admin_quick_guard_ts", 0) or 0)
+            if guard_key == last_key and (now_ms - last_ts) < 1800:
+                await _safe_answer("操作已受理，请勿连点。", show_alert=False)
+                return
+            context.user_data["admin_quick_guard_key"] = guard_key
+            context.user_data["admin_quick_guard_ts"] = now_ms
             try:
                 ok, result_text, resolved_uid = await _admin_apply_preset(
                     operator_tg_id=user_id,
@@ -5659,11 +5694,17 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # 购买物品
     if data.startswith("buy_"):
-        parts = data.split("_")
-        if len(parts) >= 3:
-            currency = str(parts[1] or "").strip().lower()
-            item_id = "_".join(parts[2:]).strip()
-            if currency not in ("copper", "gold") or not item_id:
+        payload = data[4:]
+        currency = ""
+        item_id = ""
+        for cur in ("spirit_high", "copper", "gold"):
+            prefix = f"{cur}_"
+            if payload.startswith(prefix):
+                currency = cur
+                item_id = payload[len(prefix):].strip()
+                break
+        if currency and item_id:
+            if currency not in ("copper", "gold", "spirit_high") or not item_id:
                 await _safe_edit("❌ 商品参数错误，请重新打开商店", reply_markup=get_main_menu_keyboard())
                 return
             context.user_data["pending_shop_buy_currency"] = currency
@@ -7592,9 +7633,8 @@ async def _admin_resolve_target_user(target_token: str) -> tuple[str, dict | Non
     if getattr(db_conn, "_pool", None) is None:
         db_conn.connect_sqlite()
 
-    target_uid = token
-    target_user = db_conn.get_user_by_id(target_uid)
-    if not target_user and token.isdigit():
+    # 数字目标优先按 TG_ID 解析到游戏 UID，避免误命中历史“TG_ID=UID”脏数据。
+    if token.isdigit():
         try:
             lookup = await http_get(
                 f"{SERVER_URL}/api/user/lookup",
@@ -7604,8 +7644,14 @@ async def _admin_resolve_target_user(target_token: str) -> tuple[str, dict | Non
         except Exception:
             lookup = {}
         if lookup.get("success"):
-            target_uid = str(lookup.get("user_id") or "").strip()
-            target_user = db_conn.get_user_by_id(target_uid) if target_uid else None
+            mapped_uid = str(lookup.get("user_id") or "").strip()
+            if mapped_uid:
+                mapped_user = db_conn.get_user_by_id(mapped_uid)
+                if mapped_user:
+                    return mapped_uid, mapped_user
+
+    target_uid = token
+    target_user = db_conn.get_user_by_id(target_uid)
 
     return target_uid, target_user
 
@@ -7765,7 +7811,9 @@ async def _show_admin_test_panel(
         context.user_data["admin_panel_action"] = current_action
 
     reply_target = _admin_reply_target_token(message)
-    if reply_target:
+    is_callback_panel = getattr(update, "callback_query", None) is not None
+    # 仅在命令入口使用回复目标；按钮回调阶段不能再被历史 reply_to_message 覆盖。
+    if reply_target and not is_callback_panel:
         context.user_data["admin_target_token"] = reply_target
 
     try:
@@ -7777,6 +7825,7 @@ async def _show_admin_test_panel(
 
     preview = _admin_fields_preview_text(fields, limit=24)
     example_field = next(iter(labels.keys()), "exp")
+    example_target = _admin_current_target_token(context) or "<UID|TG_ID>"
     action_label = ADMIN_PANEL_ACTION_LABELS.get(current_action, current_action)
     target_hint = _admin_current_target_hint(context)
 
@@ -7789,7 +7838,7 @@ async def _show_admin_test_panel(
         "2. 直接点下方预设按钮，一键执行。\n"
         "3. 点“手动输入”后可输入：字段 数值（使用当前操作/目标）\n"
         "4. 或直接发：UID 字段 数值 / UID 操作 字段 数值\n\n"
-        f"快速示例：\n/test 8516652120 add {example_field} 1000\n\n"
+        f"快速示例：\n/test {example_target} add {example_field} 1000\n\n"
         "可编辑字段（节选）：\n"
         f"{preview}"
     )
@@ -7954,20 +8003,7 @@ async def _admin_give_currency_cmd(
     if getattr(db_conn, "_pool", None) is None:
         db_conn.connect_sqlite()
 
-    target_uid = target_token
-    target_user = db_conn.get_user_by_id(target_uid)
-    if not target_user and target_token.isdigit():
-        try:
-            lookup = await http_get(
-                f"{SERVER_URL}/api/user/lookup",
-                params={"platform": "telegram", "platform_id": target_token},
-                timeout=15,
-            )
-        except Exception:
-            lookup = {}
-        if lookup.get("success"):
-            target_uid = str(lookup.get("user_id") or "").strip()
-            target_user = db_conn.get_user_by_id(target_uid) if target_uid else None
+    target_uid, target_user = await _admin_resolve_target_user(target_token)
 
     if not target_user:
         await message.reply_text("❌ 未找到目标玩家，请传入有效游戏UID或TG_ID。")
