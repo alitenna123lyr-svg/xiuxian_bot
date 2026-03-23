@@ -6,6 +6,14 @@
 
 ## 2026-03-23
 
+### [55] aiogram 主菜单按钮补全（修复迁移后入口缺失）
+- 记录时间：2026-03-23 12:26 (UTC+8)
+- 影响范围：`adapters/aiogram/ui.py`。
+- 修改摘要：
+  - 修复 `main_menu_keyboard` 在全量迁移后仅保留少量按钮的问题，补回核心入口。
+  - 新增/恢复按钮入口：修炼、社交、宗门、PVP、任务、活动、悬赏、世界BOSS、排行、剧情、炼丹、锻造、指南。
+  - 保持“储物袋 / 灵装”命名不变，继续作为主菜单一级入口。
+
 ### [54] aiogram + FSM 全量迁移（移除 legacy_bridge，接入 RedisStorage）
 - 记录时间：2026-03-23 11:48 (UTC+8)
 - 影响范围：`adapters/aiogram/bot.py`、`adapters/aiogram/handlers/*`、`adapters/aiogram/states/*`、`adapters/aiogram/services/*`、`adapters/aiogram/ui.py`、`core/config.py`、`config.json`、`requirements.txt`、`pyproject.toml`。
